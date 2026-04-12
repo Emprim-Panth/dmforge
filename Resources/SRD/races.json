@@ -1,0 +1,94 @@
+{
+  "races": [
+    {
+      "srd_id": "human",
+      "name": "Human",
+      "size": "Medium",
+      "speed": 30,
+      "ability_bonuses": {"str": 1, "dex": 1, "con": 1, "int": 1, "wis": 1, "cha": 1},
+      "traits": ["Extra Language"],
+      "languages": ["Common", "one extra"],
+      "darkvision": 0
+    },
+    {
+      "srd_id": "high_elf",
+      "name": "Elf (High Elf)",
+      "size": "Medium",
+      "speed": 30,
+      "ability_bonuses": {"dex": 2, "int": 1},
+      "traits": ["Darkvision", "Keen Senses", "Fey Ancestry", "Trance", "Elf Weapon Training", "Cantrip", "Extra Language"],
+      "languages": ["Common", "Elvish", "one extra"],
+      "darkvision": 60
+    },
+    {
+      "srd_id": "hill_dwarf",
+      "name": "Dwarf (Hill Dwarf)",
+      "size": "Medium",
+      "speed": 25,
+      "ability_bonuses": {"con": 2, "wis": 1},
+      "traits": ["Darkvision", "Dwarven Resilience", "Dwarven Combat Training", "Tool Proficiency", "Stonecunning", "Dwarven Toughness"],
+      "languages": ["Common", "Dwarvish"],
+      "darkvision": 60
+    },
+    {
+      "srd_id": "lightfoot_halfling",
+      "name": "Halfling (Lightfoot)",
+      "size": "Small",
+      "speed": 25,
+      "ability_bonuses": {"dex": 2, "cha": 1},
+      "traits": ["Lucky", "Brave", "Halfling Nimbleness", "Naturally Stealthy"],
+      "languages": ["Common", "Halfling"],
+      "darkvision": 0
+    },
+    {
+      "srd_id": "rock_gnome",
+      "name": "Gnome (Rock)",
+      "size": "Small",
+      "speed": 25,
+      "ability_bonuses": {"int": 2, "con": 1},
+      "traits": ["Darkvision", "Gnome Cunning", "Artificer's Lore", "Tinker"],
+      "languages": ["Common", "Gnomish"],
+      "darkvision": 60
+    },
+    {
+      "srd_id": "half_elf",
+      "name": "Half-Elf",
+      "size": "Medium",
+      "speed": 30,
+      "ability_bonuses": {"cha": 2, "choice_1": 1, "choice_2": 1},
+      "traits": ["Darkvision", "Fey Ancestry", "Skill Versatility", "Extra Language"],
+      "languages": ["Common", "Elvish", "one extra"],
+      "darkvision": 60
+    },
+    {
+      "srd_id": "half_orc",
+      "name": "Half-Orc",
+      "size": "Medium",
+      "speed": 30,
+      "ability_bonuses": {"str": 2, "con": 1},
+      "traits": ["Darkvision", "Menacing", "Relentless Endurance", "Savage Attacks"],
+      "languages": ["Common", "Orc"],
+      "darkvision": 60
+    },
+    {
+      "srd_id": "tiefling",
+      "name": "Tiefling",
+      "size": "Medium",
+      "speed": 30,
+      "ability_bonuses": {"cha": 2, "int": 1},
+      "traits": ["Darkvision", "Hellish Resistance", "Infernal Legacy"],
+      "languages": ["Common", "Infernal"],
+      "darkvision": 60
+    },
+    {
+      "srd_id": "dragonborn",
+      "name": "Dragonborn",
+      "size": "Medium",
+      "speed": 30,
+      "ability_bonuses": {"str": 2, "cha": 1},
+      "traits": ["Draconic Ancestry", "Breath Weapon", "Damage Resistance"],
+      "languages": ["Common", "Draconic"],
+      "darkvision": 0
+    }
+  ]
+}

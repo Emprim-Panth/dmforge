@@ -1,0 +1,1652 @@
+{
+  "weapons": [
+    {
+      "srd_id": "club",
+      "name": "Club",
+      "category": "simple_melee",
+      "damage": "1d4",
+      "damage_type": "bludgeoning",
+      "weight": 2.0,
+      "cost": "1 sp",
+      "properties": [
+        "light"
+      ]
+    },
+    {
+      "srd_id": "dagger",
+      "name": "Dagger",
+      "category": "simple_melee",
+      "damage": "1d4",
+      "damage_type": "piercing",
+      "weight": 1.0,
+      "cost": "2 gp",
+      "properties": [
+        "finesse",
+        "light",
+        "thrown"
+      ],
+      "range": {
+        "normal": 20,
+        "long": 60
+      }
+    },
+    {
+      "srd_id": "greatclub",
+      "name": "Greatclub",
+      "category": "simple_melee",
+      "damage": "1d8",
+      "damage_type": "bludgeoning",
+      "weight": 10.0,
+      "cost": "2 sp",
+      "properties": [
+        "two-handed"
+      ]
+    },
+    {
+      "srd_id": "handaxe",
+      "name": "Handaxe",
+      "category": "simple_melee",
+      "damage": "1d6",
+      "damage_type": "slashing",
+      "weight": 2.0,
+      "cost": "5 gp",
+      "properties": [
+        "light",
+        "thrown"
+      ],
+      "range": {
+        "normal": 20,
+        "long": 60
+      }
+    },
+    {
+      "srd_id": "javelin",
+      "name": "Javelin",
+      "category": "simple_melee",
+      "damage": "1d6",
+      "damage_type": "piercing",
+      "weight": 2.0,
+      "cost": "5 sp",
+      "properties": [
+        "thrown"
+      ],
+      "range": {
+        "normal": 30,
+        "long": 120
+      }
+    },
+    {
+      "srd_id": "light_hammer",
+      "name": "Light hammer",
+      "category": "simple_melee",
+      "damage": "1d4",
+      "damage_type": "bludgeoning",
+      "weight": 2.0,
+      "cost": "2 gp",
+      "properties": [
+        "light",
+        "thrown"
+      ],
+      "range": {
+        "normal": 20,
+        "long": 60
+      }
+    },
+    {
+      "srd_id": "mace",
+      "name": "Mace",
+      "category": "simple_melee",
+      "damage": "1d6",
+      "damage_type": "bludgeoning",
+      "weight": 4.0,
+      "cost": "5 gp",
+      "properties": []
+    },
+    {
+      "srd_id": "quarterstaff",
+      "name": "Quarterstaff",
+      "category": "simple_melee",
+      "damage": "1d6",
+      "damage_type": "bludgeoning",
+      "weight": 4.0,
+      "cost": "2 sp",
+      "properties": [
+        "versatile"
+      ],
+      "versatile_damage": "1d8"
+    },
+    {
+      "srd_id": "sickle",
+      "name": "Sickle",
+      "category": "simple_melee",
+      "damage": "1d4",
+      "damage_type": "slashing",
+      "weight": 2.0,
+      "cost": "1 gp",
+      "properties": [
+        "light"
+      ]
+    },
+    {
+      "srd_id": "spear",
+      "name": "Spear",
+      "category": "simple_melee",
+      "damage": "1d6",
+      "damage_type": "piercing",
+      "weight": 3.0,
+      "cost": "1 gp",
+      "properties": [
+        "thrown",
+        "versatile"
+      ],
+      "range": {
+        "normal": 20,
+        "long": 60
+      },
+      "versatile_damage": "1d8"
+    },
+    {
+      "srd_id": "crossbow_light",
+      "name": "Crossbow, light",
+      "category": "simple_ranged",
+      "damage": "1d8",
+      "damage_type": "piercing",
+      "weight": 5.0,
+      "cost": "25 gp",
+      "properties": [
+        "ammunition",
+        "loading",
+        "two-handed"
+      ],
+      "range": {
+        "normal": 80,
+        "long": 320
+      }
+    },
+    {
+      "srd_id": "dart",
+      "name": "Dart",
+      "category": "simple_ranged",
+      "damage": "1d4",
+      "damage_type": "piercing",
+      "weight": 0.25,
+      "cost": "5 cp",
+      "properties": [
+        "finesse",
+        "thrown"
+      ],
+      "range": {
+        "normal": 20,
+        "long": 60
+      }
+    },
+    {
+      "srd_id": "shortbow",
+      "name": "Shortbow",
+      "category": "simple_ranged",
+      "damage": "1d6",
+      "damage_type": "piercing",
+      "weight": 2.0,
+      "cost": "25 gp",
+      "properties": [
+        "ammunition",
+        "two-handed"
+      ],
+      "range": {
+        "normal": 80,
+        "long": 320
+      }
+    },
+    {
+      "srd_id": "sling",
+      "name": "Sling",
+      "category": "simple_ranged",
+      "damage": "1d4",
+      "damage_type": "bludgeoning",
+      "weight": 0.0,
+      "cost": "1 sp",
+      "properties": [
+        "ammunition"
+      ],
+      "range": {
+        "normal": 30,
+        "long": 120
+      }
+    },
+    {
+      "srd_id": "battleaxe",
+      "name": "Battleaxe",
+      "category": "martial_melee",
+      "damage": "1d8",
+      "damage_type": "slashing",
+      "weight": 4.0,
+      "cost": "10 gp",
+      "properties": [
+        "versatile"
+      ],
+      "versatile_damage": "1d10"
+    },
+    {
+      "srd_id": "flail",
+      "name": "Flail",
+      "category": "martial_melee",
+      "damage": "1d8",
+      "damage_type": "bludgeoning",
+      "weight": 2.0,
+      "cost": "10 gp",
+      "properties": []
+    },
+    {
+      "srd_id": "glaive",
+      "name": "Glaive",
+      "category": "martial_melee",
+      "damage": "1d10",
+      "damage_type": "slashing",
+      "weight": 6.0,
+      "cost": "20 gp",
+      "properties": [
+        "heavy",
+        "reach",
+        "two-handed"
+      ]
+    },
+    {
+      "srd_id": "greataxe",
+      "name": "Greataxe",
+      "category": "martial_melee",
+      "damage": "1d12",
+      "damage_type": "slashing",
+      "weight": 7.0,
+      "cost": "30 gp",
+      "properties": [
+        "heavy",
+        "two-handed"
+      ]
+    },
+    {
+      "srd_id": "greatsword",
+      "name": "Greatsword",
+      "category": "martial_melee",
+      "damage": "2d6",
+      "damage_type": "slashing",
+      "weight": 6.0,
+      "cost": "50 gp",
+      "properties": [
+        "heavy",
+        "two-handed"
+      ]
+    },
+    {
+      "srd_id": "halberd",
+      "name": "Halberd",
+      "category": "martial_melee",
+      "damage": "1d10",
+      "damage_type": "slashing",
+      "weight": 6.0,
+      "cost": "20 gp",
+      "properties": [
+        "heavy",
+        "reach",
+        "two-handed"
+      ]
+    },
+    {
+      "srd_id": "lance",
+      "name": "Lance",
+      "category": "martial_melee",
+      "damage": "1d12",
+      "damage_type": "piercing",
+      "weight": 6.0,
+      "cost": "10 gp",
+      "properties": [
+        "reach",
+        "special"
+      ]
+    },
+    {
+      "srd_id": "longsword",
+      "name": "Longsword",
+      "category": "martial_melee",
+      "damage": "1d8",
+      "damage_type": "slashing",
+      "weight": 3.0,
+      "cost": "15 gp",
+      "properties": [
+        "versatile"
+      ],
+      "versatile_damage": "1d10"
+    },
+    {
+      "srd_id": "maul",
+      "name": "Maul",
+      "category": "martial_melee",
+      "damage": "2d6",
+      "damage_type": "bludgeoning",
+      "weight": 10.0,
+      "cost": "10 gp",
+      "properties": [
+        "heavy",
+        "two-handed"
+      ]
+    },
+    {
+      "srd_id": "morningstar",
+      "name": "Morningstar",
+      "category": "martial_melee",
+      "damage": "1d8",
+      "damage_type": "piercing",
+      "weight": 4.0,
+      "cost": "15 gp",
+      "properties": []
+    },
+    {
+      "srd_id": "pike",
+      "name": "Pike",
+      "category": "martial_melee",
+      "damage": "1d10",
+      "damage_type": "piercing",
+      "weight": 18.0,
+      "cost": "5 gp",
+      "properties": [
+        "heavy",
+        "reach",
+        "two-handed"
+      ]
+    },
+    {
+      "srd_id": "rapier",
+      "name": "Rapier",
+      "category": "martial_melee",
+      "damage": "1d8",
+      "damage_type": "piercing",
+      "weight": 2.0,
+      "cost": "25 gp",
+      "properties": [
+        "finesse"
+      ]
+    },
+    {
+      "srd_id": "scimitar",
+      "name": "Scimitar",
+      "category": "martial_melee",
+      "damage": "1d6",
+      "damage_type": "slashing",
+      "weight": 3.0,
+      "cost": "25 gp",
+      "properties": [
+        "finesse",
+        "light"
+      ]
+    },
+    {
+      "srd_id": "shortsword",
+      "name": "Shortsword",
+      "category": "martial_melee",
+      "damage": "1d6",
+      "damage_type": "piercing",
+      "weight": 2.0,
+      "cost": "10 gp",
+      "properties": [
+        "finesse",
+        "light"
+      ]
+    },
+    {
+      "srd_id": "trident",
+      "name": "Trident",
+      "category": "martial_melee",
+      "damage": "1d6",
+      "damage_type": "piercing",
+      "weight": 4.0,
+      "cost": "5 gp",
+      "properties": [
+        "thrown",
+        "versatile"
+      ],
+      "range": {
+        "normal": 20,
+        "long": 60
+      },
+      "versatile_damage": "1d8"
+    },
+    {
+      "srd_id": "war_pick",
+      "name": "War pick",
+      "category": "martial_melee",
+      "damage": "1d8",
+      "damage_type": "piercing",
+      "weight": 2.0,
+      "cost": "5 gp",
+      "properties": []
+    },
+    {
+      "srd_id": "warhammer",
+      "name": "Warhammer",
+      "category": "martial_melee",
+      "damage": "1d8",
+      "damage_type": "bludgeoning",
+      "weight": 2.0,
+      "cost": "15 gp",
+      "properties": [
+        "versatile"
+      ],
+      "versatile_damage": "1d10"
+    },
+    {
+      "srd_id": "whip",
+      "name": "Whip",
+      "category": "martial_melee",
+      "damage": "1d4",
+      "damage_type": "slashing",
+      "weight": 3.0,
+      "cost": "2 gp",
+      "properties": [
+        "finesse",
+        "reach"
+      ]
+    },
+    {
+      "srd_id": "blowgun",
+      "name": "Blowgun",
+      "category": "martial_ranged",
+      "damage": "1",
+      "damage_type": "piercing",
+      "weight": 1.0,
+      "cost": "10 gp",
+      "properties": [
+        "ammunition",
+        "loading"
+      ],
+      "range": {
+        "normal": 25,
+        "long": 100
+      }
+    },
+    {
+      "srd_id": "crossbow_hand",
+      "name": "Crossbow, hand",
+      "category": "martial_ranged",
+      "damage": "1d6",
+      "damage_type": "piercing",
+      "weight": 3.0,
+      "cost": "75 gp",
+      "properties": [
+        "ammunition",
+        "light",
+        "loading"
+      ],
+      "range": {
+        "normal": 30,
+        "long": 120
+      }
+    },
+    {
+      "srd_id": "crossbow_heavy",
+      "name": "Crossbow, heavy",
+      "category": "martial_ranged",
+      "damage": "1d10",
+      "damage_type": "piercing",
+      "weight": 18.0,
+      "cost": "50 gp",
+      "properties": [
+        "ammunition",
+        "heavy",
+        "loading",
+        "two-handed"
+      ],
+      "range": {
+        "normal": 100,
+        "long": 400
+      }
+    },
+    {
+      "srd_id": "longbow",
+      "name": "Longbow",
+      "category": "martial_ranged",
+      "damage": "1d8",
+      "damage_type": "piercing",
+      "weight": 2.0,
+      "cost": "50 gp",
+      "properties": [
+        "ammunition",
+        "heavy",
+        "two-handed"
+      ],
+      "range": {
+        "normal": 150,
+        "long": 600
+      }
+    },
+    {
+      "srd_id": "net",
+      "name": "Net",
+      "category": "martial_ranged",
+      "damage": "0",
+      "damage_type": "bludgeoning",
+      "weight": 3.0,
+      "cost": "1 gp",
+      "properties": [
+        "special",
+        "thrown"
+      ],
+      "range": {
+        "normal": 5,
+        "long": 15
+      }
+    }
+  ],
+  "armor": [
+    {
+      "srd_id": "leather",
+      "name": "Leather",
+      "type": "light",
+      "base_ac": 11,
+      "dex_bonus": true,
+      "max_dex_bonus": null,
+      "strength_requirement": null,
+      "stealth_disadvantage": false,
+      "weight": 0,
+      "cost": "10 gp"
+    },
+    {
+      "srd_id": "padded",
+      "name": "Padded",
+      "type": "light",
+      "base_ac": 11,
+      "dex_bonus": true,
+      "max_dex_bonus": null,
+      "strength_requirement": null,
+      "stealth_disadvantage": true,
+      "weight": 0,
+      "cost": "5 gp"
+    },
+    {
+      "srd_id": "studded_leather",
+      "name": "Studded Leather",
+      "type": "light",
+      "base_ac": 12,
+      "dex_bonus": true,
+      "max_dex_bonus": null,
+      "strength_requirement": null,
+      "stealth_disadvantage": false,
+      "weight": 0,
+      "cost": "45 gp"
+    },
+    {
+      "srd_id": "hide",
+      "name": "Hide",
+      "type": "medium",
+      "base_ac": 12,
+      "dex_bonus": true,
+      "max_dex_bonus": 2,
+      "strength_requirement": null,
+      "stealth_disadvantage": false,
+      "weight": 0,
+      "cost": "10 gp"
+    },
+    {
+      "srd_id": "chain_shirt",
+      "name": "Chain Shirt",
+      "type": "medium",
+      "base_ac": 13,
+      "dex_bonus": true,
+      "max_dex_bonus": 2,
+      "strength_requirement": null,
+      "stealth_disadvantage": false,
+      "weight": 0,
+      "cost": "50 gp"
+    },
+    {
+      "srd_id": "breastplate",
+      "name": "Breastplate",
+      "type": "medium",
+      "base_ac": 14,
+      "dex_bonus": true,
+      "max_dex_bonus": 2,
+      "strength_requirement": null,
+      "stealth_disadvantage": false,
+      "weight": 0,
+      "cost": "400 gp"
+    },
+    {
+      "srd_id": "scale_mail",
+      "name": "Scale mail",
+      "type": "medium",
+      "base_ac": 14,
+      "dex_bonus": true,
+      "max_dex_bonus": 2,
+      "strength_requirement": null,
+      "stealth_disadvantage": true,
+      "weight": 0,
+      "cost": "50 gp"
+    },
+    {
+      "srd_id": "half_plate",
+      "name": "Half plate",
+      "type": "medium",
+      "base_ac": 15,
+      "dex_bonus": true,
+      "max_dex_bonus": 2,
+      "strength_requirement": null,
+      "stealth_disadvantage": true,
+      "weight": 0,
+      "cost": "750 gp"
+    },
+    {
+      "srd_id": "ring_mail",
+      "name": "Ring mail",
+      "type": "heavy",
+      "base_ac": 14,
+      "dex_bonus": false,
+      "max_dex_bonus": 0,
+      "strength_requirement": null,
+      "stealth_disadvantage": true,
+      "weight": 0,
+      "cost": "30 gp"
+    },
+    {
+      "srd_id": "chain_mail",
+      "name": "Chain mail",
+      "type": "heavy",
+      "base_ac": 16,
+      "dex_bonus": false,
+      "max_dex_bonus": 0,
+      "strength_requirement": 13,
+      "stealth_disadvantage": true,
+      "weight": 0,
+      "cost": "75 gp"
+    },
+    {
+      "srd_id": "splint",
+      "name": "Splint",
+      "type": "heavy",
+      "base_ac": 17,
+      "dex_bonus": false,
+      "max_dex_bonus": 0,
+      "strength_requirement": 15,
+      "stealth_disadvantage": true,
+      "weight": 0,
+      "cost": "200 gp"
+    },
+    {
+      "srd_id": "plate",
+      "name": "Plate",
+      "type": "heavy",
+      "base_ac": 18,
+      "dex_bonus": false,
+      "max_dex_bonus": 0,
+      "strength_requirement": 15,
+      "stealth_disadvantage": true,
+      "weight": 0,
+      "cost": "1500 gp"
+    },
+    {
+      "srd_id": "shield",
+      "name": "Shield",
+      "type": "shield",
+      "ac_bonus": 2,
+      "dex_bonus": false,
+      "max_dex_bonus": 0,
+      "strength_requirement": null,
+      "stealth_disadvantage": false,
+      "weight": 0,
+      "cost": "10 gp"
+    }
+  ],
+  "adventuring_gear": [
+    {
+      "srd_id": "abacus",
+      "name": "Abacus",
+      "cost": "2 gp",
+      "weight": 2,
+      "description": "A calculating tool."
+    },
+    {
+      "srd_id": "acid_vial",
+      "name": "Acid (vial)",
+      "cost": "25 gp",
+      "weight": 1,
+      "description": "As an action, you can splash the contents of this vial onto a creature within 5 feet or throw it up to 20 feet, shattering it on impact. Make a ranged attack. On a hit, the target takes 2d6 acid damage."
+    },
+    {
+      "srd_id": "alchemists_fire",
+      "name": "Alchemist's Fire (flask)",
+      "cost": "50 gp",
+      "weight": 1,
+      "description": "As an action, throw up to 20 feet. On a hit, target takes 1d4 fire damage at the start of each of its turns. A creature can end this with a DC 10 Dexterity check as an action."
+    },
+    {
+      "srd_id": "alchemists_supplies",
+      "name": "Alchemist's Supplies",
+      "cost": "50 gp",
+      "weight": 8,
+      "description": "Artisan's tools for alchemy."
+    },
+    {
+      "srd_id": "arrows_20",
+      "name": "Ammunition - Arrows (20)",
+      "cost": "1 gp",
+      "weight": 1,
+      "description": "Standard arrows for use with bows."
+    },
+    {
+      "srd_id": "blowgun_needles_50",
+      "name": "Ammunition - Blowgun Needles (50)",
+      "cost": "1 gp",
+      "weight": 1,
+      "description": "Needles for use with a blowgun."
+    },
+    {
+      "srd_id": "crossbow_bolts_20",
+      "name": "Ammunition - Crossbow Bolts (20)",
+      "cost": "1 gp",
+      "weight": 1.5,
+      "description": "Bolts for use with crossbows."
+    },
+    {
+      "srd_id": "sling_bullets_20",
+      "name": "Ammunition - Sling Bullets (20)",
+      "cost": "4 cp",
+      "weight": 1.5,
+      "description": "Bullets for use with a sling."
+    },
+    {
+      "srd_id": "antitoxin",
+      "name": "Antitoxin (vial)",
+      "cost": "50 gp",
+      "weight": 0,
+      "description": "A creature that drinks this vial of liquid gains advantage on saving throws against being poisoned for 1 hour."
+    },
+    {
+      "srd_id": "arcane_focus_crystal",
+      "name": "Arcane Focus - Crystal",
+      "cost": "10 gp",
+      "weight": 1,
+      "description": "A spellcasting focus for arcane spells."
+    },
+    {
+      "srd_id": "arcane_focus_orb",
+      "name": "Arcane Focus - Orb",
+      "cost": "20 gp",
+      "weight": 3,
+      "description": "A spellcasting focus for arcane spells."
+    },
+    {
+      "srd_id": "arcane_focus_rod",
+      "name": "Arcane Focus - Rod",
+      "cost": "10 gp",
+      "weight": 2,
+      "description": "A spellcasting focus for arcane spells."
+    },
+    {
+      "srd_id": "arcane_focus_staff",
+      "name": "Arcane Focus - Staff",
+      "cost": "5 gp",
+      "weight": 4,
+      "description": "A spellcasting focus for arcane spells."
+    },
+    {
+      "srd_id": "arcane_focus_wand",
+      "name": "Arcane Focus - Wand",
+      "cost": "10 gp",
+      "weight": 1,
+      "description": "A spellcasting focus for arcane spells."
+    },
+    {
+      "srd_id": "backpack",
+      "name": "Backpack",
+      "cost": "2 gp",
+      "weight": 5,
+      "description": "Holds up to 30 pounds or 1 cubic foot of gear."
+    },
+    {
+      "srd_id": "bagpipes",
+      "name": "Bagpipes",
+      "cost": "30 gp",
+      "weight": 6,
+      "description": "A musical instrument."
+    },
+    {
+      "srd_id": "ball_bearings",
+      "name": "Ball Bearings (bag of 1,000)",
+      "cost": "1 gp",
+      "weight": 2,
+      "description": "As an action, you can spill these on a level area 10 feet square. A creature moving through the area must succeed on a DC 10 Dexterity saving throw or fall prone."
+    },
+    {
+      "srd_id": "barrel",
+      "name": "Barrel",
+      "cost": "2 gp",
+      "weight": 70,
+      "description": "Holds 40 gallons of liquid or 4 cubic feet of solid material."
+    },
+    {
+      "srd_id": "basket",
+      "name": "Basket",
+      "cost": "4 sp",
+      "weight": 2,
+      "description": "Holds 2 cubic feet or 40 pounds of gear."
+    },
+    {
+      "srd_id": "bedroll",
+      "name": "Bedroll",
+      "cost": "1 gp",
+      "weight": 7,
+      "description": "A portable sleeping roll."
+    },
+    {
+      "srd_id": "bell",
+      "name": "Bell",
+      "cost": "1 gp",
+      "weight": 0,
+      "description": "A small bell."
+    },
+    {
+      "srd_id": "blanket",
+      "name": "Blanket",
+      "cost": "5 sp",
+      "weight": 3,
+      "description": "A warm blanket."
+    },
+    {
+      "srd_id": "block_and_tackle",
+      "name": "Block and Tackle",
+      "cost": "1 gp",
+      "weight": 5,
+      "description": "A set of pulleys with a cable threaded through them. Doubles carrying weight via pulley system."
+    },
+    {
+      "srd_id": "book",
+      "name": "Book",
+      "cost": "25 gp",
+      "weight": 5,
+      "description": "A book might contain poetry, historical accounts, information pertaining to a particular field of lore, diagrams and notes on gnomish contraptions, or just about anything else that can be represented using text or pictures."
+    },
+    {
+      "srd_id": "bottle_glass",
+      "name": "Bottle, glass",
+      "cost": "2 gp",
+      "weight": 2,
+      "description": "Holds 1.5 pints of liquid."
+    },
+    {
+      "srd_id": "brewers_supplies",
+      "name": "Brewer's Supplies",
+      "cost": "20 gp",
+      "weight": 9,
+      "description": "Artisan's tools for brewing."
+    },
+    {
+      "srd_id": "bucket",
+      "name": "Bucket",
+      "cost": "5 cp",
+      "weight": 2,
+      "description": "Holds 3 gallons of liquid or half a cubic foot of solid material."
+    },
+    {
+      "srd_id": "calligraphers_supplies",
+      "name": "Calligrapher's Supplies",
+      "cost": "10 gp",
+      "weight": 5,
+      "description": "Artisan's tools for calligraphy."
+    },
+    {
+      "srd_id": "caltrops",
+      "name": "Caltrops (bag of 20)",
+      "cost": "1 gp",
+      "weight": 2,
+      "description": "As an action, you can spread a bag of caltrops to cover a 5-foot-square area. Any creature that enters the area must succeed on a DC 15 Dexterity saving throw or stop moving and take 1 piercing damage. Until the creature regains at least 1 hit point, its walking speed is reduced by 10 feet."
+    },
+    {
+      "srd_id": "candle",
+      "name": "Candle",
+      "cost": "1 cp",
+      "weight": 0,
+      "description": "For 1 hour, a candle sheds bright light in a 5-foot radius and dim light for an additional 5 feet."
+    },
+    {
+      "srd_id": "carpenters_tools",
+      "name": "Carpenter's Tools",
+      "cost": "8 gp",
+      "weight": 6,
+      "description": "Artisan's tools for carpentry."
+    },
+    {
+      "srd_id": "cartographers_tools",
+      "name": "Cartographer's Tools",
+      "cost": "15 gp",
+      "weight": 6,
+      "description": "Artisan's tools for mapmaking."
+    },
+    {
+      "srd_id": "case_crossbow_bolt",
+      "name": "Case, crossbow bolt",
+      "cost": "1 gp",
+      "weight": 1,
+      "description": "This wooden case can hold up to 20 crossbow bolts."
+    },
+    {
+      "srd_id": "case_map_or_scroll",
+      "name": "Case, map or scroll",
+      "cost": "1 gp",
+      "weight": 1,
+      "description": "This cylindrical leather case can hold up to 10 rolled-up sheets of paper or 5 rolled-up sheets of parchment."
+    },
+    {
+      "srd_id": "chain_10ft",
+      "name": "Chain (10 feet)",
+      "cost": "5 gp",
+      "weight": 10,
+      "description": "A chain has 10 hit points, AC 20. It can be burst with a DC 20 Strength check."
+    },
+    {
+      "srd_id": "chalk",
+      "name": "Chalk (1 piece)",
+      "cost": "1 cp",
+      "weight": 0,
+      "description": "A piece of chalk."
+    },
+    {
+      "srd_id": "chest",
+      "name": "Chest",
+      "cost": "5 gp",
+      "weight": 25,
+      "description": "Holds 12 cubic feet or 300 pounds of gear."
+    },
+    {
+      "srd_id": "climbers_kit",
+      "name": "Climber's Kit",
+      "cost": "25 gp",
+      "weight": 12,
+      "description": "Includes special pitons, boot tips, gloves, and a harness. You can use the climber's kit as an action to anchor yourself; when you do, you can't fall more than 25 feet from the point where you anchored yourself."
+    },
+    {
+      "srd_id": "clothes_common",
+      "name": "Clothes, common",
+      "cost": "5 sp",
+      "weight": 3,
+      "description": "Common clothing."
+    },
+    {
+      "srd_id": "clothes_costume",
+      "name": "Clothes, costume",
+      "cost": "5 gp",
+      "weight": 4,
+      "description": "Costume clothing for disguise or performance."
+    },
+    {
+      "srd_id": "clothes_fine",
+      "name": "Clothes, fine",
+      "cost": "15 gp",
+      "weight": 6,
+      "description": "Fine clothing."
+    },
+    {
+      "srd_id": "clothes_travelers",
+      "name": "Clothes, traveler's",
+      "cost": "2 gp",
+      "weight": 4,
+      "description": "Sturdy clothing for travel."
+    },
+    {
+      "srd_id": "cobblers_tools",
+      "name": "Cobbler's Tools",
+      "cost": "5 gp",
+      "weight": 5,
+      "description": "Artisan's tools for shoemaking."
+    },
+    {
+      "srd_id": "component_pouch",
+      "name": "Component Pouch",
+      "cost": "25 gp",
+      "weight": 2,
+      "description": "A small, watertight leather belt pouch that has compartments to hold all the material components and other special items you need to cast your spells, except for those with a specific cost."
+    },
+    {
+      "srd_id": "cooks_utensils",
+      "name": "Cook's Utensils",
+      "cost": "1 gp",
+      "weight": 8,
+      "description": "Artisan's tools for cooking."
+    },
+    {
+      "srd_id": "crowbar",
+      "name": "Crowbar",
+      "cost": "2 gp",
+      "weight": 5,
+      "description": "Using a crowbar grants advantage to Strength checks where the crowbar's leverage can be applied."
+    },
+    {
+      "srd_id": "dice_set",
+      "name": "Dice Set",
+      "cost": "1 sp",
+      "weight": 0,
+      "description": "A set of gaming dice."
+    },
+    {
+      "srd_id": "disguise_kit",
+      "name": "Disguise Kit",
+      "cost": "25 gp",
+      "weight": 3,
+      "description": "This pouch of cosmetics, hair dye, and small props lets you create disguises that change your physical appearance. Proficiency with this kit lets you add your proficiency bonus to ability checks to create a visual disguise."
+    },
+    {
+      "srd_id": "dragonchess_set",
+      "name": "Dragonchess Set",
+      "cost": "1 gp",
+      "weight": 0.5,
+      "description": "A dragonchess set."
+    },
+    {
+      "srd_id": "druidic_focus_mistletoe",
+      "name": "Druidic Focus - Sprig of Mistletoe",
+      "cost": "1 gp",
+      "weight": 0,
+      "description": "A spellcasting focus for druid spells."
+    },
+    {
+      "srd_id": "druidic_focus_totem",
+      "name": "Druidic Focus - Totem",
+      "cost": "1 gp",
+      "weight": 0,
+      "description": "A spellcasting focus for druid spells."
+    },
+    {
+      "srd_id": "druidic_focus_staff",
+      "name": "Druidic Focus - Wooden Staff",
+      "cost": "5 gp",
+      "weight": 4,
+      "description": "A spellcasting focus for druid spells."
+    },
+    {
+      "srd_id": "druidic_focus_yew_wand",
+      "name": "Druidic Focus - Yew Wand",
+      "cost": "10 gp",
+      "weight": 1,
+      "description": "A spellcasting focus for druid spells."
+    },
+    {
+      "srd_id": "drum",
+      "name": "Drum",
+      "cost": "6 gp",
+      "weight": 3,
+      "description": "A musical instrument."
+    },
+    {
+      "srd_id": "dulcimer",
+      "name": "Dulcimer",
+      "cost": "25 gp",
+      "weight": 10,
+      "description": "A musical instrument."
+    },
+    {
+      "srd_id": "fishing_tackle",
+      "name": "Fishing Tackle",
+      "cost": "1 gp",
+      "weight": 4,
+      "description": "This kit includes a wooden rod, silken line, corkwood bobbers, steel hooks, lead sinkers, velvet lures, and narrow netting."
+    },
+    {
+      "srd_id": "flask",
+      "name": "Flask or Tankard",
+      "cost": "2 cp",
+      "weight": 1,
+      "description": "Holds 1 pint of liquid."
+    },
+    {
+      "srd_id": "flute",
+      "name": "Flute",
+      "cost": "2 gp",
+      "weight": 1,
+      "description": "A musical instrument."
+    },
+    {
+      "srd_id": "forgery_kit",
+      "name": "Forgery Kit",
+      "cost": "15 gp",
+      "weight": 5,
+      "description": "This small box contains a variety of papers and parchments, pens and inks, seals and sealing wax, gold and silver leaf, and other supplies necessary to create convincing forgeries of physical documents."
+    },
+    {
+      "srd_id": "glassblowers_tools",
+      "name": "Glassblower's Tools",
+      "cost": "30 gp",
+      "weight": 5,
+      "description": "Artisan's tools for glassblowing."
+    },
+    {
+      "srd_id": "grappling_hook",
+      "name": "Grappling Hook",
+      "cost": "2 gp",
+      "weight": 4,
+      "description": "When tied to the end of a rope, the grappling hook can anchor the rope to various objects."
+    },
+    {
+      "srd_id": "hammer",
+      "name": "Hammer",
+      "cost": "1 gp",
+      "weight": 3,
+      "description": "A standard hammer."
+    },
+    {
+      "srd_id": "hammer_sledge",
+      "name": "Hammer, sledge",
+      "cost": "2 gp",
+      "weight": 10,
+      "description": "A sledgehammer."
+    },
+    {
+      "srd_id": "healers_kit",
+      "name": "Healer's Kit",
+      "cost": "5 gp",
+      "weight": 3,
+      "description": "This kit has ten uses. As an action, you can expend one use to stabilize a creature that has 0 hit points, without needing to make a Wisdom (Medicine) check."
+    },
+    {
+      "srd_id": "herbalism_kit",
+      "name": "Herbalism Kit",
+      "cost": "5 gp",
+      "weight": 3,
+      "description": "This kit contains a variety of instruments such as clippers, mortar and pestle, and pouches and vials used by herbalists to create remedies and potions. Proficiency lets you add your proficiency bonus to checks for identifying or applying herbs."
+    },
+    {
+      "srd_id": "holy_symbol_amulet",
+      "name": "Holy Symbol - Amulet",
+      "cost": "5 gp",
+      "weight": 1,
+      "description": "A spellcasting focus for divine spells."
+    },
+    {
+      "srd_id": "holy_symbol_emblem",
+      "name": "Holy Symbol - Emblem",
+      "cost": "5 gp",
+      "weight": 0,
+      "description": "A spellcasting focus for divine spells."
+    },
+    {
+      "srd_id": "holy_symbol_reliquary",
+      "name": "Holy Symbol - Reliquary",
+      "cost": "5 gp",
+      "weight": 2,
+      "description": "A spellcasting focus for divine spells."
+    },
+    {
+      "srd_id": "holy_water",
+      "name": "Holy Water (flask)",
+      "cost": "25 gp",
+      "weight": 1,
+      "description": "As an action, you can splash the contents on a creature within 5 feet or throw it up to 20 feet (shatters on impact). Make a ranged attack against the target. If the target is a fiend or undead, it takes 2d6 radiant damage."
+    },
+    {
+      "srd_id": "horn",
+      "name": "Horn",
+      "cost": "3 gp",
+      "weight": 2,
+      "description": "A musical instrument."
+    },
+    {
+      "srd_id": "hourglass",
+      "name": "Hourglass",
+      "cost": "25 gp",
+      "weight": 1,
+      "description": "A standard hourglass."
+    },
+    {
+      "srd_id": "hunting_trap",
+      "name": "Hunting Trap",
+      "cost": "5 gp",
+      "weight": 25,
+      "description": "When you use your action to set it, this trap forms a saw-toothed steel ring that snaps shut when a creature steps on a pressure plate. A creature must succeed on a DC 13 Dexterity saving throw or take 1d4 piercing damage and stop moving. A creature can use its action to make a DC 13 Strength check to free itself."
+    },
+    {
+      "srd_id": "ink",
+      "name": "Ink (1 ounce bottle)",
+      "cost": "10 gp",
+      "weight": 0,
+      "description": "A bottle of ink."
+    },
+    {
+      "srd_id": "ink_pen",
+      "name": "Ink Pen",
+      "cost": "2 cp",
+      "weight": 0,
+      "description": "An ink pen."
+    },
+    {
+      "srd_id": "jewelers_tools",
+      "name": "Jeweler's Tools",
+      "cost": "25 gp",
+      "weight": 2,
+      "description": "Artisan's tools for jewelry crafting."
+    },
+    {
+      "srd_id": "jug",
+      "name": "Jug or Pitcher",
+      "cost": "2 cp",
+      "weight": 4,
+      "description": "Holds 1 gallon of liquid."
+    },
+    {
+      "srd_id": "ladder_10ft",
+      "name": "Ladder (10 feet)",
+      "cost": "1 sp",
+      "weight": 25,
+      "description": "A 10-foot wooden ladder."
+    },
+    {
+      "srd_id": "lamp",
+      "name": "Lamp",
+      "cost": "5 sp",
+      "weight": 1,
+      "description": "A lamp casts bright light in a 15-foot radius and dim light for an additional 30 feet. Burns 1 pint of oil for 6 hours."
+    },
+    {
+      "srd_id": "lantern_bullseye",
+      "name": "Lantern, Bullseye",
+      "cost": "10 gp",
+      "weight": 2,
+      "description": "A bullseye lantern casts bright light in a 60-foot cone and dim light for an additional 60 feet. Burns 1 pint of oil for 6 hours."
+    },
+    {
+      "srd_id": "lantern_hooded",
+      "name": "Lantern, Hooded",
+      "cost": "5 gp",
+      "weight": 2,
+      "description": "A hooded lantern casts bright light in a 30-foot radius and dim light for an additional 30 feet. Burns 1 pint of oil for 6 hours. As an action, you can lower the hood to reduce to 5-foot dim light."
+    },
+    {
+      "srd_id": "leatherworkers_tools",
+      "name": "Leatherworker's Tools",
+      "cost": "5 gp",
+      "weight": 5,
+      "description": "Artisan's tools for leatherworking."
+    },
+    {
+      "srd_id": "lock",
+      "name": "Lock",
+      "cost": "10 gp",
+      "weight": 1,
+      "description": "A key is provided with the lock. Without the key, a creature proficient with thieves' tools can pick this lock with a successful DC 15 Dexterity check."
+    },
+    {
+      "srd_id": "lute",
+      "name": "Lute",
+      "cost": "35 gp",
+      "weight": 2,
+      "description": "A musical instrument."
+    },
+    {
+      "srd_id": "lyre",
+      "name": "Lyre",
+      "cost": "30 gp",
+      "weight": 2,
+      "description": "A musical instrument."
+    },
+    {
+      "srd_id": "magnifying_glass",
+      "name": "Magnifying Glass",
+      "cost": "100 gp",
+      "weight": 0,
+      "description": "Grants advantage on ability checks made to appraise or inspect an item that is small or highly detailed. Can also substitute for flint and steel to start a fire (requires light, 5 minutes)."
+    },
+    {
+      "srd_id": "manacles",
+      "name": "Manacles",
+      "cost": "2 gp",
+      "weight": 6,
+      "description": "These metal restraints can bind a Small or Medium creature. Escaping the manacles requires a DC 20 Dexterity check. Breaking them requires a DC 20 Strength check. A DC 15 Dexterity check with thieves' tools can pick the lock."
+    },
+    {
+      "srd_id": "masons_tools",
+      "name": "Mason's Tools",
+      "cost": "10 gp",
+      "weight": 8,
+      "description": "Artisan's tools for masonry."
+    },
+    {
+      "srd_id": "mess_kit",
+      "name": "Mess Kit",
+      "cost": "2 sp",
+      "weight": 1,
+      "description": "This tin box contains a cup and simple cutlery. The box clamps together and can also serve as a cooking pan."
+    },
+    {
+      "srd_id": "mirror_steel",
+      "name": "Mirror, steel",
+      "cost": "5 gp",
+      "weight": 0.5,
+      "description": "A steel mirror."
+    },
+    {
+      "srd_id": "navigators_tools",
+      "name": "Navigator's Tools",
+      "cost": "25 gp",
+      "weight": 2,
+      "description": "This set of instruments is used for navigation at sea. Proficiency lets you chart a ship's course and follow navigation charts."
+    },
+    {
+      "srd_id": "oil",
+      "name": "Oil (flask)",
+      "cost": "1 sp",
+      "weight": 1,
+      "description": "Oil usually comes in a clay flask that holds 1 pint. You can splash oil on a creature within 5 feet or throw it up to 20 feet. If the target takes fire damage before the oil dries (1 minute), it takes an additional 5 fire damage from the burning oil. 1 pint of oil burns for 6 hours in a lamp or lantern."
+    },
+    {
+      "srd_id": "painters_supplies",
+      "name": "Painter's Supplies",
+      "cost": "10 gp",
+      "weight": 5,
+      "description": "Artisan's tools for painting."
+    },
+    {
+      "srd_id": "pan_flute",
+      "name": "Pan Flute",
+      "cost": "12 gp",
+      "weight": 2,
+      "description": "A musical instrument."
+    },
+    {
+      "srd_id": "paper",
+      "name": "Paper (one sheet)",
+      "cost": "2 sp",
+      "weight": 0,
+      "description": "A sheet of paper."
+    },
+    {
+      "srd_id": "parchment",
+      "name": "Parchment (one sheet)",
+      "cost": "1 sp",
+      "weight": 0,
+      "description": "A sheet of parchment."
+    },
+    {
+      "srd_id": "perfume",
+      "name": "Perfume (vial)",
+      "cost": "5 gp",
+      "weight": 0,
+      "description": "A vial of perfume."
+    },
+    {
+      "srd_id": "pick_miners",
+      "name": "Pick, miner's",
+      "cost": "2 gp",
+      "weight": 10,
+      "description": "A miner's pick."
+    },
+    {
+      "srd_id": "piton",
+      "name": "Piton",
+      "cost": "5 cp",
+      "weight": 0.25,
+      "description": "A piton for climbing."
+    },
+    {
+      "srd_id": "playing_card_set",
+      "name": "Playing Card Set",
+      "cost": "5 sp",
+      "weight": 0,
+      "description": "A deck of playing cards."
+    },
+    {
+      "srd_id": "poison_basic",
+      "name": "Poison, basic (vial)",
+      "cost": "100 gp",
+      "weight": 0,
+      "description": "You can use the poison in this vial to coat one slashing or piercing weapon or up to three pieces of ammunition. Applying the poison takes an action. A creature hit by the poisoned weapon or ammunition must make a DC 10 Constitution saving throw or take 1d4 poison damage. Once applied, the poison retains potency for 1 minute before drying."
+    },
+    {
+      "srd_id": "poisoners_kit",
+      "name": "Poisoner's Kit",
+      "cost": "50 gp",
+      "weight": 2,
+      "description": "A poisoner's kit includes the vials, chemicals, and other equipment necessary for the creation of poisons. Proficiency lets you add your proficiency bonus to ability checks to craft or use poisons."
+    },
+    {
+      "srd_id": "pole_10ft",
+      "name": "Pole (10 feet)",
+      "cost": "5 cp",
+      "weight": 7,
+      "description": "A 10-foot wooden pole."
+    },
+    {
+      "srd_id": "pot_iron",
+      "name": "Pot, iron",
+      "cost": "2 gp",
+      "weight": 10,
+      "description": "Holds 1 gallon of liquid."
+    },
+    {
+      "srd_id": "healing_potion",
+      "name": "Potion of Healing",
+      "cost": "50 gp",
+      "weight": 0.5,
+      "description": "You regain 2d4+2 hit points when you drink this potion.",
+      "healing": "2d4+2",
+      "rarity": "common"
+    },
+    {
+      "srd_id": "potters_tools",
+      "name": "Potter's Tools",
+      "cost": "10 gp",
+      "weight": 3,
+      "description": "Artisan's tools for pottery."
+    },
+    {
+      "srd_id": "pouch",
+      "name": "Pouch",
+      "cost": "5 sp",
+      "weight": 1,
+      "description": "A cloth or leather pouch can hold up to 20 sling bullets or 50 blowgun needles. A pouch holds 1/5 cubic foot or 6 pounds of gear."
+    },
+    {
+      "srd_id": "quiver",
+      "name": "Quiver",
+      "cost": "1 gp",
+      "weight": 1,
+      "description": "A quiver can hold up to 20 arrows."
+    },
+    {
+      "srd_id": "ram_portable",
+      "name": "Ram, portable",
+      "cost": "4 gp",
+      "weight": 35,
+      "description": "You can use a portable ram to break down doors. When doing so, you gain a +4 bonus to the Strength check. One other character can help you use the ram, giving you advantage on this check."
+    },
+    {
+      "srd_id": "rations",
+      "name": "Rations (1 day)",
+      "cost": "5 sp",
+      "weight": 2,
+      "description": "Dried food suitable for extended travel. Enough for one person for one day."
+    },
+    {
+      "srd_id": "robes",
+      "name": "Robes",
+      "cost": "1 gp",
+      "weight": 4,
+      "description": "Standard robes."
+    },
+    {
+      "srd_id": "rope_hempen",
+      "name": "Rope, Hempen (50 feet)",
+      "cost": "1 gp",
+      "weight": 10,
+      "description": "50 feet of hempen rope. Has 2 hit points and can be burst with a DC 17 Strength check."
+    },
+    {
+      "srd_id": "rope_silk",
+      "name": "Rope, Silk (50 feet)",
+      "cost": "10 gp",
+      "weight": 5,
+      "description": "50 feet of silk rope. Has 2 hit points and can be burst with a DC 17 Strength check."
+    },
+    {
+      "srd_id": "sack",
+      "name": "Sack",
+      "cost": "1 cp",
+      "weight": 0.5,
+      "description": "Holds 1 cubic foot or 30 pounds of gear."
+    },
+    {
+      "srd_id": "scale_merchants",
+      "name": "Scale, merchant's",
+      "cost": "5 gp",
+      "weight": 3,
+      "description": "A scale includes a small balance, pans, and a suitable assortment of weights up to 2 pounds."
+    },
+    {
+      "srd_id": "sealing_wax",
+      "name": "Sealing Wax",
+      "cost": "5 sp",
+      "weight": 0,
+      "description": "Sealing wax for letters."
+    },
+    {
+      "srd_id": "shawm",
+      "name": "Shawm",
+      "cost": "2 gp",
+      "weight": 1,
+      "description": "A musical instrument."
+    },
+    {
+      "srd_id": "shovel",
+      "name": "Shovel",
+      "cost": "2 gp",
+      "weight": 5,
+      "description": "A shovel."
+    },
+    {
+      "srd_id": "signal_whistle",
+      "name": "Signal Whistle",
+      "cost": "5 cp",
+      "weight": 0,
+      "description": "A signal whistle."
+    },
+    {
+      "srd_id": "signet_ring",
+      "name": "Signet Ring",
+      "cost": "5 gp",
+      "weight": 0,
+      "description": "A signet ring bearing a personal seal."
+    },
+    {
+      "srd_id": "smiths_tools",
+      "name": "Smith's Tools",
+      "cost": "20 gp",
+      "weight": 8,
+      "description": "Artisan's tools for smithing."
+    },
+    {
+      "srd_id": "soap",
+      "name": "Soap",
+      "cost": "2 cp",
+      "weight": 0,
+      "description": "A bar of soap."
+    },
+    {
+      "srd_id": "spellbook",
+      "name": "Spellbook",
+      "cost": "50 gp",
+      "weight": 3,
+      "description": "Essential for wizards. This leather-bound tome has 100 blank vellum pages suitable for recording spells."
+    },
+    {
+      "srd_id": "spikes_iron",
+      "name": "Spikes, iron (10)",
+      "cost": "1 gp",
+      "weight": 5,
+      "description": "Ten iron spikes."
+    },
+    {
+      "srd_id": "spyglass",
+      "name": "Spyglass",
+      "cost": "1000 gp",
+      "weight": 1,
+      "description": "Objects viewed through a spyglass are magnified to twice their size."
+    },
+    {
+      "srd_id": "tent_two_person",
+      "name": "Tent, two-person",
+      "cost": "2 gp",
+      "weight": 20,
+      "description": "A simple, portable canvas shelter that sleeps two."
+    },
+    {
+      "srd_id": "thieves_tools",
+      "name": "Thieves' Tools",
+      "cost": "25 gp",
+      "weight": 1,
+      "description": "This set of tools includes a small file, a set of lock picks, a small mirror mounted on a metal handle, a set of narrow-bladed scissors, and a pair of pliers."
+    },
+    {
+      "srd_id": "three_dragon_ante_set",
+      "name": "Three-Dragon Ante Set",
+      "cost": "1 gp",
+      "weight": 0,
+      "description": "A Three-Dragon Ante card set."
+    },
+    {
+      "srd_id": "tinderbox",
+      "name": "Tinderbox",
+      "cost": "5 sp",
+      "weight": 1,
+      "description": "This small container holds flint, fire steel, and tinder used to kindle a fire. Using it to light a torch takes an action. Lighting any other fire takes 1 minute."
+    },
+    {
+      "srd_id": "tinkers_tools",
+      "name": "Tinker's Tools",
+      "cost": "50 gp",
+      "weight": 10,
+      "description": "Artisan's tools for tinkering."
+    },
+    {
+      "srd_id": "torch",
+      "name": "Torch",
+      "cost": "1 cp",
+      "weight": 1,
+      "description": "A torch burns for 1 hour, providing bright light in a 20-foot radius and dim light for an additional 20 feet. If you make a melee attack with a burning torch and hit, it deals 1 fire damage."
+    },
+    {
+      "srd_id": "vial",
+      "name": "Vial",
+      "cost": "1 gp",
+      "weight": 0,
+      "description": "Holds 4 ounces of liquid."
+    },
+    {
+      "srd_id": "viol",
+      "name": "Viol",
+      "cost": "30 gp",
+      "weight": 1,
+      "description": "A musical instrument."
+    },
+    {
+      "srd_id": "waterskin",
+      "name": "Waterskin",
+      "cost": "2 sp",
+      "weight": 5,
+      "description": "Holds up to 4 pints of liquid. A full waterskin weighs 5 lbs."
+    },
+    {
+      "srd_id": "weavers_tools",
+      "name": "Weaver's Tools",
+      "cost": "1 gp",
+      "weight": 5,
+      "description": "Artisan's tools for weaving."
+    },
+    {
+      "srd_id": "whetstone",
+      "name": "Whetstone",
+      "cost": "1 cp",
+      "weight": 1,
+      "description": "A whetstone for sharpening blades."
+    },
+    {
+      "srd_id": "woodcarvers_tools",
+      "name": "Woodcarver's Tools",
+      "cost": "1 gp",
+      "weight": 5,
+      "description": "Artisan's tools for woodcarving."
+    }
+  ]
+}

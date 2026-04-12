@@ -1,0 +1,257 @@
+{
+  "starting_equipment": {
+    "barbarian": {
+      "package_a": {
+        "name": "Berserker's Kit",
+        "items": [
+          {"name": "Greataxe", "type": "weapon", "damage_dice": "1d12", "damage_type": "slashing", "weight": 7, "properties": ["heavy", "two-handed"]},
+          {"name": "Handaxe", "type": "weapon", "damage_dice": "1d6", "damage_type": "slashing", "weight": 2, "quantity": 2, "properties": ["light", "thrown"]},
+          {"name": "Explorer's Pack", "type": "gear", "weight": 10},
+          {"name": "Javelin", "type": "weapon", "damage_dice": "1d6", "damage_type": "piercing", "weight": 2, "quantity": 4, "properties": ["thrown"]}
+        ]
+      },
+      "package_b": {
+        "name": "Savage Warrior",
+        "items": [
+          {"name": "Greatsword", "type": "weapon", "damage_dice": "2d6", "damage_type": "slashing", "weight": 6, "properties": ["heavy", "two-handed"]},
+          {"name": "Handaxe", "type": "weapon", "damage_dice": "1d6", "damage_type": "slashing", "weight": 2, "quantity": 2, "properties": ["light", "thrown"]},
+          {"name": "Explorer's Pack", "type": "gear", "weight": 10},
+          {"name": "Javelin", "type": "weapon", "damage_dice": "1d6", "damage_type": "piercing", "weight": 2, "quantity": 4, "properties": ["thrown"]}
+        ]
+      }
+    },
+    "bard": {
+      "package_a": {
+        "name": "Entertainer's Kit",
+        "items": [
+          {"name": "Rapier", "type": "weapon", "damage_dice": "1d8", "damage_type": "piercing", "weight": 2, "properties": ["finesse"]},
+          {"name": "Leather", "type": "armor", "armor_type": "light", "base_ac": 11, "weight": 10},
+          {"name": "Diplomat's Pack", "type": "gear", "weight": 8},
+          {"name": "Dagger", "type": "weapon", "damage_dice": "1d4", "damage_type": "piercing", "weight": 1, "properties": ["finesse", "light", "thrown"]},
+          {"name": "Lute", "type": "tool", "weight": 2}
+        ]
+      },
+      "package_b": {
+        "name": "Wandering Minstrel",
+        "items": [
+          {"name": "Longsword", "type": "weapon", "damage_dice": "1d8", "damage_type": "slashing", "weight": 3, "properties": ["versatile"]},
+          {"name": "Leather", "type": "armor", "armor_type": "light", "base_ac": 11, "weight": 10},
+          {"name": "Entertainer's Pack", "type": "gear", "weight": 8},
+          {"name": "Dagger", "type": "weapon", "damage_dice": "1d4", "damage_type": "piercing", "weight": 1, "properties": ["finesse", "light", "thrown"]},
+          {"name": "Lute", "type": "tool", "weight": 2}
+        ]
+      }
+    },
+    "cleric": {
+      "package_a": {
+        "name": "Holy Warrior",
+        "items": [
+          {"name": "Mace", "type": "weapon", "damage_dice": "1d6", "damage_type": "bludgeoning", "weight": 4, "properties": []},
+          {"name": "Scale Mail", "type": "armor", "armor_type": "medium", "base_ac": 14, "weight": 45},
+          {"name": "Shield", "type": "shield", "ac_bonus": 2, "weight": 6},
+          {"name": "Priest's Pack", "type": "gear", "weight": 10},
+          {"name": "Holy Symbol", "type": "gear", "weight": 1}
+        ]
+      },
+      "package_b": {
+        "name": "Battle Priest",
+        "items": [
+          {"name": "Warhammer", "type": "weapon", "damage_dice": "1d8", "damage_type": "bludgeoning", "weight": 2, "properties": ["versatile"]},
+          {"name": "Chain Mail", "type": "armor", "armor_type": "heavy", "base_ac": 16, "weight": 55},
+          {"name": "Shield", "type": "shield", "ac_bonus": 2, "weight": 6},
+          {"name": "Explorer's Pack", "type": "gear", "weight": 10},
+          {"name": "Holy Symbol", "type": "gear", "weight": 1}
+        ]
+      }
+    },
+    "druid": {
+      "package_a": {
+        "name": "Nature's Guardian",
+        "items": [
+          {"name": "Scimitar", "type": "weapon", "damage_dice": "1d6", "damage_type": "slashing", "weight": 3, "properties": ["finesse", "light"]},
+          {"name": "Leather", "type": "armor", "armor_type": "light", "base_ac": 11, "weight": 10},
+          {"name": "Shield", "type": "shield", "ac_bonus": 2, "weight": 6},
+          {"name": "Explorer's Pack", "type": "gear", "weight": 10},
+          {"name": "Druidic Focus", "type": "gear", "weight": 1}
+        ]
+      },
+      "package_b": {
+        "name": "Wild Hermit",
+        "items": [
+          {"name": "Quarterstaff", "type": "weapon", "damage_dice": "1d6", "damage_type": "bludgeoning", "weight": 4, "properties": ["versatile"]},
+          {"name": "Leather", "type": "armor", "armor_type": "light", "base_ac": 11, "weight": 10},
+          {"name": "Explorer's Pack", "type": "gear", "weight": 10},
+          {"name": "Druidic Focus", "type": "gear", "weight": 1},
+          {"name": "Herbalism Kit", "type": "tool", "weight": 3}
+        ]
+      }
+    },
+    "fighter": {
+      "package_a": {
+        "name": "Martial Arms",
+        "items": [
+          {"name": "Chain Mail", "type": "armor", "armor_type": "heavy", "base_ac": 16, "weight": 55},
+          {"name": "Longsword", "type": "weapon", "damage_dice": "1d8", "damage_type": "slashing", "weight": 3, "properties": ["versatile"]},
+          {"name": "Shield", "type": "shield", "ac_bonus": 2, "weight": 6},
+          {"name": "Dungeoneer's Pack", "type": "gear", "weight": 12},
+          {"name": "Light Crossbow", "type": "weapon", "damage_dice": "1d8", "damage_type": "piercing", "weight": 5, "properties": ["ammunition", "loading", "two-handed"]}
+        ]
+      },
+      "package_b": {
+        "name": "Two-Handed Fury",
+        "items": [
+          {"name": "Chain Mail", "type": "armor", "armor_type": "heavy", "base_ac": 16, "weight": 55},
+          {"name": "Greatsword", "type": "weapon", "damage_dice": "2d6", "damage_type": "slashing", "weight": 6, "properties": ["heavy", "two-handed"]},
+          {"name": "Dungeoneer's Pack", "type": "gear", "weight": 12},
+          {"name": "Handaxe", "type": "weapon", "damage_dice": "1d6", "damage_type": "slashing", "weight": 2, "quantity": 2, "properties": ["light", "thrown"]}
+        ]
+      }
+    },
+    "monk": {
+      "package_a": {
+        "name": "Martial Artist",
+        "items": [
+          {"name": "Shortsword", "type": "weapon", "damage_dice": "1d6", "damage_type": "piercing", "weight": 2, "properties": ["finesse", "light"]},
+          {"name": "Dungeoneer's Pack", "type": "gear", "weight": 12},
+          {"name": "Dart", "type": "weapon", "damage_dice": "1d4", "damage_type": "piercing", "weight": 0.25, "quantity": 10, "properties": ["finesse", "thrown"]}
+        ]
+      },
+      "package_b": {
+        "name": "Wandering Ascetic",
+        "items": [
+          {"name": "Quarterstaff", "type": "weapon", "damage_dice": "1d6", "damage_type": "bludgeoning", "weight": 4, "properties": ["versatile"]},
+          {"name": "Explorer's Pack", "type": "gear", "weight": 10},
+          {"name": "Dart", "type": "weapon", "damage_dice": "1d4", "damage_type": "piercing", "weight": 0.25, "quantity": 10, "properties": ["finesse", "thrown"]}
+        ]
+      }
+    },
+    "paladin": {
+      "package_a": {
+        "name": "Holy Knight",
+        "items": [
+          {"name": "Chain Mail", "type": "armor", "armor_type": "heavy", "base_ac": 16, "weight": 55},
+          {"name": "Longsword", "type": "weapon", "damage_dice": "1d8", "damage_type": "slashing", "weight": 3, "properties": ["versatile"]},
+          {"name": "Shield", "type": "shield", "ac_bonus": 2, "weight": 6},
+          {"name": "Priest's Pack", "type": "gear", "weight": 10},
+          {"name": "Holy Symbol", "type": "gear", "weight": 1},
+          {"name": "Javelin", "type": "weapon", "damage_dice": "1d6", "damage_type": "piercing", "weight": 2, "quantity": 5, "properties": ["thrown"]}
+        ]
+      },
+      "package_b": {
+        "name": "Crusader",
+        "items": [
+          {"name": "Chain Mail", "type": "armor", "armor_type": "heavy", "base_ac": 16, "weight": 55},
+          {"name": "Greatsword", "type": "weapon", "damage_dice": "2d6", "damage_type": "slashing", "weight": 6, "properties": ["heavy", "two-handed"]},
+          {"name": "Explorer's Pack", "type": "gear", "weight": 10},
+          {"name": "Holy Symbol", "type": "gear", "weight": 1},
+          {"name": "Javelin", "type": "weapon", "damage_dice": "1d6", "damage_type": "piercing", "weight": 2, "quantity": 5, "properties": ["thrown"]}
+        ]
+      }
+    },
+    "ranger": {
+      "package_a": {
+        "name": "Archer",
+        "items": [
+          {"name": "Scale Mail", "type": "armor", "armor_type": "medium", "base_ac": 14, "weight": 45},
+          {"name": "Longbow", "type": "weapon", "damage_dice": "1d8", "damage_type": "piercing", "weight": 2, "properties": ["ammunition", "heavy", "two-handed"]},
+          {"name": "Shortsword", "type": "weapon", "damage_dice": "1d6", "damage_type": "piercing", "weight": 2, "quantity": 2, "properties": ["finesse", "light"]},
+          {"name": "Dungeoneer's Pack", "type": "gear", "weight": 12}
+        ]
+      },
+      "package_b": {
+        "name": "Dual Wielder",
+        "items": [
+          {"name": "Leather", "type": "armor", "armor_type": "light", "base_ac": 11, "weight": 10},
+          {"name": "Shortsword", "type": "weapon", "damage_dice": "1d6", "damage_type": "piercing", "weight": 2, "quantity": 2, "properties": ["finesse", "light"]},
+          {"name": "Longbow", "type": "weapon", "damage_dice": "1d8", "damage_type": "piercing", "weight": 2, "properties": ["ammunition", "heavy", "two-handed"]},
+          {"name": "Explorer's Pack", "type": "gear", "weight": 10}
+        ]
+      }
+    },
+    "rogue": {
+      "package_a": {
+        "name": "Burglar",
+        "items": [
+          {"name": "Rapier", "type": "weapon", "damage_dice": "1d8", "damage_type": "piercing", "weight": 2, "properties": ["finesse"]},
+          {"name": "Leather", "type": "armor", "armor_type": "light", "base_ac": 11, "weight": 10},
+          {"name": "Burglar's Pack", "type": "gear", "weight": 10},
+          {"name": "Dagger", "type": "weapon", "damage_dice": "1d4", "damage_type": "piercing", "weight": 1, "quantity": 2, "properties": ["finesse", "light", "thrown"]},
+          {"name": "Thieves' Tools", "type": "tool", "weight": 1}
+        ]
+      },
+      "package_b": {
+        "name": "Scoundrel",
+        "items": [
+          {"name": "Shortsword", "type": "weapon", "damage_dice": "1d6", "damage_type": "piercing", "weight": 2, "properties": ["finesse", "light"]},
+          {"name": "Leather", "type": "armor", "armor_type": "light", "base_ac": 11, "weight": 10},
+          {"name": "Dungeoneer's Pack", "type": "gear", "weight": 12},
+          {"name": "Shortbow", "type": "weapon", "damage_dice": "1d6", "damage_type": "piercing", "weight": 2, "properties": ["ammunition", "two-handed"]},
+          {"name": "Thieves' Tools", "type": "tool", "weight": 1}
+        ]
+      }
+    },
+    "sorcerer": {
+      "package_a": {
+        "name": "Arcane Prodigy",
+        "items": [
+          {"name": "Light Crossbow", "type": "weapon", "damage_dice": "1d8", "damage_type": "piercing", "weight": 5, "properties": ["ammunition", "loading", "two-handed"]},
+          {"name": "Dungeoneer's Pack", "type": "gear", "weight": 12},
+          {"name": "Dagger", "type": "weapon", "damage_dice": "1d4", "damage_type": "piercing", "weight": 1, "quantity": 2, "properties": ["finesse", "light", "thrown"]},
+          {"name": "Arcane Focus", "type": "gear", "weight": 1}
+        ]
+      },
+      "package_b": {
+        "name": "Dragon Heir",
+        "items": [
+          {"name": "Quarterstaff", "type": "weapon", "damage_dice": "1d6", "damage_type": "bludgeoning", "weight": 4, "properties": ["versatile"]},
+          {"name": "Explorer's Pack", "type": "gear", "weight": 10},
+          {"name": "Dagger", "type": "weapon", "damage_dice": "1d4", "damage_type": "piercing", "weight": 1, "quantity": 2, "properties": ["finesse", "light", "thrown"]},
+          {"name": "Component Pouch", "type": "gear", "weight": 2}
+        ]
+      }
+    },
+    "warlock": {
+      "package_a": {
+        "name": "Pact Blade",
+        "items": [
+          {"name": "Light Crossbow", "type": "weapon", "damage_dice": "1d8", "damage_type": "piercing", "weight": 5, "properties": ["ammunition", "loading", "two-handed"]},
+          {"name": "Leather", "type": "armor", "armor_type": "light", "base_ac": 11, "weight": 10},
+          {"name": "Scholar's Pack", "type": "gear", "weight": 10},
+          {"name": "Dagger", "type": "weapon", "damage_dice": "1d4", "damage_type": "piercing", "weight": 1, "quantity": 2, "properties": ["finesse", "light", "thrown"]},
+          {"name": "Arcane Focus", "type": "gear", "weight": 1}
+        ]
+      },
+      "package_b": {
+        "name": "Dark Scholar",
+        "items": [
+          {"name": "Quarterstaff", "type": "weapon", "damage_dice": "1d6", "damage_type": "bludgeoning", "weight": 4, "properties": ["versatile"]},
+          {"name": "Leather", "type": "armor", "armor_type": "light", "base_ac": 11, "weight": 10},
+          {"name": "Dungeoneer's Pack", "type": "gear", "weight": 12},
+          {"name": "Dagger", "type": "weapon", "damage_dice": "1d4", "damage_type": "piercing", "weight": 1, "quantity": 2, "properties": ["finesse", "light", "thrown"]},
+          {"name": "Component Pouch", "type": "gear", "weight": 2}
+        ]
+      }
+    },
+    "wizard": {
+      "package_a": {
+        "name": "Prepared Scholar",
+        "items": [
+          {"name": "Quarterstaff", "type": "weapon", "damage_dice": "1d6", "damage_type": "bludgeoning", "weight": 4, "properties": ["versatile"]},
+          {"name": "Scholar's Pack", "type": "gear", "weight": 10},
+          {"name": "Dagger", "type": "weapon", "damage_dice": "1d4", "damage_type": "piercing", "weight": 1, "properties": ["finesse", "light", "thrown"]},
+          {"name": "Arcane Focus", "type": "gear", "weight": 1},
+          {"name": "Spellbook", "type": "gear", "weight": 3}
+        ]
+      },
+      "package_b": {
+        "name": "Dungeon Delver",
+        "items": [
+          {"name": "Dagger", "type": "weapon", "damage_dice": "1d4", "damage_type": "piercing", "weight": 1, "quantity": 2, "properties": ["finesse", "light", "thrown"]},
+          {"name": "Explorer's Pack", "type": "gear", "weight": 10},
+          {"name": "Component Pouch", "type": "gear", "weight": 2},
+          {"name": "Spellbook", "type": "gear", "weight": 3}
+        ]
+      }
+    }
+  }
+}
