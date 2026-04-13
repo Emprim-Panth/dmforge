@@ -29,11 +29,13 @@
 		C9455D319677766C663A4A64 /* DMForgeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A5CAD1DD684C8710A53412 /* DMForgeApp.swift */; };
 		D8C69C58C7B4FD158C9075BC /* SRD in Resources */ = {isa = PBXBuildFile; fileRef = A9363F9868819CBDEE2C8566 /* SRD */; };
 		DF516195F1B976E55C4BCC9F /* PeopleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0EE6CA8A66A0E657B44670 /* PeopleView.swift */; };
+		F2C07A547189F05160A93C65 /* AIAssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E71710D3C1EB69E3C20C975 /* AIAssistantView.swift */; };
 		FBF5596884005A7327E6B6E2 /* Character.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59B12F762D9FD710567C2A54 /* Character.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		037504E25EDEFB659219A6DC /* DMForge.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DMForge.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0E71710D3C1EB69E3C20C975 /* AIAssistantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAssistantView.swift; sourceTree = "<group>"; };
 		12E18D67813433F59B476A5E /* Place.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Place.swift; sourceTree = "<group>"; };
 		14FD11295122CA60D21BA098 /* BestiaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestiaryView.swift; sourceTree = "<group>"; };
 		15AEFACD40C50D294B5F4BA2 /* ReferenceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceView.swift; sourceTree = "<group>"; };
@@ -63,6 +65,7 @@
 		0445C9C0256EF3287630B786 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				DC5E1BCCB11E41C1AC3BC25B /* AI */,
 				444CE521F4E53D7C1D49D09E /* Bestiary */,
 				32C151F4DA81CB2D60A3161C /* Combat */,
 				D504399824A49878B72081E4 /* Dashboard */,
@@ -218,6 +221,14 @@
 			path = Dashboard;
 			sourceTree = "<group>";
 		};
+		DC5E1BCCB11E41C1AC3BC25B /* AI */ = {
+			isa = PBXGroup;
+			children = (
+				0E71710D3C1EB69E3C20C975 /* AIAssistantView.swift */,
+			);
+			path = AI;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -290,6 +301,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2C07A547189F05160A93C65 /* AIAssistantView.swift in Sources */,
 				5436ED182D089656DB0D7200 /* BestiaryView.swift in Sources */,
 				036DAB25533F7628CFF56982 /* Campaign.swift in Sources */,
 				FBF5596884005A7327E6B6E2 /* Character.swift in Sources */,
@@ -370,9 +382,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -391,9 +400,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 2;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "DM Forge";
-				INFOPLIST_KEY_CFBundleIconName = AppIcon;
+				INFOPLIST_FILE = "DMForge-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -452,9 +459,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -472,9 +476,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 2;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "DM Forge";
-				INFOPLIST_KEY_CFBundleIconName = AppIcon;
+				INFOPLIST_FILE = "DMForge-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
