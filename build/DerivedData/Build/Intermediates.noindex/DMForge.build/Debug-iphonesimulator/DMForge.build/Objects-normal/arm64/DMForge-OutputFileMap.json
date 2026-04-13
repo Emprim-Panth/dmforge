@@ -26,6 +26,36 @@
     "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DMForgeApp.swiftdeps",
     "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DMForgeApp~partial.swiftmodule"
   },
+  "/Users/evanprimeau/Development/DMForge/Sources/Engine/DiceRoller.swift" : {
+    "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DiceRoller.swiftconstvalues",
+    "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DiceRoller.d",
+    "diagnostics" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DiceRoller.dia",
+    "index-unit-output-path" : "/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DiceRoller.o",
+    "llvm-bc" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DiceRoller.bc",
+    "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DiceRoller.o",
+    "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DiceRoller.swiftdeps",
+    "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DiceRoller~partial.swiftmodule"
+  },
+  "/Users/evanprimeau/Development/DMForge/Sources/Engine/RulesEngine.swift" : {
+    "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/RulesEngine.swiftconstvalues",
+    "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/RulesEngine.d",
+    "diagnostics" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/RulesEngine.dia",
+    "index-unit-output-path" : "/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/RulesEngine.o",
+    "llvm-bc" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/RulesEngine.bc",
+    "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/RulesEngine.o",
+    "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/RulesEngine.swiftdeps",
+    "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/RulesEngine~partial.swiftmodule"
+  },
+  "/Users/evanprimeau/Development/DMForge/Sources/Engine/SRDLoader.swift" : {
+    "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDLoader.swiftconstvalues",
+    "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDLoader.d",
+    "diagnostics" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDLoader.dia",
+    "index-unit-output-path" : "/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDLoader.o",
+    "llvm-bc" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDLoader.bc",
+    "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDLoader.o",
+    "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDLoader.swiftdeps",
+    "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDLoader~partial.swiftmodule"
+  },
   "/Users/evanprimeau/Development/DMForge/Sources/Models/Campaign.swift" : {
     "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/Campaign.swiftconstvalues",
     "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/Campaign.d",
@@ -56,6 +86,16 @@
     "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/Place.swiftdeps",
     "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/Place~partial.swiftmodule"
   },
+  "/Users/evanprimeau/Development/DMForge/Sources/Models/SRDMonster.swift" : {
+    "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDMonster.swiftconstvalues",
+    "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDMonster.d",
+    "diagnostics" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDMonster.dia",
+    "index-unit-output-path" : "/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDMonster.o",
+    "llvm-bc" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDMonster.bc",
+    "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDMonster.o",
+    "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDMonster.swiftdeps",
+    "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/SRDMonster~partial.swiftmodule"
+  },
   "/Users/evanprimeau/Development/DMForge/Sources/Theme/DMTheme.swift" : {
     "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DMTheme.swiftconstvalues",
     "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DMTheme.d",
@@ -66,6 +106,36 @@
     "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DMTheme.swiftdeps",
     "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DMTheme~partial.swiftmodule"
   },
+  "/Users/evanprimeau/Development/DMForge/Sources/Views/Bestiary/BestiaryView.swift" : {
+    "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/BestiaryView.swiftconstvalues",
+    "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/BestiaryView.d",
+    "diagnostics" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/BestiaryView.dia",
+    "index-unit-output-path" : "/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/BestiaryView.o",
+    "llvm-bc" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/BestiaryView.bc",
+    "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/BestiaryView.o",
+    "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/BestiaryView.swiftdeps",
+    "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/BestiaryView~partial.swiftmodule"
+  },
+  "/Users/evanprimeau/Development/DMForge/Sources/Views/Combat/DeathSaveView.swift" : {
+    "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DeathSaveView.swiftconstvalues",
+    "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DeathSaveView.d",
+    "diagnostics" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DeathSaveView.dia",
+    "index-unit-output-path" : "/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DeathSaveView.o",
+    "llvm-bc" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DeathSaveView.bc",
+    "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DeathSaveView.o",
+    "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DeathSaveView.swiftdeps",
+    "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DeathSaveView~partial.swiftmodule"
+  },
+  "/Users/evanprimeau/Development/DMForge/Sources/Views/Combat/EncounterView.swift" : {
+    "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/EncounterView.swiftconstvalues",
+    "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/EncounterView.d",
+    "diagnostics" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/EncounterView.dia",
+    "index-unit-output-path" : "/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/EncounterView.o",
+    "llvm-bc" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/EncounterView.bc",
+    "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/EncounterView.o",
+    "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/EncounterView.swiftdeps",
+    "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/EncounterView~partial.swiftmodule"
+  },
   "/Users/evanprimeau/Development/DMForge/Sources/Views/Dashboard/DashboardView.swift" : {
     "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DashboardView.swiftconstvalues",
     "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DashboardView.d",
@@ -75,5 +145,55 @@
     "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DashboardView.o",
     "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DashboardView.swiftdeps",
     "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DashboardView~partial.swiftmodule"
+  },
+  "/Users/evanprimeau/Development/DMForge/Sources/Views/People/CharacterCreatorView.swift" : {
+    "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/CharacterCreatorView.swiftconstvalues",
+    "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/CharacterCreatorView.d",
+    "diagnostics" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/CharacterCreatorView.dia",
+    "index-unit-output-path" : "/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/CharacterCreatorView.o",
+    "llvm-bc" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/CharacterCreatorView.bc",
+    "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/CharacterCreatorView.o",
+    "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/CharacterCreatorView.swiftdeps",
+    "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/CharacterCreatorView~partial.swiftmodule"
+  },
+  "/Users/evanprimeau/Development/DMForge/Sources/Views/People/PeopleView.swift" : {
+    "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PeopleView.swiftconstvalues",
+    "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PeopleView.d",
+    "diagnostics" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PeopleView.dia",
+    "index-unit-output-path" : "/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PeopleView.o",
+    "llvm-bc" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PeopleView.bc",
+    "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PeopleView.o",
+    "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PeopleView.swiftdeps",
+    "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PeopleView~partial.swiftmodule"
+  },
+  "/Users/evanprimeau/Development/DMForge/Sources/Views/Places/PlacesView.swift" : {
+    "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PlacesView.swiftconstvalues",
+    "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PlacesView.d",
+    "diagnostics" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PlacesView.dia",
+    "index-unit-output-path" : "/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PlacesView.o",
+    "llvm-bc" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PlacesView.bc",
+    "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PlacesView.o",
+    "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PlacesView.swiftdeps",
+    "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/PlacesView~partial.swiftmodule"
+  },
+  "/Users/evanprimeau/Development/DMForge/Sources/Views/Reference/ReferenceView.swift" : {
+    "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/ReferenceView.swiftconstvalues",
+    "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/ReferenceView.d",
+    "diagnostics" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/ReferenceView.dia",
+    "index-unit-output-path" : "/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/ReferenceView.o",
+    "llvm-bc" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/ReferenceView.bc",
+    "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/ReferenceView.o",
+    "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/ReferenceView.swiftdeps",
+    "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/ReferenceView~partial.swiftmodule"
+  },
+  "/Users/evanprimeau/Development/DMForge/Sources/Views/Story/StoryView.swift" : {
+    "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/StoryView.swiftconstvalues",
+    "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/StoryView.d",
+    "diagnostics" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/StoryView.dia",
+    "index-unit-output-path" : "/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/StoryView.o",
+    "llvm-bc" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/StoryView.bc",
+    "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/StoryView.o",
+    "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/StoryView.swiftdeps",
+    "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/StoryView~partial.swiftmodule"
   }
 }
