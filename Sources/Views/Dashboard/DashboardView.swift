@@ -92,7 +92,7 @@ struct DashboardView: View {
                 case .bestiary:
                     BestiaryView(campaign: campaign)
                 case .map:
-                    MapPlaceholder()
+                    WorldMapView(campaign: campaign)
                 case .notes:
                     NotesView(campaign: campaign)
                 case .reference:

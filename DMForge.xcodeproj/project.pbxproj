@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		036DAB25533F7628CFF56982 /* Campaign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69B4E931705E33C0DB7B275E /* Campaign.swift */; };
+		18B48FED0D542397FAF7A958 /* WorldMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA4480D909B99DFCBB4E8C6 /* WorldMapView.swift */; };
 		21AE5CED4772A06212165F32 /* StoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 994C0FEC204CFD99A05C7FA4 /* StoryView.swift */; };
 		2595655CA94EC68E442036A9 /* ReferenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AEFACD40C50D294B5F4BA2 /* ReferenceView.swift */; };
 		3BA080393314696606886367 /* DeathSaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E518C6DD254B269AD7000 /* DeathSaveView.swift */; };
@@ -41,6 +42,7 @@
 		5056011700C412EC4C3A954B /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		59B12F762D9FD710567C2A54 /* Character.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Character.swift; sourceTree = "<group>"; };
 		69B4E931705E33C0DB7B275E /* Campaign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Campaign.swift; sourceTree = "<group>"; };
+		6BA4480D909B99DFCBB4E8C6 /* WorldMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldMapView.swift; sourceTree = "<group>"; };
 		73100BE023CDD225C5E0EC97 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7F1E518C6DD254B269AD7000 /* DeathSaveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeathSaveView.swift; sourceTree = "<group>"; };
 		94D1F90AC53316923BBF41F1 /* PlacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesView.swift; sourceTree = "<group>"; };
@@ -62,6 +64,7 @@
 				444CE521F4E53D7C1D49D09E /* Bestiary */,
 				32C151F4DA81CB2D60A3161C /* Combat */,
 				D504399824A49878B72081E4 /* Dashboard */,
+				69DBB19A6BD3FE705DB19C13 /* Map */,
 				0D5D117767CC5E4161A13C89 /* People */,
 				644914C7917487797C41EE3D /* Places */,
 				77BEB4B389D84A0F05FAA52F /* Reference */,
@@ -165,6 +168,14 @@
 				94D1F90AC53316923BBF41F1 /* PlacesView.swift */,
 			);
 			path = Places;
+			sourceTree = "<group>";
+		};
+		69DBB19A6BD3FE705DB19C13 /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				6BA4480D909B99DFCBB4E8C6 /* WorldMapView.swift */,
+			);
+			path = Map;
 			sourceTree = "<group>";
 		};
 		74C8E9BA478123666D79F9E4 /* Engine */ = {
@@ -295,6 +306,7 @@
 				A550BE796CD224D534EBB4B4 /* SRDLoader.swift in Sources */,
 				9E4CFAA9F327F2A9AC4CD3EB /* SRDMonster.swift in Sources */,
 				21AE5CED4772A06212165F32 /* StoryView.swift in Sources */,
+				18B48FED0D542397FAF7A958 /* WorldMapView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -10,6 +10,10 @@ final class Place {
     var desc: String
     var notes: String
 
+    // Map pin position (normalized 0...1 relative to map image size)
+    var mapX: Double?
+    var mapY: Double?
+
     var campaign: Campaign?
 
     init(name: String, type: String = "town") {

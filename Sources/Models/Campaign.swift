@@ -18,6 +18,9 @@ final class Campaign {
     @Relationship(deleteRule: .cascade) var sessions: [StorySession]
     @Relationship(deleteRule: .cascade) var encounterZones: [EncounterZone]
 
+    // Map image (stored as raw Data)
+    @Attribute(.externalStorage) var mapImageData: Data?
+
     // SRD bookmarks (stored as srd_id strings)
     var monsterRoster: [String]
     var spellList: [String]
