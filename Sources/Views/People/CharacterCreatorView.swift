@@ -90,35 +90,57 @@ struct CharacterCreatorView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .animation(.easeInOut(duration: 0.2), value: currentStep)
+                // No animation on step switch — prevents gesture conflicts
 
                 Divider().overlay(DMTheme.border)
 
                 // Navigation buttons
                 HStack {
                     if currentStep > 0 {
-                        Button("Back") {
-                            currentStep -= 1
+                        Button {
+                            withAnimation { currentStep -= 1 }
+                        } label: {
+                            Text("Back")
+                                .font(.headline)
+                                .foregroundStyle(DMTheme.textPrimary)
+                                .frame(minWidth: 80, minHeight: 44)
+                                .background(DMTheme.card)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
-                        .buttonStyle(DMSmallButtonStyle())
-                        .frame(minHeight: 44)
                     }
 
                     Spacer()
 
+                    // Show what's needed
+                    if !canAdvance {
+                        Text(advanceHint)
+                            .font(.caption)
+                            .foregroundStyle(DMTheme.accentRed)
+                    }
+
                     if currentStep < 4 {
-                        Button("Next") {
-                            currentStep += 1
+                        Button {
+                            withAnimation { currentStep += 1 }
+                        } label: {
+                            Text("Next →")
+                                .font(.headline)
+                                .foregroundStyle(canAdvance ? DMTheme.background : DMTheme.textDim)
+                                .frame(minWidth: 100, minHeight: 44)
+                                .background(canAdvance ? DMTheme.accent : DMTheme.card)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
-                        .buttonStyle(DMSmallButtonStyle(color: DMTheme.accent.opacity(0.3)))
-                        .frame(minHeight: 44)
                         .disabled(!canAdvance)
                     } else {
-                        Button("Create Character") {
+                        Button {
                             createCharacter()
+                        } label: {
+                            Text("Create Character ✓")
+                                .font(.headline)
+                                .foregroundStyle(DMTheme.background)
+                                .frame(minWidth: 160, minHeight: 44)
+                                .background(DMTheme.accentGreen)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
-                        .buttonStyle(DMSmallButtonStyle(color: DMTheme.accentGreen.opacity(0.3)))
-                        .frame(minHeight: 44)
                         .disabled(name.isEmpty || selectedRace.isEmpty || selectedClass.isEmpty)
                     }
                 }
@@ -136,6 +158,24 @@ struct CharacterCreatorView: View {
                 loadRaces()
                 loadClasses()
             }
+        }
+    }
+
+    private var advanceHint: String {
+        switch currentStep {
+        case 0:
+            if name.isEmpty && selectedRace.isEmpty { return "Enter a name and select a race" }
+            if name.isEmpty { return "Enter a name" }
+            if selectedRace.isEmpty { return "Select a race" }
+            return ""
+        case 1: return selectedClass.isEmpty ? "Select a class" : ""
+        case 3:
+            if let cls = selectedClassData {
+                let needed = cls.skillChoices.count - selectedSkills.count
+                return needed > 0 ? "Select \(needed) more skill\(needed == 1 ? "" : "s")" : ""
+            }
+            return ""
+        default: return ""
         }
     }
 
