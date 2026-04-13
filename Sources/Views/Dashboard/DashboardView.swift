@@ -2,8 +2,9 @@ import SwiftUI
 import SwiftData
 
 struct DashboardView: View {
-    let campaign: Campaign
+    @Bindable var campaign: Campaign
     @State private var selectedTab: Tab = .encounter
+    @State private var showCharacterCreator = false
 
     enum Tab: String, CaseIterable {
         case encounter = "Encounter"
@@ -50,7 +51,7 @@ struct DashboardView: View {
                 Divider()
 
                 // Party compact strip
-                PartyStripView(campaign: campaign)
+                PartyStripView(campaign: campaign, onAddPC: { showCharacterCreator = true })
 
                 Divider()
 
@@ -81,21 +82,21 @@ struct DashboardView: View {
             Group {
                 switch selectedTab {
                 case .encounter:
-                    EncounterPlaceholder()
+                    EncounterView(campaign: campaign)
                 case .people:
-                    PeoplePlaceholder()
+                    PeopleView(campaign: campaign)
                 case .places:
-                    PlacesPlaceholder()
+                    PlacesView(campaign: campaign)
                 case .story:
-                    StoryPlaceholder()
+                    StoryView(campaign: campaign)
                 case .bestiary:
-                    BestiaryPlaceholder()
+                    BestiaryView(campaign: campaign)
                 case .map:
                     MapPlaceholder()
                 case .notes:
                     NotesView(campaign: campaign)
                 case .reference:
-                    ReferencePlaceholder()
+                    ReferenceView()
                 case .ai:
                     AIPlaceholder()
                 }
@@ -104,6 +105,9 @@ struct DashboardView: View {
             .background(DMTheme.background)
         }
         .navigationSplitViewStyle(.balanced)
+        .sheet(isPresented: $showCharacterCreator) {
+            CharacterCreatorView(campaign: campaign)
+        }
     }
 }
 
@@ -111,6 +115,7 @@ struct DashboardView: View {
 
 struct PartyStripView: View {
     let campaign: Campaign
+    var onAddPC: (() -> Void)?
 
     var body: some View {
         VStack(spacing: 6) {
@@ -119,6 +124,16 @@ struct PartyStripView: View {
                     .font(.caption.bold())
                     .foregroundStyle(DMTheme.accent)
                 Spacer()
+                if let onAddPC {
+                    Button {
+                        onAddPC()
+                    } label: {
+                        Label("New PC", systemImage: "plus")
+                            .font(.caption2)
+                            .foregroundStyle(DMTheme.accent)
+                    }
+                    .frame(minHeight: 44)
+                }
                 Text("\(campaign.party.count) PCs")
                     .font(.caption2)
                     .foregroundStyle(.secondary)

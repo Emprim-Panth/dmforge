@@ -8,15 +8,20 @@
 
 /* Begin PBXBuildFile section */
 		036DAB25533F7628CFF56982 /* Campaign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69B4E931705E33C0DB7B275E /* Campaign.swift */; };
+		21AE5CED4772A06212165F32 /* StoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 994C0FEC204CFD99A05C7FA4 /* StoryView.swift */; };
+		2595655CA94EC68E442036A9 /* ReferenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AEFACD40C50D294B5F4BA2 /* ReferenceView.swift */; };
 		3BA080393314696606886367 /* DeathSaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E518C6DD254B269AD7000 /* DeathSaveView.swift */; };
 		44AB2B9F1B35B8A64640F94D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73100BE023CDD225C5E0EC97 /* ContentView.swift */; };
 		46C8316646672716DD9CAB44 /* Place.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E18D67813433F59B476A5E /* Place.swift */; };
 		4DCCD175A26B45FA1A378791 /* PlacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D1F90AC53316923BBF41F1 /* PlacesView.swift */; };
+		5436ED182D089656DB0D7200 /* BestiaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FD11295122CA60D21BA098 /* BestiaryView.swift */; };
 		54B57D1CBDCAC943B3D7548A /* DiceRoller.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA98322C7FB219190D6DA268 /* DiceRoller.swift */; };
 		62613CDFF71B557EF0043D91 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5056011700C412EC4C3A954B /* DashboardView.swift */; };
 		62F561531CDED8CD5740E3EE /* RulesEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23A56B8DB60B440726170A3A /* RulesEngine.swift */; };
+		63CFE793DAD583BC44312F62 /* CharacterCreatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF2531217920829646B52CCC /* CharacterCreatorView.swift */; };
 		8D06191C231D4E29F0AFB84E /* EncounterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2673B78921DA5D5B20C00001 /* EncounterView.swift */; };
 		97BB2587294F3419CC8844EA /* DMTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DFDE9A4C5F51FC4F77862D /* DMTheme.swift */; };
+		9E4CFAA9F327F2A9AC4CD3EB /* SRDMonster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E88F041093FE98C43C3D70D /* SRDMonster.swift */; };
 		A550BE796CD224D534EBB4B4 /* SRDLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D793E50FE8A7440D4AE0555 /* SRDLoader.swift */; };
 		C9455D319677766C663A4A64 /* DMForgeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A5CAD1DD684C8710A53412 /* DMForgeApp.swift */; };
 		DF516195F1B976E55C4BCC9F /* PeopleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0EE6CA8A66A0E657B44670 /* PeopleView.swift */; };
@@ -26,8 +31,11 @@
 /* Begin PBXFileReference section */
 		037504E25EDEFB659219A6DC /* DMForge.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DMForge.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12E18D67813433F59B476A5E /* Place.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Place.swift; sourceTree = "<group>"; };
+		14FD11295122CA60D21BA098 /* BestiaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestiaryView.swift; sourceTree = "<group>"; };
+		15AEFACD40C50D294B5F4BA2 /* ReferenceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceView.swift; sourceTree = "<group>"; };
 		23A56B8DB60B440726170A3A /* RulesEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesEngine.swift; sourceTree = "<group>"; };
 		2673B78921DA5D5B20C00001 /* EncounterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncounterView.swift; sourceTree = "<group>"; };
+		2E88F041093FE98C43C3D70D /* SRDMonster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRDMonster.swift; sourceTree = "<group>"; };
 		5056011700C412EC4C3A954B /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		59B12F762D9FD710567C2A54 /* Character.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Character.swift; sourceTree = "<group>"; };
 		69B4E931705E33C0DB7B275E /* Campaign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Campaign.swift; sourceTree = "<group>"; };
@@ -35,8 +43,10 @@
 		7F1E518C6DD254B269AD7000 /* DeathSaveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeathSaveView.swift; sourceTree = "<group>"; };
 		94D1F90AC53316923BBF41F1 /* PlacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesView.swift; sourceTree = "<group>"; };
 		95A5CAD1DD684C8710A53412 /* DMForgeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMForgeApp.swift; sourceTree = "<group>"; };
+		994C0FEC204CFD99A05C7FA4 /* StoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryView.swift; sourceTree = "<group>"; };
 		9D793E50FE8A7440D4AE0555 /* SRDLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRDLoader.swift; sourceTree = "<group>"; };
 		AA0EE6CA8A66A0E657B44670 /* PeopleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleView.swift; sourceTree = "<group>"; };
+		BF2531217920829646B52CCC /* CharacterCreatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterCreatorView.swift; sourceTree = "<group>"; };
 		CA98322C7FB219190D6DA268 /* DiceRoller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiceRoller.swift; sourceTree = "<group>"; };
 		E7DFDE9A4C5F51FC4F77862D /* DMTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMTheme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -45,10 +55,13 @@
 		0445C9C0256EF3287630B786 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				444CE521F4E53D7C1D49D09E /* Bestiary */,
 				32C151F4DA81CB2D60A3161C /* Combat */,
 				D504399824A49878B72081E4 /* Dashboard */,
 				0D5D117767CC5E4161A13C89 /* People */,
 				644914C7917487797C41EE3D /* Places */,
+				77BEB4B389D84A0F05FAA52F /* Reference */,
+				17BE6E21C161CA04D942873E /* Story */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -56,6 +69,7 @@
 		0D5D117767CC5E4161A13C89 /* People */ = {
 			isa = PBXGroup;
 			children = (
+				BF2531217920829646B52CCC /* CharacterCreatorView.swift */,
 				AA0EE6CA8A66A0E657B44670 /* PeopleView.swift */,
 			);
 			path = People;
@@ -68,6 +82,14 @@
 				95A5CAD1DD684C8710A53412 /* DMForgeApp.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		17BE6E21C161CA04D942873E /* Story */ = {
+			isa = PBXGroup;
+			children = (
+				994C0FEC204CFD99A05C7FA4 /* StoryView.swift */,
+			);
+			path = Story;
 			sourceTree = "<group>";
 		};
 		31D482C215B0168E5DEBDD7A /* Sources */ = {
@@ -107,6 +129,14 @@
 			);
 			sourceTree = "<group>";
 		};
+		444CE521F4E53D7C1D49D09E /* Bestiary */ = {
+			isa = PBXGroup;
+			children = (
+				14FD11295122CA60D21BA098 /* BestiaryView.swift */,
+			);
+			path = Bestiary;
+			sourceTree = "<group>";
+		};
 		51145DBC67BD7D988D661E8D /* Theme */ = {
 			isa = PBXGroup;
 			children = (
@@ -133,12 +163,21 @@
 			path = Engine;
 			sourceTree = "<group>";
 		};
+		77BEB4B389D84A0F05FAA52F /* Reference */ = {
+			isa = PBXGroup;
+			children = (
+				15AEFACD40C50D294B5F4BA2 /* ReferenceView.swift */,
+			);
+			path = Reference;
+			sourceTree = "<group>";
+		};
 		C448BE9C66A57488663555CB /* Models */ = {
 			isa = PBXGroup;
 			children = (
 				69B4E931705E33C0DB7B275E /* Campaign.swift */,
 				59B12F762D9FD710567C2A54 /* Character.swift */,
 				12E18D67813433F59B476A5E /* Place.swift */,
+				2E88F041093FE98C43C3D70D /* SRDMonster.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -210,8 +249,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5436ED182D089656DB0D7200 /* BestiaryView.swift in Sources */,
 				036DAB25533F7628CFF56982 /* Campaign.swift in Sources */,
 				FBF5596884005A7327E6B6E2 /* Character.swift in Sources */,
+				63CFE793DAD583BC44312F62 /* CharacterCreatorView.swift in Sources */,
 				44AB2B9F1B35B8A64640F94D /* ContentView.swift in Sources */,
 				C9455D319677766C663A4A64 /* DMForgeApp.swift in Sources */,
 				97BB2587294F3419CC8844EA /* DMTheme.swift in Sources */,
@@ -222,8 +263,11 @@
 				DF516195F1B976E55C4BCC9F /* PeopleView.swift in Sources */,
 				46C8316646672716DD9CAB44 /* Place.swift in Sources */,
 				4DCCD175A26B45FA1A378791 /* PlacesView.swift in Sources */,
+				2595655CA94EC68E442036A9 /* ReferenceView.swift in Sources */,
 				62F561531CDED8CD5740E3EE /* RulesEngine.swift in Sources */,
 				A550BE796CD224D534EBB4B4 /* SRDLoader.swift in Sources */,
+				9E4CFAA9F327F2A9AC4CD3EB /* SRDMonster.swift in Sources */,
+				21AE5CED4772A06212165F32 /* StoryView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
