@@ -44,38 +44,30 @@ struct PlacesView: View {
                 Button {
                     showNewPlace = true
                 } label: {
-                    Text("+ New Place")
-                        .font(.subheadline)
-                        .foregroundStyle(DMTheme.textPrimary)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(Color(hex: "1a4a2a"))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                    Label("New Place", systemImage: "plus")
+                        .font(.subheadline.bold())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(DMSmallButtonStyle(color: DMTheme.accentGreen.opacity(0.3)))
+                .frame(minHeight: 44)
             }
-            .padding()
+            .padding(DMTheme.contentPadding)
 
             ScrollView {
                 if campaign.places.isEmpty {
-                    VStack(spacing: 8) {
-                        Text("No locations yet.")
-                            .font(.subheadline)
-                            .foregroundStyle(DMTheme.textDim)
-                        Text("Add towns, dungeons, and buildings to track where NPCs and enemies are.")
-                            .font(.caption)
-                            .foregroundStyle(DMTheme.textDim)
-                            .multilineTextAlignment(.center)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 40)
+                    DMEmptyStateView(
+                        icon: "map",
+                        title: "No Locations Yet",
+                        message: "Add towns, dungeons, and buildings to track where NPCs and enemies are.",
+                        buttonTitle: "New Place",
+                        buttonAction: { showNewPlace = true }
+                    )
                 } else {
-                    VStack(spacing: 6) {
+                    VStack(spacing: DMTheme.cardSpacing) {
                         ForEach(topLevelPlaces) { place in
                             placeTree(place: place, depth: 0)
                         }
                     }
-                    .padding(.horizontal)
+                    .padding(.horizontal, DMTheme.contentPadding)
                     .padding(.bottom, 20)
                 }
             }
@@ -83,9 +75,11 @@ struct PlacesView: View {
         .background(DMTheme.background)
         .sheet(isPresented: $showNewPlace) {
             PlaceFormSheet(campaign: campaign, editingPlace: nil)
+                .presentationDetents([.medium, .large])
         }
         .sheet(item: $editingPlace) { place in
             PlaceFormSheet(campaign: campaign, editingPlace: place)
+                .presentationDetents([.medium, .large])
         }
     }
 
@@ -109,11 +103,12 @@ struct PlacesView: View {
         HStack(spacing: 0) {
             if depth > 0 {
                 Rectangle()
-                    .fill(DMTheme.border)
-                    .frame(width: 2)
+                    .fill(DMTheme.accent.opacity(0.2))
+                    .frame(width: 3)
+                    .clipShape(RoundedRectangle(cornerRadius: 1.5))
             }
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 8) {
                 // Name + type
                 HStack {
                     Text("\(place.typeIcon) \(place.name)")
@@ -123,6 +118,10 @@ struct PlacesView: View {
                     Text(place.type.capitalized)
                         .font(.caption)
                         .foregroundStyle(DMTheme.textDim)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(DMTheme.detail)
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
                 }
 
                 // Description
@@ -163,22 +162,28 @@ struct PlacesView: View {
                 }
 
                 // Buttons
-                HStack(spacing: 6) {
+                HStack(spacing: 8) {
                     Button("Edit") {
                         editingPlace = place
                     }
-                    .buttonStyle(DMSmallButtonStyle(color: Color(hex: "2a2a44")))
+                    .buttonStyle(DMSmallButtonStyle(color: DMTheme.card))
+                    .frame(minHeight: 44)
 
                     Button("Remove") {
                         modelContext.delete(place)
                     }
-                    .buttonStyle(DMSmallButtonStyle(color: Color(hex: "4a2020")))
+                    .buttonStyle(DMDestructiveButtonStyle())
                 }
             }
-            .padding(12)
+            .padding(DMTheme.cardPadding)
         }
         .background(DMTheme.card)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: DMTheme.cardCornerRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: DMTheme.cardCornerRadius)
+                .stroke(DMTheme.border, lineWidth: 1)
+        )
+        .shadow(color: DMTheme.cardShadow, radius: 4, y: 2)
         .padding(.leading, CGFloat(depth) * 20)
     }
 

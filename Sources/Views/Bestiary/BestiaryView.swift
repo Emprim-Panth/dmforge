@@ -58,21 +58,27 @@ struct BestiaryView: View {
                     .foregroundStyle(DMTheme.accent)
                 Spacer()
                 Text("\(filteredMonsters.count) of \(allMonsters.count)")
-                    .font(.caption)
+                    .font(.caption.monospacedDigit())
                     .foregroundStyle(DMTheme.textDim)
             }
-            .padding()
+            .padding(DMTheme.contentPadding)
 
             // Mode toggle
             HStack(spacing: 0) {
                 modeButton("Campaign Roster", active: showRosterOnly) {
-                    showRosterOnly = true
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showRosterOnly = true
+                    }
                 }
                 modeButton("Full SRD", active: !showRosterOnly) {
-                    showRosterOnly = false
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showRosterOnly = false
+                    }
                 }
             }
-            .padding(.horizontal)
+            .background(DMTheme.detail)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .padding(.horizontal, DMTheme.contentPadding)
 
             // Search bar
             HStack {
@@ -93,53 +99,70 @@ struct BestiaryView: View {
             .padding(10)
             .background(DMTheme.detail)
             .clipShape(RoundedRectangle(cornerRadius: 8))
-            .padding(.horizontal)
-            .padding(.top, 8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(DMTheme.border, lineWidth: 1)
+            )
+            .padding(.horizontal, DMTheme.contentPadding)
+            .padding(.top, DMTheme.cardSpacing)
 
             // CR filter chips
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
                     ForEach(crFilters, id: \.self) { cr in
                         filterChip(cr, selected: selectedCR == cr) {
-                            selectedCR = cr
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                selectedCR = cr
+                            }
                         }
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, DMTheme.contentPadding)
             }
-            .padding(.top, 8)
+            .padding(.top, DMTheme.cardSpacing)
 
             // Type filter chips
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
                     ForEach(typeFilters, id: \.self) { type in
                         filterChip(type, selected: selectedType == type) {
-                            selectedType = type
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                selectedType = type
+                            }
                         }
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, DMTheme.contentPadding)
             }
             .padding(.top, 4)
 
             // Monster list
             ScrollView {
-                LazyVStack(spacing: 6) {
-                    ForEach(filteredMonsters) { monster in
-                        monsterCard(monster)
-                            .onTapGesture {
-                                selectedMonster = monster
-                            }
+                if showRosterOnly && filteredMonsters.isEmpty {
+                    DMEmptyStateView(
+                        icon: "pawprint",
+                        title: "No Monsters in Roster",
+                        message: "Switch to Full SRD to browse and add monsters to your campaign roster."
+                    )
+                } else {
+                    LazyVStack(spacing: DMTheme.cardSpacing) {
+                        ForEach(filteredMonsters) { monster in
+                            monsterCard(monster)
+                                .onTapGesture {
+                                    selectedMonster = monster
+                                }
+                        }
                     }
+                    .padding(.horizontal, DMTheme.contentPadding)
+                    .padding(.vertical, DMTheme.cardSpacing)
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
             }
         }
         .background(DMTheme.background)
         .onAppear { loadMonsters() }
         .sheet(item: $selectedMonster) { monster in
             MonsterDetailView(monster: monster, campaign: campaign)
+                .presentationDetents([.large])
         }
     }
 
@@ -148,11 +171,12 @@ struct BestiaryView: View {
     private func modeButton(_ title: String, active: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title)
-                .font(.subheadline)
+                .font(.subheadline.weight(active ? .semibold : .regular))
                 .foregroundStyle(active ? DMTheme.accent : DMTheme.textDim)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
                 .background(active ? DMTheme.card : .clear)
+                .clipShape(RoundedRectangle(cornerRadius: 6))
         }
         .buttonStyle(.plain)
     }
@@ -168,6 +192,7 @@ struct BestiaryView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 6))
         }
         .buttonStyle(.plain)
+        .frame(minHeight: 32)
     }
 
     private func monsterCard(_ monster: SRDMonster) -> some View {
@@ -197,10 +222,7 @@ struct BestiaryView: View {
                 .background(DMTheme.accent.opacity(0.15))
                 .clipShape(RoundedRectangle(cornerRadius: 4))
         }
-        .padding(12)
-        .frame(minHeight: 44)
-        .background(DMTheme.card)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .dmCard()
     }
 
     // MARK: - Helpers
@@ -244,7 +266,7 @@ struct MonsterDetailView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: DMTheme.contentPadding) {
                     // Title + CR
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
@@ -268,7 +290,7 @@ struct MonsterDetailView: View {
                     Divider().background(DMTheme.border)
 
                     // Core stats
-                    HStack(spacing: 16) {
+                    HStack(spacing: DMTheme.contentPadding) {
                         statBlock("AC", value: "\(monster.armorClass)")
                         statBlock("HP", value: "\(monster.hitPoints)")
                         statBlock("Hit Dice", value: monster.hitDice)
@@ -366,11 +388,11 @@ struct MonsterDetailView: View {
                             systemImage: isInRoster ? "minus.circle" : "plus.circle"
                         )
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
                     }
                     .buttonStyle(DMButtonStyle(color: isInRoster ? DMTheme.accentRed.opacity(0.3) : DMTheme.accentGreen.opacity(0.3)))
+                    .frame(minHeight: 44)
                 }
-                .padding()
+                .padding(DMTheme.contentPadding)
             }
             .background(DMTheme.background)
             .navigationTitle(monster.name)
@@ -430,7 +452,7 @@ struct MonsterDetailView: View {
     }
 
     private func detailRow(_ label: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(label)
                 .font(.caption.bold())
                 .foregroundStyle(DMTheme.accent)
@@ -455,10 +477,10 @@ struct MonsterDetailView: View {
                 .font(.caption)
                 .foregroundStyle(DMTheme.textSecondary)
         }
-        .padding(10)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(DMTheme.detail)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     private func actionBlock(_ action: SRDMonster.MonsterAction) -> some View {
@@ -491,9 +513,9 @@ struct MonsterDetailView: View {
                     .foregroundStyle(DMTheme.textSecondary)
             }
         }
-        .padding(10)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(DMTheme.detail)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }

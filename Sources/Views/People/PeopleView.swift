@@ -21,63 +21,96 @@ struct PeopleView: View {
             headerBar
 
             ScrollView {
-                VStack(spacing: 4) {
+                VStack(spacing: DMTheme.sectionSpacing) {
                     // Active Party
-                    sectionHeader(key: "party", title: "Active Party", count: campaign.party.count, color: DMTheme.accent)
-                    if !collapsedSections.contains("party") {
-                        if campaign.party.isEmpty {
-                            emptyLabel("No party members yet. Tap '+ New PC' to create one.")
-                        } else {
-                            ForEach(campaign.party.sorted(by: { $0.name < $1.name })) { pc in
-                                pcCard(pc)
+                    VStack(spacing: DMTheme.cardSpacing) {
+                        sectionHeader(key: "party", title: "Active Party", count: campaign.party.count, color: DMTheme.accent)
+                        if !collapsedSections.contains("party") {
+                            if campaign.party.isEmpty {
+                                DMEmptyStateView(
+                                    icon: "person.3",
+                                    title: "No Party Members",
+                                    message: "Tap + New PC to create your first character and begin your adventure.",
+                                    buttonTitle: "New PC",
+                                    buttonAction: {
+                                        let pc = PlayerCharacter(name: "New Hero", race: "Human", characterClass: "Fighter")
+                                        pc.campaign = campaign
+                                        modelContext.insert(pc)
+                                    }
+                                )
+                                .frame(height: 240)
+                            } else {
+                                ForEach(campaign.party.sorted(by: { $0.name < $1.name })) { pc in
+                                    pcCard(pc)
+                                }
                             }
                         }
                     }
 
                     // NPCs
-                    sectionHeader(key: "npcs", title: "NPCs", count: campaign.npcs.count, color: DMTheme.accentBlue)
-                    if !collapsedSections.contains("npcs") {
-                        if campaign.npcs.isEmpty {
-                            emptyLabel("No NPCs yet. Tap '+ Quick Add' to create one.")
-                        } else {
-                            ForEach(campaign.npcs.sorted(by: { $0.name < $1.name })) { npc in
-                                npcCard(npc)
+                    VStack(spacing: DMTheme.cardSpacing) {
+                        sectionHeader(key: "npcs", title: "NPCs", count: campaign.npcs.count, color: DMTheme.accentBlue)
+                        if !collapsedSections.contains("npcs") {
+                            if campaign.npcs.isEmpty {
+                                DMEmptyStateView(
+                                    icon: "person.text.rectangle",
+                                    title: "No NPCs",
+                                    message: "Add shopkeepers, quest givers, and allies your party will meet along the way.",
+                                    buttonTitle: "Quick Add",
+                                    buttonAction: { showQuickAdd = true }
+                                )
+                                .frame(height: 220)
+                            } else {
+                                ForEach(campaign.npcs.sorted(by: { $0.name < $1.name })) { npc in
+                                    npcCard(npc)
+                                }
                             }
                         }
                     }
 
                     // Enemies
-                    sectionHeader(key: "enemies", title: "Enemies", count: campaign.enemies.count, color: DMTheme.accentRed)
-                    if !collapsedSections.contains("enemies") {
-                        if campaign.enemies.isEmpty {
-                            emptyLabel("No tracked enemies.")
-                        } else {
-                            ForEach(campaign.enemies.sorted(by: { $0.name < $1.name })) { enemy in
-                                enemyCard(enemy)
+                    VStack(spacing: DMTheme.cardSpacing) {
+                        sectionHeader(key: "enemies", title: "Enemies", count: campaign.enemies.count, color: DMTheme.accentRed)
+                        if !collapsedSections.contains("enemies") {
+                            if campaign.enemies.isEmpty {
+                                DMEmptyStateView(
+                                    icon: "bolt.shield",
+                                    title: "No Tracked Enemies",
+                                    message: "Enemies added from the Bestiary or encounters will appear here."
+                                )
+                                .frame(height: 180)
+                            } else {
+                                ForEach(campaign.enemies.sorted(by: { $0.name < $1.name })) { enemy in
+                                    enemyCard(enemy)
+                                }
                             }
                         }
                     }
 
                     // Fallen Heroes
                     if !campaign.fallen.isEmpty {
-                        sectionHeader(key: "fallen", title: "Fallen Heroes", count: campaign.fallen.count, color: DMTheme.textDim)
-                        if !collapsedSections.contains("fallen") {
-                            ForEach(campaign.fallen.sorted(by: { $0.diedDate < $1.diedDate })) { hero in
-                                fallenCard(hero)
+                        VStack(spacing: DMTheme.cardSpacing) {
+                            sectionHeader(key: "fallen", title: "Fallen Heroes", count: campaign.fallen.count, color: DMTheme.textDim)
+                            if !collapsedSections.contains("fallen") {
+                                ForEach(campaign.fallen.sorted(by: { $0.diedDate < $1.diedDate })) { hero in
+                                    fallenCard(hero)
+                                }
                             }
                         }
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, DMTheme.contentPadding)
                 .padding(.bottom, 20)
             }
         }
         .background(DMTheme.background)
         .sheet(isPresented: $showQuickAdd) {
             QuickAddSheet(campaign: campaign)
+                .presentationDetents([.medium, .large])
         }
         .sheet(item: $damageHealTarget) { pc in
             DamageHealSheet(pc: pc, isDamage: isDamageMode)
+                .presentationDetents([.medium])
         }
     }
 
@@ -96,55 +129,57 @@ struct PeopleView: View {
                 pc.campaign = campaign
                 modelContext.insert(pc)
             } label: {
-                Text("+ New PC")
-                    .font(.subheadline)
-                    .foregroundStyle(DMTheme.textPrimary)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(Color(hex: "1a4a2a"))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                Label("New PC", systemImage: "plus")
+                    .font(.subheadline.bold())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DMSmallButtonStyle(color: DMTheme.accentGreen.opacity(0.3)))
+            .frame(minHeight: 44)
 
             Button {
                 showQuickAdd = true
             } label: {
-                Text("+ Quick Add")
+                Label("Quick Add", systemImage: "plus")
                     .font(.subheadline)
-                    .foregroundStyle(DMTheme.textPrimary)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(Color(hex: "2a2a5a"))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DMSmallButtonStyle(color: DMTheme.accentBlue.opacity(0.2)))
+            .frame(minHeight: 44)
         }
-        .padding()
+        .padding(DMTheme.contentPadding)
     }
 
     // MARK: - Section Headers
 
     private func sectionHeader(key: String, title: String, count: Int, color: Color) -> some View {
         Button {
-            if collapsedSections.contains(key) {
-                collapsedSections.remove(key)
-            } else {
-                collapsedSections.insert(key)
+            withAnimation(.easeInOut(duration: 0.2)) {
+                if collapsedSections.contains(key) {
+                    collapsedSections.remove(key)
+                } else {
+                    collapsedSections.insert(key)
+                }
             }
         } label: {
-            HStack {
+            HStack(spacing: 8) {
                 Image(systemName: collapsedSections.contains(key) ? "chevron.right" : "chevron.down")
-                    .font(.caption)
-                Text("\(title) (\(count))")
-                    .font(.subheadline.bold())
+                    .font(.caption.bold())
+                    .frame(width: 16)
+                Text(title)
+                    .font(.headline)
+                Text("\(count)")
+                    .font(.caption.monospacedDigit().bold())
+                    .foregroundStyle(color.opacity(0.7))
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(color.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
                 Spacer()
             }
             .foregroundStyle(color)
-            .padding(.horizontal, 10)
+            .padding(.horizontal, 12)
             .padding(.vertical, 10)
             .frame(minHeight: 44)
             .background(DMTheme.detail)
-            .clipShape(RoundedRectangle(cornerRadius: 6))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .buttonStyle(.plain)
     }
@@ -152,7 +187,7 @@ struct PeopleView: View {
     // MARK: - PC Card
 
     private func pcCard(_ pc: PlayerCharacter) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             // Name + Class/Level
             HStack {
                 Text(pc.name)
@@ -176,7 +211,7 @@ struct PeopleView: View {
             }
 
             // Stats row: AC, Speed, Mana pips
-            HStack(spacing: 16) {
+            HStack(spacing: DMTheme.contentPadding) {
                 statBadge(icon: "shield.fill", value: "\(pc.armorClass)", label: "AC")
                 statBadge(icon: "figure.walk", value: "\(pc.speed)ft", label: "SPD")
 
@@ -191,25 +226,25 @@ struct PeopleView: View {
             }
 
             // Action buttons
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 Button("Damage") {
                     isDamageMode = true
                     damageHealTarget = pc
                 }
                 .buttonStyle(DMSmallButtonStyle(color: DMTheme.accentRed.opacity(0.3)))
+                .frame(minHeight: 44)
 
                 Button("Heal") {
                     isDamageMode = false
                     damageHealTarget = pc
                 }
                 .buttonStyle(DMSmallButtonStyle(color: DMTheme.accentGreen.opacity(0.3)))
+                .frame(minHeight: 44)
 
                 Spacer()
             }
         }
-        .padding(12)
-        .background(DMTheme.card)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .dmCard()
     }
 
     // MARK: - NPC Card
@@ -221,7 +256,7 @@ struct PeopleView: View {
                 .fill(DMTheme.accentBlue)
                 .frame(width: 4)
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text(npc.name)
                         .font(.headline)
@@ -230,8 +265,8 @@ struct PeopleView: View {
                         Text(npc.role)
                             .font(.caption)
                             .foregroundStyle(DMTheme.accentBlue)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
                             .background(DMTheme.accentBlue.opacity(0.15))
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                     }
@@ -240,22 +275,27 @@ struct PeopleView: View {
 
                 if !npc.notes.isEmpty {
                     Text(String(npc.notes.prefix(100)))
-                        .font(.caption)
+                        .font(.subheadline)
                         .foregroundStyle(DMTheme.textDim)
                         .lineLimit(2)
                 }
 
-                HStack(spacing: 6) {
+                HStack(spacing: 8) {
                     Button("Remove") {
                         modelContext.delete(npc)
                     }
-                    .buttonStyle(DMSmallButtonStyle(color: DMTheme.accentRed.opacity(0.2)))
+                    .buttonStyle(DMDestructiveButtonStyle())
                 }
             }
-            .padding(12)
+            .padding(DMTheme.cardPadding)
         }
         .background(DMTheme.card)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: DMTheme.cardCornerRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: DMTheme.cardCornerRadius)
+                .stroke(DMTheme.border, lineWidth: 1)
+        )
+        .shadow(color: DMTheme.cardShadow, radius: 4, y: 2)
     }
 
     // MARK: - Enemy Card
@@ -267,7 +307,7 @@ struct PeopleView: View {
                 .fill(DMTheme.accentRed)
                 .frame(width: 4)
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text(enemy.name)
                         .font(.headline)
@@ -276,7 +316,7 @@ struct PeopleView: View {
                     crBadge(enemy.cr)
                 }
 
-                HStack(spacing: 12) {
+                HStack(spacing: DMTheme.cardSpacing) {
                     if enemy.hpMax > 0 {
                         Label("\(enemy.hpCurrent)/\(enemy.hpMax) HP", systemImage: "heart.fill")
                             .font(.caption)
@@ -289,26 +329,32 @@ struct PeopleView: View {
                     }
                 }
 
-                HStack(spacing: 6) {
+                HStack(spacing: 8) {
                     Button("To Encounter") { }
                         .buttonStyle(DMSmallButtonStyle(color: DMTheme.accentRed.opacity(0.2)))
+                        .frame(minHeight: 44)
 
                     Button("Remove") {
                         modelContext.delete(enemy)
                     }
-                    .buttonStyle(DMSmallButtonStyle(color: Color(hex: "4a2020")))
+                    .buttonStyle(DMDestructiveButtonStyle())
                 }
             }
-            .padding(12)
+            .padding(DMTheme.cardPadding)
         }
         .background(DMTheme.card)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: DMTheme.cardCornerRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: DMTheme.cardCornerRadius)
+                .stroke(DMTheme.border, lineWidth: 1)
+        )
+        .shadow(color: DMTheme.cardShadow, radius: 4, y: 2)
     }
 
     // MARK: - Fallen Card
 
     private func fallenCard(_ hero: FallenHero) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
             Text("\u{271D} \(hero.name)")
                 .font(.headline)
                 .foregroundStyle(DMTheme.textDim)
@@ -328,10 +374,14 @@ struct PeopleView: View {
                 }
             }
         }
-        .padding(12)
+        .padding(DMTheme.cardPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(DMTheme.card.opacity(0.5))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: DMTheme.cardCornerRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: DMTheme.cardCornerRadius)
+                .stroke(DMTheme.border.opacity(0.5), lineWidth: 1)
+        )
     }
 
     // MARK: - Helpers
@@ -342,7 +392,7 @@ struct PeopleView: View {
                 .font(.caption2)
                 .foregroundStyle(DMTheme.textDim)
             Text(value)
-                .font(.subheadline.monospacedDigit())
+                .font(.body.monospacedDigit())
                 .foregroundStyle(DMTheme.textPrimary)
         }
     }
@@ -350,13 +400,14 @@ struct PeopleView: View {
     private func manaPips(current: Int, max: Int) -> some View {
         HStack(spacing: 3) {
             ForEach(0..<Swift.min(max, 10), id: \.self) { i in
-                Circle()
+                RoundedRectangle(cornerRadius: 3)
                     .fill(i < current ? DMTheme.manaFull : DMTheme.manaEmpty)
-                    .frame(width: 8, height: 8)
+                    .frame(width: 10, height: 10)
                     .overlay(
-                        Circle()
+                        RoundedRectangle(cornerRadius: 3)
                             .stroke(DMTheme.manaBorder, lineWidth: 1)
                     )
+                    .shadow(color: i < current ? DMTheme.manaFull.opacity(0.4) : .clear, radius: 3)
             }
             if max > 10 {
                 Text("+\(max - 10)")
@@ -375,14 +426,6 @@ struct PeopleView: View {
             .padding(.vertical, 3)
             .background(DMTheme.accent.opacity(0.15))
             .clipShape(RoundedRectangle(cornerRadius: 4))
-    }
-
-    private func emptyLabel(_ text: String) -> some View {
-        Text(text)
-            .font(.caption)
-            .foregroundStyle(DMTheme.textDim)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
     }
 }
 
@@ -494,6 +537,10 @@ struct DamageHealSheet: View {
                     .padding()
                     .background(DMTheme.detail)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(DMTheme.border, lineWidth: 1)
+                    )
                     .padding(.horizontal)
 
                 Button(isDamage ? "Apply Damage" : "Apply Healing") {

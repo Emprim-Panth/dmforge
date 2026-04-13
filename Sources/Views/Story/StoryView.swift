@@ -30,21 +30,20 @@ struct StoryView: View {
                             .font(.subheadline.bold())
                     }
                     .buttonStyle(DMSmallButtonStyle(color: DMTheme.accentGreen.opacity(0.3)))
+                    .frame(minHeight: 44)
                 }
-                .padding()
+                .padding(DMTheme.contentPadding)
 
                 Divider().overlay(DMTheme.border)
 
                 if sortedSessions.isEmpty {
-                    VStack(spacing: 12) {
-                        Image(systemName: "book.closed")
-                            .font(.system(size: 40))
-                            .foregroundStyle(DMTheme.textDim)
-                        Text("No sessions planned yet")
-                            .font(.subheadline)
-                            .foregroundStyle(DMTheme.textSecondary)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    DMEmptyStateView(
+                        icon: "book.closed",
+                        title: "No Sessions Planned",
+                        message: "Create your first session to start planning encounters, story arcs, and key moments.",
+                        buttonTitle: "New Session",
+                        buttonAction: { addSession() }
+                    )
                 } else {
                     List(sortedSessions) { session in
                         Button {
@@ -79,7 +78,7 @@ struct SessionRow: View {
     let session: StorySession
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: DMTheme.cardSpacing) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(session.title)
                     .font(.headline)
@@ -141,7 +140,7 @@ struct SessionDetailView: View {
                     .font(.title3.bold())
                     .foregroundStyle(DMTheme.textPrimary)
 
-                HStack(spacing: 12) {
+                HStack(spacing: DMTheme.cardSpacing) {
                     DatePicker("", selection: $session.date, displayedComponents: .date)
                         .labelsHidden()
 
@@ -165,17 +164,21 @@ struct SessionDetailView: View {
                             .scrollContentBackground(.hidden)
                             .background(DMTheme.detail)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(DMTheme.border, lineWidth: 1)
+                            )
                             .frame(height: 80)
                     }
                 }
             }
-            .padding()
+            .padding(DMTheme.contentPadding)
 
             Divider().overlay(DMTheme.border)
 
             // Acts list
             ScrollView {
-                LazyVStack(spacing: 10) {
+                LazyVStack(spacing: DMTheme.cardSpacing) {
                     ForEach(acts.indices, id: \.self) { index in
                         ActCard(act: $acts[index], onDelete: {
                             acts.remove(at: index)
@@ -194,7 +197,7 @@ struct SessionDetailView: View {
                     .buttonStyle(DMSmallButtonStyle())
                     .frame(minHeight: 44)
                 }
-                .padding()
+                .padding(DMTheme.contentPadding)
             }
         }
         .background(DMTheme.background)
@@ -251,7 +254,7 @@ struct ActCard: View {
     @State private var tagType = "npc"
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             // Title row
             HStack {
                 TextField("Act title", text: $act.title)
@@ -284,7 +287,11 @@ struct ActCard: View {
                 .foregroundStyle(DMTheme.textPrimary)
                 .scrollContentBackground(.hidden)
                 .background(DMTheme.detail)
-                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(DMTheme.border, lineWidth: 1)
+                )
                 .frame(minHeight: 60, maxHeight: 120)
 
             // Branches
@@ -341,7 +348,9 @@ struct ActCard: View {
             // Action buttons
             HStack(spacing: 8) {
                 Button("+ Branch") {
-                    showBranchInput.toggle()
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showBranchInput.toggle()
+                    }
                 }
                 .font(.caption)
                 .frame(minHeight: 44)
@@ -369,9 +378,9 @@ struct ActCard: View {
                 HStack(spacing: 6) {
                     TextField("If...", text: $newCondition)
                         .font(.caption)
-                        .padding(6)
+                        .padding(8)
                         .background(DMTheme.detail)
-                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
 
                     Image(systemName: "arrow.right")
                         .font(.caption2)
@@ -379,9 +388,9 @@ struct ActCard: View {
 
                     TextField("Then...", text: $newLeadsTo)
                         .font(.caption)
-                        .padding(6)
+                        .padding(8)
                         .background(DMTheme.detail)
-                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
 
                     Button("Add") {
                         if !newCondition.isEmpty && !newLeadsTo.isEmpty {
@@ -396,11 +405,9 @@ struct ActCard: View {
                 }
             }
         }
-        .padding(12)
-        .background(DMTheme.card)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .dmCard()
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: DMTheme.cardCornerRadius)
                 .stroke(statusBorderColor, lineWidth: statusBorderWidth)
         )
     }

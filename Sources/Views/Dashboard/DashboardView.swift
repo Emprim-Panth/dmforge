@@ -34,49 +34,89 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationSplitView {
-            // Sidebar
+            // Sidebar — leather DM screen feel
             VStack(spacing: 0) {
-                // Campaign header
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(campaign.name)
-                        .font(.title2.bold())
-                        .foregroundStyle(DMTheme.accent)
-                    Text("D&D 5e Campaign")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
+                // Campaign header with badge-style treatment
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 10) {
+                        Image(systemName: "book.closed.fill")
+                            .font(.title3)
+                            .foregroundStyle(DMTheme.accent)
 
-                Divider()
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(campaign.name)
+                                .font(.title3.bold())
+                                .foregroundStyle(DMTheme.accent)
+                            Text("D&D 5e Campaign")
+                                .font(.caption)
+                                .foregroundStyle(DMTheme.textDim)
+                        }
+                    }
+                }
+                .padding(.horizontal, DMTheme.contentPadding)
+                .padding(.vertical, 14)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(DMTheme.accent.opacity(0.05))
+                .overlay(
+                    Rectangle()
+                        .fill(DMTheme.accent.opacity(0.2))
+                        .frame(height: 1),
+                    alignment: .bottom
+                )
 
                 // Party compact strip
                 PartyStripView(campaign: campaign, onAddPC: { showCharacterCreator = true })
 
-                Divider()
+                // Divider with subtle gold tint
+                Rectangle()
+                    .fill(DMTheme.accent.opacity(0.15))
+                    .frame(height: 1)
 
                 // Tab list
                 ScrollView {
-                    VStack(spacing: 2) {
+                    VStack(spacing: 4) {
                         ForEach(Tab.allCases, id: \.self) { tab in
                             Button {
-                                selectedTab = tab
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    selectedTab = tab
+                                }
                             } label: {
-                                Label(tab.rawValue, systemImage: tab.icon)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 12)
-                                    .foregroundStyle(selectedTab == tab ? DMTheme.accent : DMTheme.textSecondary)
-                                    .background(selectedTab == tab ? DMTheme.cardHover : .clear)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                HStack(spacing: 12) {
+                                    Image(systemName: tab.icon)
+                                        .font(.body)
+                                        .frame(width: 24)
+                                        .foregroundStyle(selectedTab == tab ? DMTheme.accent : DMTheme.textDim)
+
+                                    Text(tab.rawValue)
+                                        .font(.subheadline.weight(selectedTab == tab ? .semibold : .regular))
+                                        .foregroundStyle(selectedTab == tab ? DMTheme.textPrimary : DMTheme.textSecondary)
+
+                                    Spacer()
+
+                                    if selectedTab == tab {
+                                        RoundedRectangle(cornerRadius: 1.5)
+                                            .fill(DMTheme.accent)
+                                            .frame(width: 3, height: 20)
+                                    }
+                                }
+                                .padding(.horizontal, DMTheme.contentPadding)
+                                .padding(.vertical, 10)
+                                .frame(minHeight: 44)
+                                .background(
+                                    selectedTab == tab
+                                        ? DMTheme.accent.opacity(0.1)
+                                        : Color.clear
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
                             }
                             .buttonStyle(.plain)
                         }
                     }
                     .padding(.horizontal, 8)
+                    .padding(.top, 8)
                 }
             }
-            .background(DMTheme.background)
+            .background(DMTheme.sidebarBackground)
         } detail: {
             // Main content area
             Group {
@@ -107,6 +147,7 @@ struct DashboardView: View {
         .navigationSplitViewStyle(.balanced)
         .sheet(isPresented: $showCharacterCreator) {
             CharacterCreatorView(campaign: campaign)
+                .presentationDetents([.large])
         }
     }
 }
@@ -118,50 +159,62 @@ struct PartyStripView: View {
     var onAddPC: (() -> Void)?
 
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 8) {
             HStack {
-                Text("Party")
-                    .font(.caption.bold())
+                Text("PARTY")
+                    .font(.caption2.bold())
                     .foregroundStyle(DMTheme.accent)
+                    .tracking(1.5)
                 Spacer()
                 if let onAddPC {
                     Button {
                         onAddPC()
                     } label: {
-                        Label("New PC", systemImage: "plus")
-                            .font(.caption2)
+                        Image(systemName: "plus.circle.fill")
+                            .font(.body)
                             .foregroundStyle(DMTheme.accent)
                     }
-                    .frame(minHeight: 44)
+                    .frame(minWidth: 44, minHeight: 44)
                 }
-                Text("\(campaign.party.count) PCs")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                Text("\(campaign.party.count)")
+                    .font(.caption2.monospacedDigit().bold())
+                    .foregroundStyle(DMTheme.textDim)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(DMTheme.detail)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
             }
-            .padding(.horizontal)
+            .padding(.horizontal, DMTheme.contentPadding)
 
-            ForEach(campaign.party) { pc in
-                HStack(spacing: 8) {
-                    Text(pc.name)
-                        .font(.caption)
-                        .foregroundStyle(DMTheme.textPrimary)
-                        .lineLimit(1)
+            if campaign.party.isEmpty {
+                Text("No party members")
+                    .font(.caption)
+                    .foregroundStyle(DMTheme.textDim)
+                    .padding(.bottom, 4)
+            } else {
+                ForEach(campaign.party) { pc in
+                    HStack(spacing: 8) {
+                        Text(pc.name)
+                            .font(.caption)
+                            .foregroundStyle(DMTheme.textPrimary)
+                            .lineLimit(1)
 
-                    Spacer()
+                        Spacer()
 
-                    // HP bar
-                    HPBarView(current: pc.hpCurrent, max: pc.hpMax, height: 8)
-                        .frame(width: 60)
+                        // HP bar
+                        HPBarView(current: pc.hpCurrent, max: pc.hpMax, height: 8)
+                            .frame(width: 60)
 
-                    Text("\(pc.hpCurrent)/\(pc.hpMax)")
-                        .font(.caption2.monospacedDigit())
-                        .foregroundStyle(.secondary)
+                        Text("\(pc.hpCurrent)/\(pc.hpMax)")
+                            .font(.caption2.monospacedDigit())
+                            .foregroundStyle(DMTheme.textDim)
+                    }
+                    .padding(.horizontal, DMTheme.contentPadding)
+                    .padding(.vertical, 2)
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 2)
             }
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, 10)
     }
 }
 
@@ -180,12 +233,40 @@ struct HPBarView: View {
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .leading) {
+                // Track with inner shadow
                 RoundedRectangle(cornerRadius: height / 3)
                     .fill(Color(hex: "13131c"))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: height / 3)
+                            .stroke(Color.black.opacity(0.4), lineWidth: 1)
+                    )
+                    .overlay(
+                        // Inner shadow effect
+                        RoundedRectangle(cornerRadius: height / 3)
+                            .fill(
+                                LinearGradient(
+                                    colors: [.black.opacity(0.3), .clear],
+                                    startPoint: .top,
+                                    endPoint: .center
+                                )
+                            )
+                    )
 
+                // Fill with gradient for depth
                 RoundedRectangle(cornerRadius: height / 3)
-                    .fill(DMTheme.hpColor(ratio: ratio))
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                DMTheme.hpColor(ratio: ratio).opacity(0.9),
+                                DMTheme.hpColor(ratio: ratio),
+                                DMTheme.hpColor(ratio: ratio).opacity(0.7)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
                     .frame(width: geo.size.width * Swift.max(0, Swift.min(1, ratio)))
+                    .animation(.easeInOut(duration: 0.3), value: ratio)
             }
         }
         .frame(height: height)
@@ -198,7 +279,7 @@ struct NotesView: View {
     @Bindable var campaign: Campaign
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: DMTheme.contentPadding) {
             Text("DM Notes")
                 .font(.title2.bold())
                 .foregroundStyle(DMTheme.accent)
@@ -208,13 +289,13 @@ struct NotesView: View {
                 .foregroundStyle(DMTheme.textPrimary)
                 .scrollContentBackground(.hidden)
                 .background(DMTheme.detail)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(RoundedRectangle(cornerRadius: DMTheme.cardCornerRadius))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: DMTheme.cardCornerRadius)
                         .stroke(DMTheme.border, lineWidth: 1)
                 )
         }
-        .padding()
+        .padding(DMTheme.contentPadding)
     }
 }
 
@@ -252,7 +333,71 @@ struct BestiaryPlaceholder: View {
 
 struct MapPlaceholder: View {
     var body: some View {
-        PlaceholderView(title: "World Map", icon: "globe.americas.fill", description: "Travel paths + encounter zones — coming in Phase 4")
+        ZStack {
+            DMTheme.background.ignoresSafeArea()
+
+            // Parchment texture effect
+            RoundedRectangle(cornerRadius: DMTheme.cardCornerRadius)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(hex: "1a1810").opacity(0.6),
+                            Color(hex: "151310").opacity(0.4),
+                            Color(hex: "1a1810").opacity(0.6)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .padding(40)
+
+            VStack(spacing: 20) {
+                Image(systemName: "map")
+                    .font(.system(size: 64, weight: .ultraLight))
+                    .foregroundStyle(DMTheme.accent.opacity(0.25))
+
+                Text("World Map")
+                    .font(.title2.bold())
+                    .foregroundStyle(DMTheme.textPrimary)
+
+                Text("Import your Wonderdraft map\nor draw your own")
+                    .font(.subheadline)
+                    .foregroundStyle(DMTheme.textSecondary)
+                    .multilineTextAlignment(.center)
+
+                HStack(spacing: DMTheme.contentPadding) {
+                    VStack(spacing: 4) {
+                        Image(systemName: "square.and.arrow.down")
+                            .font(.title3)
+                            .foregroundStyle(DMTheme.accent.opacity(0.5))
+                        Text("Import")
+                            .font(.caption)
+                            .foregroundStyle(DMTheme.textDim)
+                    }
+                    .frame(width: 80, height: 80)
+                    .background(DMTheme.card)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                    VStack(spacing: 4) {
+                        Image(systemName: "pencil.and.outline")
+                            .font(.title3)
+                            .foregroundStyle(DMTheme.accent.opacity(0.5))
+                        Text("Draw")
+                            .font(.caption)
+                            .foregroundStyle(DMTheme.textDim)
+                    }
+                    .frame(width: 80, height: 80)
+                    .background(DMTheme.card)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .padding(.top, 8)
+
+                Text("Coming in Phase 4")
+                    .font(.caption)
+                    .foregroundStyle(DMTheme.textDim)
+                    .padding(.top, 4)
+            }
+        }
     }
 }
 
@@ -264,7 +409,73 @@ struct ReferencePlaceholder: View {
 
 struct AIPlaceholder: View {
     var body: some View {
-        PlaceholderView(title: "AI Co-DM", icon: "sparkles", description: "On-device AI assistant — coming in Phase 4")
+        ZStack {
+            DMTheme.background.ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                // Sparkle cluster
+                ZStack {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 56, weight: .light))
+                        .foregroundStyle(DMTheme.accent.opacity(0.2))
+
+                    Image(systemName: "sparkle")
+                        .font(.system(size: 20))
+                        .foregroundStyle(DMTheme.accent.opacity(0.4))
+                        .offset(x: 30, y: -25)
+
+                    Image(systemName: "sparkle")
+                        .font(.system(size: 14))
+                        .foregroundStyle(DMTheme.accent.opacity(0.3))
+                        .offset(x: -25, y: 20)
+                }
+
+                Text("AI Co-DM")
+                    .font(.title2.bold())
+                    .foregroundStyle(DMTheme.textPrimary)
+
+                Text("Your AI co-DM is being trained")
+                    .font(.subheadline)
+                    .foregroundStyle(DMTheme.textSecondary)
+
+                VStack(spacing: 8) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(DMTheme.accentGreen.opacity(0.5))
+                        Text("On-device inference")
+                            .font(.caption)
+                            .foregroundStyle(DMTheme.textDim)
+                    }
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(DMTheme.accentGreen.opacity(0.5))
+                        Text("No internet required")
+                            .font(.caption)
+                            .foregroundStyle(DMTheme.textDim)
+                    }
+                    HStack(spacing: 8) {
+                        Image(systemName: "circle.dotted")
+                            .foregroundStyle(DMTheme.accent.opacity(0.5))
+                        Text("NPC dialogue generation")
+                            .font(.caption)
+                            .foregroundStyle(DMTheme.textDim)
+                    }
+                    HStack(spacing: 8) {
+                        Image(systemName: "circle.dotted")
+                            .foregroundStyle(DMTheme.accent.opacity(0.5))
+                        Text("Encounter suggestions")
+                            .font(.caption)
+                            .foregroundStyle(DMTheme.textDim)
+                    }
+                }
+                .padding(.top, 8)
+
+                Text("Coming in Phase 4")
+                    .font(.caption)
+                    .foregroundStyle(DMTheme.textDim)
+                    .padding(.top, 4)
+            }
+        }
     }
 }
 
@@ -276,14 +487,16 @@ struct PlaceholderView: View {
     var body: some View {
         VStack(spacing: 16) {
             Image(systemName: icon)
-                .font(.system(size: 48))
-                .foregroundStyle(DMTheme.accent.opacity(0.4))
+                .font(.system(size: 56, weight: .light))
+                .foregroundStyle(DMTheme.accent.opacity(0.3))
             Text(title)
-                .font(.title.bold())
+                .font(.title2.bold())
                 .foregroundStyle(DMTheme.textPrimary)
             Text(description)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(DMTheme.textSecondary)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(DMTheme.background)
     }
 }

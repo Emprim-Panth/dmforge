@@ -41,27 +41,23 @@ struct EncounterView: View {
                         .font(.subheadline.bold())
                 }
                 .buttonStyle(DMSmallButtonStyle(color: DMTheme.accentGreen.opacity(0.3)))
+                .frame(minHeight: 44)
             }
-            .padding()
+            .padding(DMTheme.contentPadding)
 
             Divider().overlay(DMTheme.border)
 
             // Monster list
             ScrollView {
-                LazyVStack(spacing: 10) {
+                LazyVStack(spacing: DMTheme.cardSpacing) {
                     if aliveEnemies.isEmpty {
-                        VStack(spacing: 12) {
-                            Image(systemName: "shield.slash")
-                                .font(.system(size: 40))
-                                .foregroundStyle(DMTheme.textDim)
-                            Text("No monsters in encounter")
-                                .font(.subheadline)
-                                .foregroundStyle(DMTheme.textSecondary)
-                            Text("Tap \"+ Add Monster\" to begin")
-                                .font(.caption)
-                                .foregroundStyle(DMTheme.textDim)
-                        }
-                        .padding(.top, 60)
+                        DMEmptyStateView(
+                            icon: "shield.slash",
+                            title: "No Monsters in Encounter",
+                            message: "Tap Add Monster to pull creatures from the SRD Bestiary and begin combat.",
+                            buttonTitle: "Add Monster",
+                            buttonAction: { showMonsterPicker = true }
+                        )
                     } else {
                         ForEach(aliveEnemies) { enemy in
                             MonsterCard(enemy: enemy, onKill: {
@@ -70,7 +66,7 @@ struct EncounterView: View {
                         }
                     }
                 }
-                .padding()
+                .padding(DMTheme.contentPadding)
             }
 
             Divider().overlay(DMTheme.border)
@@ -81,12 +77,15 @@ struct EncounterView: View {
         .background(DMTheme.background)
         .sheet(isPresented: $showMonsterPicker) {
             MonsterPickerSheet(campaign: campaign)
+                .presentationDetents([.medium, .large])
         }
     }
 
     private func killMonster(_ enemy: Enemy) {
-        enemy.alive = false
-        enemy.hpCurrent = 0
+        withAnimation(.easeInOut(duration: 0.3)) {
+            enemy.alive = false
+            enemy.hpCurrent = 0
+        }
     }
 }
 
@@ -99,7 +98,7 @@ struct MonsterCard: View {
     @State private var damageText = ""
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             // Top row: name, CR, AC
             HStack(spacing: 8) {
                 Text(enemy.name)
@@ -154,6 +153,10 @@ struct MonsterCard: View {
                         .padding(.vertical, 6)
                         .background(DMTheme.detail)
                         .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(DMTheme.border, lineWidth: 1)
+                        )
                         .keyboardType(.numberPad)
 
                     Button("Hit") {
@@ -172,7 +175,9 @@ struct MonsterCard: View {
                 Spacer()
 
                 Button {
-                    showConditions.toggle()
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showConditions.toggle()
+                    }
                 } label: {
                     Image(systemName: "exclamationmark.triangle")
                         .font(.subheadline)
@@ -199,13 +204,7 @@ struct MonsterCard: View {
                 ))
             }
         }
-        .padding(12)
-        .background(DMTheme.card)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(DMTheme.border, lineWidth: 1)
-        )
+        .dmCard()
     }
 
     private var crString: String {
@@ -220,7 +219,9 @@ struct MonsterCard: View {
 
     private func applyDamage() {
         guard let dmg = Int(damageText), dmg > 0 else { return }
-        enemy.hpCurrent = max(0, enemy.hpCurrent - dmg)
+        withAnimation(.easeInOut(duration: 0.3)) {
+            enemy.hpCurrent = max(0, enemy.hpCurrent - dmg)
+        }
         damageText = ""
         if enemy.hpCurrent <= 0 {
             onKill()
@@ -229,7 +230,9 @@ struct MonsterCard: View {
 
     private func applyHeal() {
         guard let heal = Int(damageText), heal > 0 else { return }
-        enemy.hpCurrent = min(enemy.hpMax, enemy.hpCurrent + heal)
+        withAnimation(.easeInOut(duration: 0.3)) {
+            enemy.hpCurrent = min(enemy.hpMax, enemy.hpCurrent + heal)
+        }
         damageText = ""
     }
 }
@@ -251,18 +254,21 @@ struct ConditionPickerRow: View {
                 ForEach(allConditions, id: \.self) { condition in
                     let isActive = conditions.contains(condition)
                     Button(condition) {
-                        if isActive {
-                            conditions.removeAll { $0 == condition }
-                        } else {
-                            conditions.append(condition)
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            if isActive {
+                                conditions.removeAll { $0 == condition }
+                            } else {
+                                conditions.append(condition)
+                            }
                         }
                     }
                     .font(.caption2)
                     .foregroundStyle(isActive ? DMTheme.background : DMTheme.textPrimary)
                     .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
+                    .padding(.vertical, 5)
                     .background(isActive ? DMTheme.accentRed : DMTheme.detail)
                     .clipShape(Capsule())
+                    .frame(minHeight: 32)
                 }
             }
         }
@@ -379,24 +385,29 @@ struct InitiativeStripView: View {
     var body: some View {
         VStack(spacing: 6) {
             HStack {
-                Text("Initiative")
-                    .font(.caption.bold())
+                Text("INITIATIVE")
+                    .font(.caption2.bold())
                     .foregroundStyle(DMTheme.accent)
+                    .tracking(1.5)
 
                 Spacer()
 
                 Button {
-                    showAddEntry.toggle()
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showAddEntry.toggle()
+                    }
                 } label: {
                     Image(systemName: "plus.circle")
-                        .font(.subheadline)
+                        .font(.body)
                         .foregroundStyle(DMTheme.accent)
                 }
                 .frame(minWidth: 44, minHeight: 44)
 
                 if !initiativeEntries.isEmpty {
                     Button {
-                        initiativeEntries.removeAll()
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            initiativeEntries.removeAll()
+                        }
                     } label: {
                         Text("Clear")
                             .font(.caption)
@@ -405,7 +416,7 @@ struct InitiativeStripView: View {
                     .frame(minHeight: 44)
                 }
             }
-            .padding(.horizontal)
+            .padding(.horizontal, DMTheme.contentPadding)
 
             if showAddEntry {
                 HStack(spacing: 8) {
@@ -429,8 +440,10 @@ struct InitiativeStripView: View {
 
                     Button("Add") {
                         if let roll = Int(newRoll), !newName.isEmpty {
-                            initiativeEntries.append(InitiativeEntry(name: newName, roll: roll))
-                            initiativeEntries.sort { $0.roll > $1.roll }
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                initiativeEntries.append(InitiativeEntry(name: newName, roll: roll))
+                                initiativeEntries.sort { $0.roll > $1.roll }
+                            }
                             newName = ""
                             newRoll = ""
                             showAddEntry = false
@@ -439,7 +452,7 @@ struct InitiativeStripView: View {
                     .buttonStyle(DMSmallButtonStyle(color: DMTheme.accentGreen.opacity(0.3)))
                     .frame(minHeight: 44)
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, DMTheme.contentPadding)
             }
 
             if initiativeEntries.isEmpty {
@@ -463,18 +476,18 @@ struct InitiativeStripView: View {
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
                             .background(index == 0 ? DMTheme.accent.opacity(0.15) : DMTheme.card)
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                             .overlay(
-                                RoundedRectangle(cornerRadius: 6)
+                                RoundedRectangle(cornerRadius: 8)
                                     .stroke(index == 0 ? DMTheme.accent : DMTheme.border, lineWidth: 1)
                             )
                         }
                     }
-                    .padding(.horizontal)
+                    .padding(.horizontal, DMTheme.contentPadding)
                 }
             }
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, 10)
         .background(DMTheme.card)
     }
 }
@@ -502,11 +515,24 @@ struct MonsterPickerSheet: View {
                         .foregroundStyle(DMTheme.textDim)
                     TextField("Search monsters...", text: $searchText)
                         .foregroundStyle(DMTheme.textPrimary)
+                    if !searchText.isEmpty {
+                        Button {
+                            searchText = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(DMTheme.textDim)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
                 .padding(10)
                 .background(DMTheme.detail)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
-                .padding()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(DMTheme.border, lineWidth: 1)
+                )
+                .padding(DMTheme.contentPadding)
 
                 List(filtered) { monster in
                     Button {
@@ -517,13 +543,13 @@ struct MonsterPickerSheet: View {
                                 .foregroundStyle(DMTheme.textPrimary)
                             Spacer()
                             Text("CR \(monster.crString)")
-                                .font(.caption)
+                                .font(.caption.monospacedDigit())
                                 .foregroundStyle(DMTheme.accent)
                             Text("AC \(monster.armorClass)")
-                                .font(.caption)
+                                .font(.caption.monospacedDigit())
                                 .foregroundStyle(DMTheme.accentBlue)
                             Text("HP \(monster.hitPoints)")
-                                .font(.caption)
+                                .font(.caption.monospacedDigit())
                                 .foregroundStyle(DMTheme.accentGreen)
                         }
                     }
