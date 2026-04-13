@@ -138,7 +138,7 @@ struct DashboardView: View {
                 case .reference:
                     ReferenceView()
                 case .ai:
-                    AIPlaceholder()
+                    AIAssistantView(campaign: campaign)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
