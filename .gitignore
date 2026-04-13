@@ -1,3 +1,7 @@
 build/
 *.xcodeproj
 DerivedData/
+.claude/worktrees/
+build/
+DerivedData/
+*.xcodeproj
