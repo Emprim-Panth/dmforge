@@ -39,5 +39,5 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.forgecode.forgemaster
         MARKETING_VERSION: "2.0.0"
-        CURRENT_PROJECT_VERSION: "3"
+        CURRENT_PROJECT_VERSION: "4"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
