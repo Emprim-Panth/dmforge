@@ -12,18 +12,23 @@ struct ContentView: View {
             if let campaign = activeCampaign {
                 DashboardView(campaign: campaign)
                     .environment(\.campaign, campaign)
+                    .transition(.opacity)
             } else {
                 CampaignPickerView(
                     campaigns: campaigns,
                     onSelect: { campaign in
-                        activeCampaign = campaign
-                        showCampaignPicker = false
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            activeCampaign = campaign
+                            showCampaignPicker = false
+                        }
                     },
                     onCreate: { name in
                         let campaign = Campaign(name: name)
                         modelContext.insert(campaign)
-                        activeCampaign = campaign
-                        showCampaignPicker = false
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            activeCampaign = campaign
+                            showCampaignPicker = false
+                        }
                     }
                 )
             }
@@ -43,65 +48,146 @@ struct CampaignPickerView: View {
     @State private var showCreate = false
 
     var body: some View {
-        VStack(spacing: 32) {
-            Spacer()
+        ZStack {
+            // Background gradient instead of flat black
+            LinearGradient(
+                colors: [
+                    Color(hex: "08080e"),
+                    Color(hex: "0d0d18"),
+                    Color(hex: "12101e")
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
 
-            Text("DM FORGE")
-                .font(.system(size: 42, weight: .bold, design: .serif))
-                .foregroundStyle(DMTheme.accent)
+            // Subtle radial glow behind title
+            RadialGradient(
+                colors: [DMTheme.accent.opacity(0.06), .clear],
+                center: .center,
+                startRadius: 20,
+                endRadius: 300
+            )
+            .offset(y: -120)
+            .ignoresSafeArea()
 
-            Text("Your table. Your dice. Your story.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            VStack(spacing: 32) {
+                Spacer()
 
-            Spacer().frame(height: 20)
-
-            if campaigns.isEmpty {
-                Button("Start Your First Campaign") {
-                    showCreate = true
-                }
-                .buttonStyle(DMButtonStyle())
-            } else {
+                // App title with ornamental styling
                 VStack(spacing: 12) {
-                    ForEach(campaigns) { campaign in
-                        Button {
-                            onSelect(campaign)
-                        } label: {
-                            HStack {
-                                VStack(alignment: .leading) {
-                                    Text(campaign.name)
-                                        .font(.headline)
-                                    Text(campaign.updatedAt.formatted(date: .abbreviated, time: .shortened))
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .foregroundStyle(.secondary)
-                            }
-                            .padding()
-                            .background(DMTheme.card, in: RoundedRectangle(cornerRadius: 12))
-                        }
-                        .buttonStyle(.plain)
+                    // Decorative divider
+                    HStack(spacing: 8) {
+                        Rectangle()
+                            .fill(DMTheme.accent.opacity(0.3))
+                            .frame(width: 40, height: 1)
+                        Image(systemName: "shield.fill")
+                            .font(.caption)
+                            .foregroundStyle(DMTheme.accent.opacity(0.5))
+                        Rectangle()
+                            .fill(DMTheme.accent.opacity(0.3))
+                            .frame(width: 40, height: 1)
                     }
 
-                    Button("New Campaign") {
+                    Text("DM FORGE")
+                        .font(.system(size: 42, weight: .bold, design: .serif))
+                        .foregroundStyle(DMTheme.accent)
+                        .tracking(4)
+
+                    Text("Your table. Your dice. Your story.")
+                        .font(.subheadline)
+                        .foregroundStyle(DMTheme.textSecondary)
+
+                    // Decorative divider
+                    HStack(spacing: 8) {
+                        Rectangle()
+                            .fill(DMTheme.accent.opacity(0.3))
+                            .frame(width: 40, height: 1)
+                        Image(systemName: "diamond.fill")
+                            .font(.system(size: 6))
+                            .foregroundStyle(DMTheme.accent.opacity(0.5))
+                        Rectangle()
+                            .fill(DMTheme.accent.opacity(0.3))
+                            .frame(width: 40, height: 1)
+                    }
+                }
+
+                Spacer().frame(height: 20)
+
+                if campaigns.isEmpty {
+                    Button("Start Your First Campaign") {
                         showCreate = true
                     }
-                    .buttonStyle(DMButtonStyle(color: DMTheme.accent))
+                    .buttonStyle(DMPrimaryButtonStyle())
+                } else {
+                    VStack(spacing: DMTheme.cardSpacing) {
+                        ForEach(campaigns) { campaign in
+                            Button {
+                                onSelect(campaign)
+                            } label: {
+                                HStack(spacing: 16) {
+                                    // Campaign icon
+                                    Image(systemName: "book.closed.fill")
+                                        .font(.title2)
+                                        .foregroundStyle(DMTheme.accent)
+                                        .frame(width: 44, height: 44)
+                                        .background(DMTheme.accent.opacity(0.1))
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(campaign.name)
+                                            .font(.headline)
+                                            .foregroundStyle(DMTheme.textPrimary)
+
+                                        HStack(spacing: 12) {
+                                            Label("\(campaign.party.count) PCs", systemImage: "person.3.fill")
+                                                .font(.caption)
+                                                .foregroundStyle(DMTheme.textSecondary)
+                                            Label("\(campaign.sessions.count) sessions", systemImage: "book.fill")
+                                                .font(.caption)
+                                                .foregroundStyle(DMTheme.textSecondary)
+                                        }
+
+                                        Text("Last played \(campaign.updatedAt.formatted(.relative(presentation: .named)))")
+                                            .font(.caption2)
+                                            .foregroundStyle(DMTheme.textDim)
+                                    }
+
+                                    Spacer()
+
+                                    Image(systemName: "chevron.right")
+                                        .font(.subheadline)
+                                        .foregroundStyle(DMTheme.textDim)
+                                }
+                                .padding(DMTheme.cardPadding)
+                                .background(DMTheme.card)
+                                .clipShape(RoundedRectangle(cornerRadius: DMTheme.cardCornerRadius))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: DMTheme.cardCornerRadius)
+                                        .stroke(DMTheme.border, lineWidth: 1)
+                                )
+                                .shadow(color: DMTheme.cardShadow, radius: 4, y: 2)
+                            }
+                            .buttonStyle(.plain)
+                        }
+
+                        Button("New Campaign") {
+                            showCreate = true
+                        }
+                        .buttonStyle(DMPrimaryButtonStyle())
+                        .padding(.top, 8)
+                    }
+                    .frame(maxWidth: 480)
                 }
-                .frame(maxWidth: 400)
+
+                Spacer()
+
+                Text("v2.0 — D&D 5e SRD")
+                    .font(.caption2)
+                    .foregroundStyle(DMTheme.textDim)
             }
-
-            Spacer()
-
-            Text("v2.0 — D&D 5e SRD")
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
+            .padding()
         }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(DMTheme.background)
         .alert("New Campaign", isPresented: $showCreate) {
             TextField("Campaign name", text: $newName)
             Button("Create") {
