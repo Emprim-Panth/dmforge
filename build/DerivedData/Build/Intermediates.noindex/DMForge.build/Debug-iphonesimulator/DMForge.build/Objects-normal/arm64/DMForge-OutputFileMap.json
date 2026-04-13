@@ -146,6 +146,16 @@
     "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DashboardView.swiftdeps",
     "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/DashboardView~partial.swiftmodule"
   },
+  "/Users/evanprimeau/Development/DMForge/Sources/Views/Map/WorldMapView.swift" : {
+    "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/WorldMapView.swiftconstvalues",
+    "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/WorldMapView.d",
+    "diagnostics" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/WorldMapView.dia",
+    "index-unit-output-path" : "/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/WorldMapView.o",
+    "llvm-bc" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/WorldMapView.bc",
+    "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/WorldMapView.o",
+    "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/WorldMapView.swiftdeps",
+    "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/WorldMapView~partial.swiftmodule"
+  },
   "/Users/evanprimeau/Development/DMForge/Sources/Views/People/CharacterCreatorView.swift" : {
     "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/CharacterCreatorView.swiftconstvalues",
     "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/CharacterCreatorView.d",
