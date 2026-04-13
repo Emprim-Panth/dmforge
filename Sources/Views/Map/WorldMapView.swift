@@ -41,6 +41,8 @@ enum MapUndoAction {
     case addWaterBody(UUID)
     case removeRiver(MapRiver)
     case removeWaterBody(MapWaterBody)
+    case moveStamp(UUID, oldX: Double, oldY: Double)
+    case moveTextLabel(UUID, oldX: Double, oldY: Double)
 }
 
 // MARK: - WorldMapView
@@ -83,6 +85,9 @@ struct WorldMapView: View {
 
     // Selected stamp for editing
     @State private var selectedStampID: UUID?
+    @State private var selectedTextLabelID: UUID?
+    @State private var isDraggingSelected = false
+    @State private var dragStartPosition: CGPoint?
 
     // River drawing state
     @State private var currentRiverPoints: [CGPoint] = []
@@ -90,6 +95,10 @@ struct WorldMapView: View {
 
     // Water body drawing state
     @State private var currentWaterBodyPoints: [CGPoint] = []
+
+    // Apple Pencil pressure tracking
+    @State private var currentDrawPressures: [Double] = []
+    @State private var pencilCanvasSize: CGSize = .zero
 
     // Undo stack
     @State private var undoStack: [MapUndoAction] = []
@@ -309,14 +318,15 @@ struct WorldMapView: View {
                     )
                 }
 
-                // Layer 5: Freehand drawings
+                // Layer 5: Freehand drawings (with pressure-sensitive width)
                 for drawing in campaign.mapDrawings {
                     MapRenderer.drawFreehand(
                         context: &context,
                         points: drawing.points,
                         mapSize: size,
                         lineWidth: drawing.lineWidth * zoomScale,
-                        color: drawing.color
+                        color: drawing.color,
+                        pressures: drawing.pressures
                     )
                 }
 
@@ -341,6 +351,20 @@ struct WorldMapView: View {
                         mapSize: size,
                         fontSize: 16
                     )
+
+                    // Selection highlight for text labels
+                    if selectedTextLabelID == label.id {
+                        let labelPoint = CGPoint(x: label.x * size.width, y: label.y * size.height)
+                        let highlightSize: CGFloat = 40
+                        var selRect = Path()
+                        selRect.addRect(CGRect(
+                            x: labelPoint.x - highlightSize,
+                            y: labelPoint.y - highlightSize * 0.4,
+                            width: highlightSize * 2,
+                            height: highlightSize * 0.8
+                        ))
+                        context.stroke(selRect, with: .color(DMTheme.accent), style: StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
+                    }
                 }
 
                 // Layer 8: Location pins
@@ -349,14 +373,15 @@ struct WorldMapView: View {
                 // Layer 9: Travel path
                 drawTravelPath(context: &context, size: size)
 
-                // Draw current drawing in progress
+                // Draw current drawing in progress (with live pressure data)
                 if !currentDrawPoints.isEmpty {
                     MapRenderer.drawFreehand(
                         context: &context,
                         points: currentDrawPoints,
                         mapSize: size,
                         lineWidth: drawLineWidth * zoomScale,
-                        color: drawColor
+                        color: drawColor,
+                        pressures: currentDrawPressures
                     )
                 }
 
@@ -371,6 +396,70 @@ struct WorldMapView: View {
                         lineWidth: max(1, 2 * zoomScale)
                     )
                 }
+            }
+            .overlay {
+                // Apple Pencil overlay — intercepts pencil touches for pressure-sensitive drawing
+                PencilCanvasView(
+                    toolMode: toolMode,
+                    zoomScale: zoomScale,
+                    panOffset: panOffset,
+                    onTouchPoint: { point in
+                        switch toolMode {
+                        case .draw:
+                            currentDrawPoints.append(point.location)
+                            currentDrawPressures.append(point.pressure)
+                        case .river:
+                            currentRiverPoints.append(point.location)
+                        default:
+                            break
+                        }
+                    },
+                    onTouchEnded: {
+                        switch toolMode {
+                        case .draw:
+                            if currentDrawPoints.count >= 2 {
+                                let simplified = PathSimplifier.simplify(currentDrawPoints, epsilon: 0.003)
+                                // Downsample pressures to match simplified points
+                                let pressures = downsamplePressures(
+                                    currentDrawPressures,
+                                    originalCount: currentDrawPoints.count,
+                                    targetCount: simplified.count
+                                )
+                                let drawing = MapDrawing(
+                                    points: simplified,
+                                    lineWidth: drawLineWidth,
+                                    color: drawColor,
+                                    pressures: pressures
+                                )
+                                campaign.mapDrawings.append(drawing)
+                                undoStack.append(.addDrawing(drawing.id))
+                            }
+                            currentDrawPoints = []
+                            currentDrawPressures = []
+                        case .river:
+                            if currentRiverPoints.count >= 2 {
+                                let simplified = PathSimplifier.simplify(currentRiverPoints, epsilon: 0.003)
+                                let (sw, ew) = riverWidths(for: riverPreset)
+                                let river = MapRiver(
+                                    points: simplified,
+                                    startWidth: sw,
+                                    endWidth: ew
+                                )
+                                campaign.mapRivers.append(river)
+                                undoStack.append(.addRiver(river.id))
+                            }
+                            currentRiverPoints = []
+                        default:
+                            break
+                        }
+                    },
+                    onPencilDoubleTap: {
+                        // Toggle between Draw and Eraser on pencil barrel double-tap
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            toolMode = (toolMode == .eraser) ? .draw : .eraser
+                        }
+                    }
+                )
             }
             .gesture(canvasGesture(in: canvasSize))
             .simultaneousGesture(magnificationGesture)
@@ -387,11 +476,51 @@ struct WorldMapView: View {
 
                 switch toolMode {
                 case .select:
-                    // Pan the map
-                    panOffset = CGSize(
-                        width: lastPanOffset.width + value.translation.width,
-                        height: lastPanOffset.height + value.translation.height
-                    )
+                    // Check if we should drag a selected element
+                    if !isDraggingSelected && dragStartPosition == nil {
+                        // First touch — check if we're on a selected stamp or text label
+                        let hitRadius: CGFloat = 0.03
+                        if let sid = selectedStampID,
+                           let idx = campaign.mapStamps.firstIndex(where: { $0.id == sid }) {
+                            let stamp = campaign.mapStamps[idx]
+                            let dist = hypot(stamp.x - normalized.x, stamp.y - normalized.y)
+                            if dist < hitRadius {
+                                isDraggingSelected = true
+                                dragStartPosition = CGPoint(x: stamp.x, y: stamp.y)
+                            }
+                        }
+                        if !isDraggingSelected, let tid = selectedTextLabelID,
+                           let idx = campaign.mapTextLabels.firstIndex(where: { $0.id == tid }) {
+                            let label = campaign.mapTextLabels[idx]
+                            let dist = hypot(label.x - normalized.x, label.y - normalized.y)
+                            if dist < hitRadius {
+                                isDraggingSelected = true
+                                dragStartPosition = CGPoint(x: label.x, y: label.y)
+                            }
+                        }
+                        if !isDraggingSelected {
+                            dragStartPosition = .zero // sentinel: we're panning
+                        }
+                    }
+
+                    if isDraggingSelected {
+                        // Move selected element in real-time
+                        if let sid = selectedStampID,
+                           let idx = campaign.mapStamps.firstIndex(where: { $0.id == sid }) {
+                            campaign.mapStamps[idx].x = normalized.x
+                            campaign.mapStamps[idx].y = normalized.y
+                        } else if let tid = selectedTextLabelID,
+                                  let idx = campaign.mapTextLabels.firstIndex(where: { $0.id == tid }) {
+                            campaign.mapTextLabels[idx].x = normalized.x
+                            campaign.mapTextLabels[idx].y = normalized.y
+                        }
+                    } else {
+                        // Pan the map
+                        panOffset = CGSize(
+                            width: lastPanOffset.width + value.translation.width,
+                            height: lastPanOffset.height + value.translation.height
+                        )
+                    }
                 case .stamp:
                     break // handled on tap (onEnded with no translation)
                 case .draw:
@@ -415,11 +544,22 @@ struct WorldMapView: View {
 
                 switch toolMode {
                 case .select:
-                    lastPanOffset = panOffset
-                    // If it was a tap (minimal drag), check for stamp selection
-                    if dragDistance < 10 {
-                        handleSelectTap(at: normalized)
+                    if isDraggingSelected, let startPos = dragStartPosition {
+                        // Commit the move as an undo action
+                        if let sid = selectedStampID {
+                            undoStack.append(.moveStamp(sid, oldX: startPos.x, oldY: startPos.y))
+                        } else if let tid = selectedTextLabelID {
+                            undoStack.append(.moveTextLabel(tid, oldX: startPos.x, oldY: startPos.y))
+                        }
+                    } else {
+                        lastPanOffset = panOffset
+                        // If it was a tap (minimal drag), check for stamp/text selection
+                        if dragDistance < 10 {
+                            handleSelectTap(at: normalized)
+                        }
                     }
+                    isDraggingSelected = false
+                    dragStartPosition = nil
                 case .stamp:
                     if dragDistance < 10, let stampType = selectedStampType {
                         let stamp = MapStamp(
@@ -511,23 +651,40 @@ struct WorldMapView: View {
     }
 
     private func handleSelectTap(at normalized: CGPoint) {
-        // Find nearest stamp
         let hitRadius: CGFloat = 0.03
         var bestStamp: MapStamp?
+        var bestTextLabel: MapTextLabel?
         var bestDist: CGFloat = .infinity
 
+        // Find nearest stamp
         for stamp in campaign.mapStamps {
             let dist = hypot(stamp.x - normalized.x, stamp.y - normalized.y)
             if dist < hitRadius && dist < bestDist {
                 bestDist = dist
                 bestStamp = stamp
+                bestTextLabel = nil
+            }
+        }
+
+        // Find nearest text label
+        for label in campaign.mapTextLabels {
+            let dist = hypot(label.x - normalized.x, label.y - normalized.y)
+            if dist < hitRadius && dist < bestDist {
+                bestDist = dist
+                bestTextLabel = label
+                bestStamp = nil
             }
         }
 
         if let stamp = bestStamp {
             selectedStampID = (selectedStampID == stamp.id) ? nil : stamp.id
+            selectedTextLabelID = nil
+        } else if let label = bestTextLabel {
+            selectedTextLabelID = (selectedTextLabelID == label.id) ? nil : label.id
+            selectedStampID = nil
         } else {
             selectedStampID = nil
+            selectedTextLabelID = nil
             // Check for pin tap
             for place in campaign.places where place.mapX != nil && place.mapY != nil {
                 let dist = hypot((place.mapX ?? 0) - normalized.x, (place.mapY ?? 0) - normalized.y)
@@ -1050,6 +1207,16 @@ struct WorldMapView: View {
             campaign.mapRivers.append(river)
         case .removeWaterBody(let water):
             campaign.mapWaterBodies.append(water)
+        case .moveStamp(let id, let oldX, let oldY):
+            if let idx = campaign.mapStamps.firstIndex(where: { $0.id == id }) {
+                campaign.mapStamps[idx].x = oldX
+                campaign.mapStamps[idx].y = oldY
+            }
+        case .moveTextLabel(let id, let oldX, let oldY):
+            if let idx = campaign.mapTextLabels.firstIndex(where: { $0.id == id }) {
+                campaign.mapTextLabels[idx].x = oldX
+                campaign.mapTextLabels[idx].y = oldY
+            }
         }
     }
 
@@ -1301,5 +1468,22 @@ struct WorldMapView: View {
         panOffset = .zero
         lastPanOffset = .zero
         selectedPhoto = nil
+    }
+
+    /// Downsample pressure array to match simplified point count
+    private func downsamplePressures(_ pressures: [Double], originalCount: Int, targetCount: Int) -> [Double] {
+        guard !pressures.isEmpty, targetCount > 0 else { return [] }
+        guard pressures.count > 1, targetCount < pressures.count else { return pressures }
+
+        var result: [Double] = []
+        for i in 0..<targetCount {
+            let t = Double(i) / Double(max(1, targetCount - 1))
+            let srcIdx = t * Double(pressures.count - 1)
+            let lo = Int(srcIdx)
+            let hi = min(lo + 1, pressures.count - 1)
+            let frac = srcIdx - Double(lo)
+            result.append(pressures[lo] * (1 - frac) + pressures[hi] * frac)
+        }
+        return result
     }
 }

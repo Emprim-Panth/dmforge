@@ -1077,13 +1077,16 @@ enum MapRenderer {
 
     // MARK: - Freehand Drawing
 
-    /// Draw a freehand ink line with calligraphy-style width variation
+    /// Draw a freehand ink line with calligraphy-style width variation.
+    /// When pressures are provided (from Apple Pencil), each segment gets a
+    /// different stroke width for natural calligraphy feel.
     static func drawFreehand(
         context: inout GraphicsContext,
         points: [CGPoint],
         mapSize: CGSize,
         lineWidth: Double,
-        color: String
+        color: String,
+        pressures: [Double] = []
     ) {
         guard points.count >= 2 else { return }
 
@@ -1096,13 +1099,32 @@ enum MapRenderer {
 
         let canvasPoints = points.map { CGPoint(x: $0.x * mapSize.width, y: $0.y * mapSize.height) }
 
-        // Simple path with variable width approximation
-        var path = Path()
-        path.move(to: canvasPoints[0])
-        for i in 1..<canvasPoints.count {
-            path.addLine(to: canvasPoints[i])
+        // If pressure data is available, draw per-segment with variable width
+        if pressures.count >= canvasPoints.count {
+            for i in 1..<canvasPoints.count {
+                // Blend pressure between adjacent points for smooth transitions
+                let p = (pressures[i - 1] + pressures[i]) / 2.0
+                // Pressure maps to 0.3x...2.0x of base line width
+                let segmentWidth = lineWidth * (0.3 + p * 1.7)
+
+                var segPath = Path()
+                segPath.move(to: canvasPoints[i - 1])
+                segPath.addLine(to: canvasPoints[i])
+                context.stroke(
+                    segPath,
+                    with: .color(resolvedColor),
+                    style: StrokeStyle(lineWidth: segmentWidth, lineCap: .round, lineJoin: .round)
+                )
+            }
+        } else {
+            // No pressure data — uniform width
+            var path = Path()
+            path.move(to: canvasPoints[0])
+            for i in 1..<canvasPoints.count {
+                path.addLine(to: canvasPoints[i])
+            }
+            context.stroke(path, with: .color(resolvedColor), style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round))
         }
-        context.stroke(path, with: .color(resolvedColor), style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round))
     }
 
     // MARK: - Text Label

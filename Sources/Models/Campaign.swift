@@ -113,6 +113,7 @@ struct MapDrawing: Codable, Identifiable {
     var points: [CGPoint]  // normalized 0...1
     var lineWidth: Double = 2.0
     var color: String = "ink"  // ink, blue, green, red
+    var pressures: [Double] = []  // per-point pressure from Apple Pencil (0.0...1.0), empty = uniform width
 }
 
 // MARK: - Map Text Labels

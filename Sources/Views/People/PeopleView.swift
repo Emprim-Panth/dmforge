@@ -330,7 +330,9 @@ struct PeopleView: View {
                 }
 
                 HStack(spacing: 8) {
-                    Button("To Encounter") { }
+                    Button("To Encounter") {
+                        addEnemyToEncounter(enemy)
+                    }
                         .buttonStyle(DMSmallButtonStyle(color: DMTheme.accentRed.opacity(0.2)))
                         .frame(minHeight: 44)
 
@@ -415,6 +417,17 @@ struct PeopleView: View {
                     .foregroundStyle(DMTheme.manaFull)
             }
         }
+    }
+
+    /// Clone this enemy into the active encounter as a fresh combatant
+    private func addEnemyToEncounter(_ enemy: Enemy) {
+        let clone = Enemy(name: enemy.name, cr: enemy.cr)
+        clone.hpMax = enemy.hpMax
+        clone.hpCurrent = enemy.hpMax  // full health for encounter
+        clone.armorClass = enemy.armorClass
+        clone.srdID = enemy.srdID
+        clone.campaign = campaign
+        campaign.enemies.append(clone)
     }
 
     private func crBadge(_ cr: Double) -> some View {

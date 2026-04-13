@@ -499,11 +499,21 @@ struct MonsterPickerSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @State private var searchText = ""
-    @State private var monsters: [SRDMonster] = []
+    @State private var allMonsters: [SRDMonster] = []
+    @State private var showFullSRD = false
 
-    var filtered: [SRDMonster] {
-        if searchText.isEmpty { return monsters }
-        return monsters.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+    /// Monsters bookmarked in the campaign's roster
+    private var rosterMonsters: [SRDMonster] {
+        let rosterIDs = Set(campaign.monsterRoster)
+        let roster = allMonsters.filter { rosterIDs.contains($0.srdID) }
+        if searchText.isEmpty { return roster }
+        return roster.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+    }
+
+    /// All SRD monsters (filtered by search)
+    private var srdMonsters: [SRDMonster] {
+        if searchText.isEmpty { return allMonsters }
+        return allMonsters.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
     }
 
     var body: some View {
@@ -534,26 +544,63 @@ struct MonsterPickerSheet: View {
                 )
                 .padding(DMTheme.contentPadding)
 
-                List(filtered) { monster in
-                    Button {
-                        addMonster(monster)
-                    } label: {
-                        HStack {
-                            Text(monster.name)
-                                .foregroundStyle(DMTheme.textPrimary)
-                            Spacer()
-                            Text("CR \(monster.crString)")
-                                .font(.caption.monospacedDigit())
+                List {
+                    // Campaign Roster section
+                    if !rosterMonsters.isEmpty {
+                        Section {
+                            ForEach(rosterMonsters) { monster in
+                                Button { addMonster(monster) } label: {
+                                    monsterRow(monster, isRoster: true)
+                                }
+                                .listRowBackground(DMTheme.card)
+                            }
+                        } header: {
+                            Label("Campaign Roster", systemImage: "star.fill")
+                                .font(.subheadline.bold())
                                 .foregroundStyle(DMTheme.accent)
-                            Text("AC \(monster.armorClass)")
-                                .font(.caption.monospacedDigit())
-                                .foregroundStyle(DMTheme.accentBlue)
-                            Text("HP \(monster.hitPoints)")
-                                .font(.caption.monospacedDigit())
-                                .foregroundStyle(DMTheme.accentGreen)
+                        }
+                    } else if !campaign.monsterRoster.isEmpty {
+                        // Roster exists but search filtered everything out
+                        Section {
+                            Text("No roster matches")
+                                .font(.caption)
+                                .foregroundStyle(DMTheme.textDim)
+                                .listRowBackground(DMTheme.card)
+                        } header: {
+                            Label("Campaign Roster", systemImage: "star.fill")
+                                .font(.subheadline.bold())
+                                .foregroundStyle(DMTheme.accent)
                         }
                     }
-                    .listRowBackground(DMTheme.card)
+
+                    // Full SRD section
+                    Section {
+                        if showFullSRD || campaign.monsterRoster.isEmpty {
+                            ForEach(srdMonsters) { monster in
+                                Button { addMonster(monster) } label: {
+                                    monsterRow(monster, isRoster: false)
+                                }
+                                .listRowBackground(DMTheme.card)
+                            }
+                        } else {
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    showFullSRD = true
+                                }
+                            } label: {
+                                Label("Browse Full SRD (\(allMonsters.count) monsters)", systemImage: "book.pages")
+                                    .font(.subheadline)
+                                    .foregroundStyle(DMTheme.accent)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .frame(minHeight: 44)
+                            }
+                            .listRowBackground(DMTheme.card)
+                        }
+                    } header: {
+                        Label("SRD Bestiary", systemImage: "book.closed")
+                            .font(.subheadline.bold())
+                            .foregroundStyle(DMTheme.textSecondary)
+                    }
                 }
                 .scrollContentBackground(.hidden)
             }
@@ -567,6 +614,28 @@ struct MonsterPickerSheet: View {
             }
         }
         .onAppear { loadMonsters() }
+    }
+
+    private func monsterRow(_ monster: SRDMonster, isRoster: Bool) -> some View {
+        HStack {
+            if isRoster {
+                Image(systemName: "star.fill")
+                    .font(.caption2)
+                    .foregroundStyle(DMTheme.accent.opacity(0.6))
+            }
+            Text(monster.name)
+                .foregroundStyle(DMTheme.textPrimary)
+            Spacer()
+            Text("CR \(monster.crString)")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(DMTheme.accent)
+            Text("AC \(monster.armorClass)")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(DMTheme.accentBlue)
+            Text("HP \(monster.hitPoints)")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(DMTheme.accentGreen)
+        }
     }
 
     private func addMonster(_ monster: SRDMonster) {
@@ -584,6 +653,6 @@ struct MonsterPickerSheet: View {
         guard let url = Bundle.main.url(forResource: "monsters", withExtension: "json", subdirectory: "SRD") else { return }
         guard let data = try? Data(contentsOf: url) else { return }
         guard let wrapper = try? JSONDecoder().decode(SRDMonsterFile.self, from: data) else { return }
-        monsters = wrapper.monsters
+        allMonsters = wrapper.monsters
     }
 }
