@@ -33,6 +33,8 @@ final class Campaign {
     // Map stamps and text labels
     var mapStamps: [MapStamp]
     var mapTextLabels: [MapTextLabel]
+    var mapBorders: [MapBorder]
+    var mapDrawings: [MapDrawing]
 
     init(name: String) {
         self.id = UUID()
@@ -54,6 +56,8 @@ final class Campaign {
         self.travelSegments = []
         self.mapStamps = []
         self.mapTextLabels = []
+        self.mapBorders = []
+        self.mapDrawings = []
     }
 }
 
@@ -80,24 +84,31 @@ struct TravelSegment: Codable, Identifiable {
 
 struct MapStamp: Codable, Identifiable {
     var id: UUID = UUID()
-    var type: String   // "mountain", "forest", "water", "town", "castle", "cave", "camp", "road"
-    var x: Double      // normalized 0...1
-    var y: Double      // normalized 0...1
+    var type: String       // "mountain", "forest", "water", "settlement", "castle", "hills", "swamp", "desert", "plains", "landmark"
+    var variant: Int = 0   // variant index within type
+    var x: Double          // normalized 0...1
+    var y: Double          // normalized 0...1
+    var size: Double = 40  // base size in points (scales with zoom)
     var label: String?
+    var rotation: Double = 0  // radians
+}
 
-    var emoji: String {
-        switch type {
-        case "mountain": return "\u{26F0}"  // ⛰
-        case "forest": return "\u{1F332}"   // 🌲
-        case "water": return "\u{1F4A7}"    // 💧
-        case "town": return "\u{1F3D8}"     // 🏘
-        case "castle": return "\u{1F3F0}"   // 🏰
-        case "cave": return "\u{2694}\u{FE0F}" // ⚔️
-        case "camp": return "\u{26FA}"      // ⛺
-        case "road": return "\u{2014}"      // —
-        default: return "\u{1F4CD}"         // 📍
-        }
-    }
+// MARK: - Map Borders
+
+struct MapBorder: Codable, Identifiable {
+    var id: UUID = UUID()
+    var points: [CGPoint]  // normalized 0...1
+    var color: String = "border"  // border, river, road
+    var style: String = "dashed"  // solid, dashed, dotted
+}
+
+// MARK: - Map Freehand Drawings
+
+struct MapDrawing: Codable, Identifiable {
+    var id: UUID = UUID()
+    var points: [CGPoint]  // normalized 0...1
+    var lineWidth: Double = 2.0
+    var color: String = "ink"  // ink, blue, green, red
 }
 
 // MARK: - Map Text Labels

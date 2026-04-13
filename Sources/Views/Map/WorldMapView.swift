@@ -2,42 +2,38 @@ import SwiftUI
 import SwiftData
 import PhotosUI
 
-// MARK: - Stamp Definition
-
-struct StampType: Identifiable {
-    let id: String
-    let emoji: String
-    let label: String
-
-    static let all: [StampType] = [
-        StampType(id: "mountain", emoji: "\u{26F0}", label: "Mountain"),
-        StampType(id: "forest", emoji: "\u{1F332}", label: "Forest"),
-        StampType(id: "water", emoji: "\u{1F4A7}", label: "Water"),
-        StampType(id: "town", emoji: "\u{1F3D8}", label: "Town"),
-        StampType(id: "castle", emoji: "\u{1F3F0}", label: "Castle"),
-        StampType(id: "cave", emoji: "\u{2694}\u{FE0F}", label: "Cave"),
-        StampType(id: "camp", emoji: "\u{26FA}", label: "Camp"),
-        StampType(id: "road", emoji: "\u{2014}", label: "Road"),
-    ]
-}
-
 // MARK: - Map Tool Mode
 
 enum MapToolMode: Equatable {
-    case none
-    case addPin
-    case stamp(StampType)
-    case textLabel
+    case select
+    case stamp
+    case draw
+    case border
+    case text
+    case eraser
 
     static func == (lhs: MapToolMode, rhs: MapToolMode) -> Bool {
         switch (lhs, rhs) {
-        case (.none, .none): return true
-        case (.addPin, .addPin): return true
-        case (.textLabel, .textLabel): return true
-        case (.stamp(let a), .stamp(let b)): return a.id == b.id
-        default: return false
+        case (.select, .select), (.stamp, .stamp), (.draw, .draw),
+             (.border, .border), (.text, .text), (.eraser, .eraser):
+            return true
+        default:
+            return false
         }
     }
+}
+
+// MARK: - Undo Action
+
+enum MapUndoAction {
+    case addStamp(UUID)
+    case addBorder(UUID)
+    case addDrawing(UUID)
+    case addTextLabel(UUID)
+    case removeStamp(MapStamp)
+    case removeBorder(MapBorder)
+    case removeDrawing(MapDrawing)
+    case removeTextLabel(MapTextLabel)
 }
 
 // MARK: - WorldMapView
@@ -48,21 +44,50 @@ struct WorldMapView: View {
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showFileImporter = false
     @State private var isDMView = true
-    @State private var toolMode: MapToolMode = .none
+    @State private var toolMode: MapToolMode = .select
     @State private var pendingPinPosition: CGPoint?
     @State private var showPlacePicker = false
     @State private var selectedPinPlace: Place?
-    @State private var zoom: CGFloat = 1.0
-    @State private var lastZoom: CGFloat = 1.0
-    @State private var offset: CGSize = .zero
-    @State private var lastOffset: CGSize = .zero
+
+    // Zoom and pan
+    @State private var zoomScale: CGFloat = 1.0
+    @State private var lastZoomScale: CGFloat = 1.0
+    @State private var panOffset: CGSize = .zero
+    @State private var lastPanOffset: CGSize = .zero
+
+    // Stamp picker
+    @State private var showStampPicker = false
+    @State private var selectedStampType: InkStampType?
+
+    // Freehand drawing state
+    @State private var currentDrawPoints: [CGPoint] = []
+    @State private var drawLineWidth: Double = 2.0
+    @State private var drawColor: String = "ink"
+
+    // Border drawing state
+    @State private var currentBorderPoints: [CGPoint] = []
+    @State private var borderColor: String = "border"
+    @State private var borderStyle: String = "dashed"
+
+    // Text label
     @State private var showTextLabelInput = false
     @State private var pendingTextLabelPosition: CGPoint?
     @State private var textLabelInput = ""
-    @State private var showStampToolbar = false
+
+    // Selected stamp for editing
+    @State private var selectedStampID: UUID?
+
+    // Undo stack
+    @State private var undoStack: [MapUndoAction] = []
+
+    // Map dimensions for canvas
+    private let mapWidth: CGFloat = 2048
+    private let mapHeight: CGFloat = 2048
 
     private var hasContent: Bool {
-        campaign.mapImageData != nil || !campaign.mapStamps.isEmpty || !campaign.mapTextLabels.isEmpty
+        campaign.mapImageData != nil || !campaign.mapStamps.isEmpty ||
+        !campaign.mapTextLabels.isEmpty || !campaign.mapBorders.isEmpty ||
+        !campaign.mapDrawings.isEmpty
     }
 
     var body: some View {
@@ -70,16 +95,16 @@ struct WorldMapView: View {
             DMTheme.background.ignoresSafeArea()
 
             if hasContent {
-                mapContentView
+                mapCanvasView
             } else {
                 emptyStateView
             }
 
-            // Stamp toolbar overlay at bottom
+            // Bottom toolbar
             if hasContent {
                 VStack {
                     Spacer()
-                    stampToolbarView
+                    bottomToolbar
                 }
             }
         }
@@ -101,6 +126,9 @@ struct WorldMapView: View {
         .sheet(isPresented: $showPlacePicker) {
             placePickerSheet
         }
+        .sheet(isPresented: $showStampPicker) {
+            stampPickerSheet
+        }
         .alert("Add Label", isPresented: $showTextLabelInput) {
             TextField("Label text", text: $textLabelInput)
             Button("Add") {
@@ -111,6 +139,7 @@ struct WorldMapView: View {
                         y: pos.y
                     )
                     campaign.mapTextLabels.append(label)
+                    undoStack.append(.addTextLabel(label.id))
                 }
                 textLabelInput = ""
                 pendingTextLabelPosition = nil
@@ -131,430 +160,396 @@ struct WorldMapView: View {
 
     private func handleCoordinatorOnAppear() {
         if let place = coordinator.showPlaceOnMap {
-            // Zoom/highlight to this place
             selectedPinPlace = place
             if let mx = place.mapX, let my = place.mapY {
-                // Center on the place
-                zoom = 2.0
-                lastZoom = 2.0
-                offset = CGSize(
+                zoomScale = 2.0
+                lastZoomScale = 2.0
+                panOffset = CGSize(
                     width: -(mx - 0.5) * 400,
                     height: -(my - 0.5) * 400
                 )
-                lastOffset = offset
+                lastPanOffset = panOffset
             }
             coordinator.showPlaceOnMap = nil
         }
 
-        if let place = coordinator.placeNeedingPin {
-            // Switch to add-pin mode, pre-selecting this place
-            toolMode = .addPin
+        if coordinator.placeNeedingPin != nil {
+            toolMode = .select
             coordinator.placeNeedingPin = nil
-            // If no map exists yet, create a blank canvas
-            if campaign.mapImageData == nil {
+            if campaign.mapImageData == nil && !hasContent {
                 createParchmentCanvas()
-                showStampToolbar = true
             }
         }
     }
 
-    // MARK: - Map Content
+    // MARK: - Canvas-Based Map View
 
     @ViewBuilder
-    private var mapContentView: some View {
+    private var mapCanvasView: some View {
         GeometryReader { geo in
-            ZStack {
-                if let data = campaign.mapImageData, let mapImage = UIImage(data: data) {
-                    Image(uiImage: mapImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .overlay {
-                            GeometryReader { imageGeo in
-                                ZStack {
-                                    // Travel path
-                                    travelPathOverlay(in: imageGeo.size)
+            let canvasSize = geo.size
 
-                                    // Encounter zones (DM view only)
-                                    if isDMView {
-                                        encounterZoneOverlay(in: imageGeo.size)
-                                    }
+            Canvas { context, size in
+                // Apply zoom + pan transform
+                let tx = panOffset.width + size.width / 2 * (1 - zoomScale)
+                let ty = panOffset.height + size.height / 2 * (1 - zoomScale)
 
-                                    // Map stamps
-                                    stampOverlay(in: imageGeo.size)
+                context.translateBy(x: tx, y: ty)
+                context.scaleBy(x: zoomScale, y: zoomScale)
 
-                                    // Text labels
-                                    textLabelOverlay(in: imageGeo.size)
+                // Draw parchment background (always, as base layer)
+                if campaign.mapImageData == nil {
+                    MapRenderer.drawParchmentBackground(context: &context, size: size)
+                }
 
-                                    // Location pins
-                                    pinOverlay(in: imageGeo.size)
+                // Draw imported map image if present
+                if let data = campaign.mapImageData, let uiImage = UIImage(data: data) {
+                    let image = context.resolve(Image(uiImage: uiImage))
+                    context.draw(image, in: CGRect(origin: .zero, size: size))
+                }
 
-                                    // Pending pin placement
-                                    if case .addPin = toolMode, let pos = pendingPinPosition {
-                                        pinMarker(emoji: "\u{1F4CD}", label: "New Pin")
-                                            .position(x: pos.x * imageGeo.size.width,
-                                                      y: pos.y * imageGeo.size.height)
-                                    }
-                                }
-                            }
-                        }
-                } else {
-                    // No image but has stamps/labels — show parchment background
-                    parchmentBackground
-                        .overlay {
-                            GeometryReader { imageGeo in
-                                ZStack {
-                                    stampOverlay(in: imageGeo.size)
-                                    textLabelOverlay(in: imageGeo.size)
-                                    pinOverlay(in: imageGeo.size)
-                                }
-                            }
-                        }
+                // Draw freehand drawings
+                for drawing in campaign.mapDrawings {
+                    MapRenderer.drawFreehand(
+                        context: &context,
+                        points: drawing.points,
+                        mapSize: size,
+                        lineWidth: drawing.lineWidth * zoomScale,
+                        color: drawing.color
+                    )
+                }
+
+                // Draw borders
+                for border in campaign.mapBorders {
+                    MapRenderer.drawBorder(
+                        context: &context,
+                        points: border.points,
+                        mapSize: size,
+                        style: border.style,
+                        color: border.color,
+                        lineWidth: max(1, 2 * zoomScale)
+                    )
+                }
+
+                // Draw travel path
+                drawTravelPath(context: &context, size: size)
+
+                // Draw encounter zones (DM view only)
+                if isDMView {
+                    drawEncounterZones(context: &context, size: size)
+                }
+
+                // Draw stamps (map-space, scale with zoom)
+                for stamp in campaign.mapStamps {
+                    let mapPoint = CGPoint(x: stamp.x * size.width, y: stamp.y * size.height)
+                    let stampSize = stamp.size
+
+                    MapRenderer.draw(
+                        stamp.type,
+                        variant: stamp.variant,
+                        context: &context,
+                        at: mapPoint,
+                        size: stampSize,
+                        seed: stamp.id
+                    )
+
+                    // Draw label if present
+                    if let label = stamp.label, !label.isEmpty {
+                        let labelPoint = CGPoint(x: mapPoint.x, y: mapPoint.y + stampSize * 0.5 + 12)
+                        let resolved = context.resolve(
+                            Text(label)
+                                .font(.system(size: 11, weight: .semibold, design: .serif))
+                                .foregroundColor(InkStyle.inkColor)
+                        )
+                        context.draw(resolved, at: labelPoint, anchor: .top)
+                    }
+
+                    // Selection highlight
+                    if selectedStampID == stamp.id {
+                        var selRect = Path()
+                        selRect.addRect(CGRect(
+                            x: mapPoint.x - stampSize * 0.5 - 4,
+                            y: mapPoint.y - stampSize * 0.5 - 4,
+                            width: stampSize + 8,
+                            height: stampSize + 8
+                        ))
+                        context.stroke(selRect, with: .color(DMTheme.accent), style: StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
+                    }
+                }
+
+                // Draw text labels
+                for label in campaign.mapTextLabels {
+                    MapRenderer.drawTextLabel(
+                        context: &context,
+                        text: label.text,
+                        at: CGPoint(x: label.x, y: label.y),
+                        mapSize: size,
+                        fontSize: 16
+                    )
+                }
+
+                // Draw location pins
+                drawPins(context: &context, size: size)
+
+                // Draw current drawing in progress
+                if !currentDrawPoints.isEmpty {
+                    MapRenderer.drawFreehand(
+                        context: &context,
+                        points: currentDrawPoints,
+                        mapSize: size,
+                        lineWidth: drawLineWidth * zoomScale,
+                        color: drawColor
+                    )
+                }
+
+                // Draw current border in progress
+                if !currentBorderPoints.isEmpty {
+                    MapRenderer.drawBorder(
+                        context: &context,
+                        points: currentBorderPoints,
+                        mapSize: size,
+                        style: borderStyle,
+                        color: borderColor,
+                        lineWidth: max(1, 2 * zoomScale)
+                    )
                 }
             }
-            .scaleEffect(zoom)
-            .offset(offset)
-            .gesture(dragGesture)
-            .gesture(magnificationGesture)
-            .overlay {
-                // Invisible tap target for tool interactions
-                if toolMode != .none {
-                    GeometryReader { tapGeo in
-                        Color.clear
-                            .contentShape(Rectangle())
-                            .onTapGesture { location in
-                                let normalized = CGPoint(
-                                    x: location.x / tapGeo.size.width,
-                                    y: location.y / tapGeo.size.height
-                                )
-                                handleMapTap(at: normalized)
-                            }
+            .gesture(canvasGesture(in: canvasSize))
+            .simultaneousGesture(magnificationGesture)
+        }
+    }
+
+    // MARK: - Canvas Gesture Handling
+
+    private func canvasGesture(in canvasSize: CGSize) -> some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                let location = value.location
+                let normalized = screenToNormalized(location, canvasSize: canvasSize)
+
+                switch toolMode {
+                case .select:
+                    // Pan the map
+                    panOffset = CGSize(
+                        width: lastPanOffset.width + value.translation.width,
+                        height: lastPanOffset.height + value.translation.height
+                    )
+                case .stamp:
+                    break // handled on tap (onEnded with no translation)
+                case .draw:
+                    currentDrawPoints.append(normalized)
+                case .border:
+                    currentBorderPoints.append(normalized)
+                case .text:
+                    break
+                case .eraser:
+                    break
+                }
+            }
+            .onEnded { value in
+                let location = value.location
+                let normalized = screenToNormalized(location, canvasSize: canvasSize)
+                let dragDistance = hypot(value.translation.width, value.translation.height)
+
+                switch toolMode {
+                case .select:
+                    lastPanOffset = panOffset
+                    // If it was a tap (minimal drag), check for stamp selection
+                    if dragDistance < 10 {
+                        handleSelectTap(at: normalized)
+                    }
+                case .stamp:
+                    if dragDistance < 10, let stampType = selectedStampType {
+                        let stamp = MapStamp(
+                            type: stampType.id,
+                            variant: stampType.variant,
+                            x: normalized.x,
+                            y: normalized.y,
+                            size: 40
+                        )
+                        campaign.mapStamps.append(stamp)
+                        undoStack.append(.addStamp(stamp.id))
+                    }
+                case .draw:
+                    if currentDrawPoints.count >= 2 {
+                        let simplified = PathSimplifier.simplify(currentDrawPoints, epsilon: 0.003)
+                        let drawing = MapDrawing(
+                            points: simplified,
+                            lineWidth: drawLineWidth,
+                            color: drawColor
+                        )
+                        campaign.mapDrawings.append(drawing)
+                        undoStack.append(.addDrawing(drawing.id))
+                    }
+                    currentDrawPoints = []
+                case .border:
+                    if currentBorderPoints.count >= 2 {
+                        let simplified = PathSimplifier.simplify(currentBorderPoints, epsilon: 0.005)
+                        let border = MapBorder(
+                            points: simplified,
+                            color: borderColor,
+                            style: borderStyle
+                        )
+                        campaign.mapBorders.append(border)
+                        undoStack.append(.addBorder(border.id))
+                    }
+                    currentBorderPoints = []
+                case .text:
+                    if dragDistance < 10 {
+                        pendingTextLabelPosition = normalized
+                        showTextLabelInput = true
+                    }
+                case .eraser:
+                    if dragDistance < 10 {
+                        handleEraserTap(at: normalized)
                     }
                 }
             }
-        }
     }
 
-    // MARK: - Map Tap Handling
+    /// Convert screen coordinates to normalized map coordinates (0...1)
+    private func screenToNormalized(_ screenPoint: CGPoint, canvasSize: CGSize) -> CGPoint {
+        let tx = panOffset.width + canvasSize.width / 2 * (1 - zoomScale)
+        let ty = panOffset.height + canvasSize.height / 2 * (1 - zoomScale)
 
-    private func handleMapTap(at normalized: CGPoint) {
-        switch toolMode {
-        case .addPin:
-            pendingPinPosition = normalized
-            showPlacePicker = true
-        case .stamp(let stampType):
-            let stamp = MapStamp(
-                type: stampType.id,
-                x: normalized.x,
-                y: normalized.y
-            )
-            campaign.mapStamps.append(stamp)
-        case .textLabel:
-            pendingTextLabelPosition = normalized
-            showTextLabelInput = true
-        case .none:
-            break
-        }
+        let mapX = (screenPoint.x - tx) / (canvasSize.width * zoomScale)
+        let mapY = (screenPoint.y - ty) / (canvasSize.height * zoomScale)
+
+        return CGPoint(x: mapX, y: mapY)
     }
 
-    // MARK: - Parchment Background
+    private func handleSelectTap(at normalized: CGPoint) {
+        // Find nearest stamp
+        let hitRadius: CGFloat = 0.03
+        var bestStamp: MapStamp?
+        var bestDist: CGFloat = .infinity
 
-    private var parchmentBackground: some View {
-        RoundedRectangle(cornerRadius: 8)
-            .fill(
-                LinearGradient(
-                    colors: [
-                        Color(red: 0.85, green: 0.78, blue: 0.65),
-                        Color(red: 0.82, green: 0.74, blue: 0.60),
-                        Color(red: 0.80, green: 0.72, blue: 0.58),
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .overlay(
-                // Subtle texture noise
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.brown.opacity(0.05))
-            )
-            .padding(8)
-    }
-
-    // MARK: - Stamp Toolbar
-
-    private var stampToolbarView: some View {
-        VStack(spacing: 0) {
-            if showStampToolbar {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        // Pin tool
-                        toolButton(
-                            emoji: "\u{1F4CD}",
-                            label: "Pin",
-                            isActive: toolMode == .addPin
-                        ) {
-                            toolMode = toolMode == .addPin ? .none : .addPin
-                        }
-
-                        Divider()
-                            .frame(height: 40)
-
-                        // Stamp tools
-                        ForEach(StampType.all) { stamp in
-                            toolButton(
-                                emoji: stamp.emoji,
-                                label: stamp.label,
-                                isActive: toolMode == .stamp(stamp)
-                            ) {
-                                toolMode = toolMode == .stamp(stamp) ? .none : .stamp(stamp)
-                            }
-                        }
-
-                        Divider()
-                            .frame(height: 40)
-
-                        // Text label tool
-                        toolButton(
-                            emoji: "Aa",
-                            label: "Label",
-                            isActive: toolMode == .textLabel
-                        ) {
-                            toolMode = toolMode == .textLabel ? .none : .textLabel
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                }
-                .background(
-                    DMTheme.card.opacity(0.95)
-                        .shadow(color: .black.opacity(0.3), radius: 8, y: -2)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .padding(.horizontal, 16)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-
-            // Toggle button
-            Button {
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    showStampToolbar.toggle()
-                    if !showStampToolbar {
-                        toolMode = .none
-                    }
-                }
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: showStampToolbar ? "chevron.down" : "paintbrush.pointed.fill")
-                        .font(.caption)
-                    Text(showStampToolbar ? "Hide Tools" : "Build Tools")
-                        .font(.caption.bold())
-                }
-                .foregroundStyle(DMTheme.accent)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(DMTheme.card.opacity(0.95))
-                .clipShape(Capsule())
-                .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
-            }
-            .padding(.bottom, 12)
-        }
-    }
-
-    private func toolButton(emoji: String, label: String, isActive: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            VStack(spacing: 4) {
-                Text(emoji)
-                    .font(.title2)
-                Text(label)
-                    .font(.caption2)
-                    .foregroundStyle(isActive ? DMTheme.accent : DMTheme.textDim)
-            }
-            .frame(width: 52, height: 52)
-            .background(isActive ? DMTheme.accent.opacity(0.2) : Color.clear)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(isActive ? DMTheme.accent : Color.clear, lineWidth: 2)
-            )
-        }
-        .frame(minHeight: 44)
-    }
-
-    // MARK: - Overlays
-
-    @ViewBuilder
-    private func stampOverlay(in size: CGSize) -> some View {
-        ForEach(campaign.mapStamps) { stamp in
-            VStack(spacing: 1) {
-                Text(stamp.emoji)
-                    .font(.system(size: 28 / zoom))
-                if let label = stamp.label, !label.isEmpty {
-                    Text(label)
-                        .font(.system(size: 10 / zoom, weight: .semibold))
-                        .foregroundStyle(DMTheme.textPrimary)
-                        .padding(.horizontal, 4)
-                        .background(DMTheme.card.opacity(0.7))
-                        .clipShape(RoundedRectangle(cornerRadius: 3))
-                }
-            }
-            .position(
-                x: stamp.x * size.width,
-                y: stamp.y * size.height
-            )
-            .onLongPressGesture {
-                // Remove stamp on long press
-                campaign.mapStamps.removeAll { $0.id == stamp.id }
+        for stamp in campaign.mapStamps {
+            let dist = hypot(stamp.x - normalized.x, stamp.y - normalized.y)
+            if dist < hitRadius && dist < bestDist {
+                bestDist = dist
+                bestStamp = stamp
             }
         }
-    }
 
-    @ViewBuilder
-    private func textLabelOverlay(in size: CGSize) -> some View {
-        ForEach(campaign.mapTextLabels) { label in
-            Text(label.text)
-                .font(.system(size: 16 / zoom, weight: .bold, design: .serif))
-                .foregroundStyle(Color(red: 0.3, green: 0.2, blue: 0.1))
-                .shadow(color: .white.opacity(0.5), radius: 1, y: 1)
-                .position(
-                    x: label.x * size.width,
-                    y: label.y * size.height
-                )
-                .onLongPressGesture {
-                    campaign.mapTextLabels.removeAll { $0.id == label.id }
-                }
-        }
-    }
-
-    @ViewBuilder
-    private func pinOverlay(in size: CGSize) -> some View {
-        ForEach(campaign.places.filter { $0.mapX != nil && $0.mapY != nil }) { place in
-            pinMarker(emoji: place.typeIcon, label: place.name)
-                .position(
-                    x: (place.mapX ?? 0) * size.width,
-                    y: (place.mapY ?? 0) * size.height
-                )
-                .onTapGesture {
+        if let stamp = bestStamp {
+            selectedStampID = (selectedStampID == stamp.id) ? nil : stamp.id
+        } else {
+            selectedStampID = nil
+            // Check for pin tap
+            for place in campaign.places where place.mapX != nil && place.mapY != nil {
+                let dist = hypot((place.mapX ?? 0) - normalized.x, (place.mapY ?? 0) - normalized.y)
+                if dist < hitRadius {
                     selectedPinPlace = (selectedPinPlace?.id == place.id) ? nil : place
+                    return
                 }
-                .overlay {
-                    if selectedPinPlace?.id == place.id {
-                        pinPopover(for: place)
-                            .position(
-                                x: (place.mapX ?? 0) * size.width,
-                                y: (place.mapY ?? 0) * size.height - 50
-                            )
-                    }
+            }
+            selectedPinPlace = nil
+        }
+    }
+
+    private func handleEraserTap(at normalized: CGPoint) {
+        let hitRadius: CGFloat = 0.03
+
+        // Check stamps
+        if let index = campaign.mapStamps.firstIndex(where: { hypot($0.x - normalized.x, $0.y - normalized.y) < hitRadius }) {
+            let stamp = campaign.mapStamps.remove(at: index)
+            undoStack.append(.removeStamp(stamp))
+            return
+        }
+
+        // Check text labels
+        if let index = campaign.mapTextLabels.firstIndex(where: { hypot($0.x - normalized.x, $0.y - normalized.y) < hitRadius }) {
+            let label = campaign.mapTextLabels.remove(at: index)
+            undoStack.append(.removeTextLabel(label))
+            return
+        }
+
+        // Check borders (find nearest point)
+        for (bi, border) in campaign.mapBorders.enumerated() {
+            for point in border.points {
+                if hypot(point.x - normalized.x, point.y - normalized.y) < hitRadius * 1.5 {
+                    let removed = campaign.mapBorders.remove(at: bi)
+                    undoStack.append(.removeBorder(removed))
+                    return
                 }
+            }
         }
-    }
 
-    @ViewBuilder
-    private func encounterZoneOverlay(in size: CGSize) -> some View {
-        ForEach(campaign.encounterZones.filter { $0.active }) { zone in
-            Circle()
-                .fill(DMTheme.accentRed.opacity(0.2))
-                .stroke(DMTheme.accentRed.opacity(0.5), lineWidth: 2)
-                .frame(
-                    width: zone.radius * 2 * size.width / 1000,
-                    height: zone.radius * 2 * size.width / 1000
-                )
-                .position(
-                    x: zone.positionX * size.width,
-                    y: zone.positionY * size.height
-                )
-        }
-    }
-
-    @ViewBuilder
-    private func travelPathOverlay(in size: CGSize) -> some View {
-        if !campaign.travelStops.isEmpty {
-            Canvas { context, canvasSize in
-                let stops = campaign.travelStops
-                guard stops.count > 1 else { return }
-
-                var path = Path()
-                let first = stops[0].position
-                path.move(to: CGPoint(
-                    x: first.x * canvasSize.width,
-                    y: first.y * canvasSize.height
-                ))
-
-                for i in 1..<stops.count {
-                    let stop = stops[i].position
-                    path.addLine(to: CGPoint(
-                        x: stop.x * canvasSize.width,
-                        y: stop.y * canvasSize.height
-                    ))
+        // Check drawings
+        for (di, drawing) in campaign.mapDrawings.enumerated() {
+            for point in drawing.points {
+                if hypot(point.x - normalized.x, point.y - normalized.y) < hitRadius * 1.5 {
+                    let removed = campaign.mapDrawings.remove(at: di)
+                    undoStack.append(.removeDrawing(removed))
+                    return
                 }
-
-                context.stroke(
-                    path,
-                    with: .color(DMTheme.accent.opacity(0.7)),
-                    style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
-                )
             }
-            .allowsHitTesting(false)
         }
     }
 
-    // MARK: - Pin Components
+    // MARK: - Canvas Drawing Helpers
 
-    private func pinMarker(emoji: String, label: String) -> some View {
-        VStack(spacing: 2) {
-            ZStack {
-                Circle()
-                    .fill(DMTheme.accent)
-                    .frame(width: 36, height: 36)
-                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
-                Text(emoji)
-                    .font(.system(size: 18))
-            }
-            Text(label)
-                .font(.caption2.bold())
-                .foregroundStyle(DMTheme.textPrimary)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(DMTheme.card.opacity(0.9))
-                .clipShape(RoundedRectangle(cornerRadius: 4))
-                .lineLimit(1)
+    private func drawTravelPath(context: inout GraphicsContext, size: CGSize) {
+        let stops = campaign.travelStops
+        guard stops.count > 1 else { return }
+
+        var path = Path()
+        let first = stops[0].position
+        path.move(to: CGPoint(x: first.x * size.width, y: first.y * size.height))
+
+        for i in 1..<stops.count {
+            let stop = stops[i].position
+            path.addLine(to: CGPoint(x: stop.x * size.width, y: stop.y * size.height))
         }
-    }
 
-    private func pinPopover(for place: Place) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(place.name)
-                .font(.subheadline.bold())
-                .foregroundStyle(DMTheme.accent)
-            Text(place.type.capitalized)
-                .font(.caption)
-                .foregroundStyle(DMTheme.textSecondary)
-            if !place.desc.isEmpty {
-                Text(place.desc)
-                    .font(.caption2)
-                    .foregroundStyle(DMTheme.textPrimary)
-                    .lineLimit(2)
-            }
-
-            Button {
-                coordinator.showPlaceInList = place
-                coordinator.requestedTab = .places
-            } label: {
-                Label("View in Places", systemImage: "list.bullet")
-                    .font(.caption2.bold())
-                    .foregroundStyle(DMTheme.accent)
-            }
-            .frame(minHeight: 36)
-            .padding(.top, 2)
-        }
-        .padding(10)
-        .background(DMTheme.card)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(DMTheme.border, lineWidth: 1)
+        context.stroke(
+            path,
+            with: .color(DMTheme.accent.opacity(0.7)),
+            style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
         )
-        .shadow(color: .black.opacity(0.4), radius: 8, y: 4)
-        .frame(width: 180)
+    }
+
+    private func drawEncounterZones(context: inout GraphicsContext, size: CGSize) {
+        for zone in campaign.encounterZones where zone.active {
+            let center = CGPoint(x: zone.positionX * size.width, y: zone.positionY * size.height)
+            let radius = zone.radius * size.width / 1000
+
+            var circle = Path()
+            circle.addEllipse(in: CGRect(
+                x: center.x - radius,
+                y: center.y - radius,
+                width: radius * 2,
+                height: radius * 2
+            ))
+            context.fill(circle, with: .color(DMTheme.accentRed.opacity(0.15)))
+            context.stroke(circle, with: .color(DMTheme.accentRed.opacity(0.4)), lineWidth: 2)
+        }
+    }
+
+    private func drawPins(context: inout GraphicsContext, size: CGSize) {
+        for place in campaign.places where place.mapX != nil && place.mapY != nil {
+            let center = CGPoint(x: (place.mapX ?? 0) * size.width, y: (place.mapY ?? 0) * size.height)
+
+            // Pin circle
+            var pinPath = Path()
+            pinPath.addEllipse(in: CGRect(x: center.x - 12, y: center.y - 12, width: 24, height: 24))
+            context.fill(pinPath, with: .color(DMTheme.accent))
+
+            // Pin icon text
+            let icon = context.resolve(
+                Text(place.typeIcon).font(.system(size: 14))
+            )
+            context.draw(icon, at: center, anchor: .center)
+
+            // Pin label
+            let label = context.resolve(
+                Text(place.name)
+                    .font(.system(size: 10, weight: .bold, design: .serif))
+                    .foregroundColor(InkStyle.inkColor)
+            )
+            context.draw(label, at: CGPoint(x: center.x, y: center.y + 18), anchor: .top)
+        }
     }
 
     // MARK: - Gestures
@@ -562,24 +557,314 @@ struct WorldMapView: View {
     private var magnificationGesture: some Gesture {
         MagnifyGesture()
             .onChanged { value in
-                zoom = lastZoom * value.magnification
+                zoomScale = lastZoomScale * value.magnification
             }
-            .onEnded { value in
-                lastZoom = zoom
+            .onEnded { _ in
+                lastZoomScale = zoomScale
             }
     }
 
-    private var dragGesture: some Gesture {
-        DragGesture()
-            .onChanged { value in
-                offset = CGSize(
-                    width: lastOffset.width + value.translation.width,
-                    height: lastOffset.height + value.translation.height
-                )
+    // MARK: - Bottom Toolbar
+
+    private var bottomToolbar: some View {
+        VStack(spacing: 8) {
+            // Tool-specific options
+            if toolMode == .draw {
+                drawOptionsBar
+            } else if toolMode == .border {
+                borderOptionsBar
             }
-            .onEnded { _ in
-                lastOffset = offset
+
+            // Main tool buttons
+            HStack(spacing: 4) {
+                toolButton(icon: "arrow.up.left.and.arrow.down.right", label: "Select", tool: .select)
+                toolButton(icon: "mountain.2", label: "Stamp", tool: .stamp)
+                toolButton(icon: "pencil.tip", label: "Draw", tool: .draw)
+                toolButton(icon: "line.diagonal", label: "Border", tool: .border)
+                toolButton(icon: "textformat", label: "Text", tool: .text)
+                toolButton(icon: "eraser", label: "Eraser", tool: .eraser)
+
+                Divider()
+                    .frame(height: 36)
+                    .padding(.horizontal, 4)
+
+                // Pin tool
+                Button {
+                    pendingPinPosition = nil
+                    showPlacePicker = false
+                } label: {
+                    VStack(spacing: 2) {
+                        Image(systemName: "mappin")
+                            .font(.system(size: 18))
+                        Text("Pin")
+                            .font(.caption2)
+                    }
+                    .frame(width: 52, height: 52)
+                    .foregroundStyle(DMTheme.textDim)
+                }
+                .frame(minWidth: 44, minHeight: 44)
+
+                Divider()
+                    .frame(height: 36)
+                    .padding(.horizontal, 4)
+
+                // Undo button
+                Button {
+                    performUndo()
+                } label: {
+                    VStack(spacing: 2) {
+                        Image(systemName: "arrow.uturn.backward")
+                            .font(.system(size: 18))
+                        Text("Undo")
+                            .font(.caption2)
+                    }
+                    .frame(width: 52, height: 52)
+                    .foregroundStyle(undoStack.isEmpty ? DMTheme.textDim.opacity(0.3) : DMTheme.textDim)
+                }
+                .disabled(undoStack.isEmpty)
+                .frame(minWidth: 44, minHeight: 44)
             }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                DMTheme.card.opacity(0.95)
+                    .shadow(color: .black.opacity(0.3), radius: 8, y: -2)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .padding(.horizontal, 16)
+            .padding(.bottom, 12)
+        }
+    }
+
+    private func toolButton(icon: String, label: String, tool: MapToolMode) -> some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                if toolMode == tool && tool == .stamp {
+                    showStampPicker = true
+                } else {
+                    toolMode = tool
+                    if tool == .stamp {
+                        showStampPicker = true
+                    }
+                }
+            }
+        } label: {
+            VStack(spacing: 2) {
+                Image(systemName: icon)
+                    .font(.system(size: 18))
+                Text(label)
+                    .font(.caption2)
+            }
+            .frame(width: 52, height: 52)
+            .foregroundStyle(toolMode == tool ? DMTheme.accent : DMTheme.textDim)
+            .background(toolMode == tool ? DMTheme.accent.opacity(0.15) : Color.clear)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(toolMode == tool ? DMTheme.accent : Color.clear, lineWidth: 1.5)
+            )
+        }
+        .frame(minWidth: 44, minHeight: 44)
+    }
+
+    // MARK: - Draw Options Bar
+
+    private var drawOptionsBar: some View {
+        HStack(spacing: 12) {
+            Text("Width:")
+                .font(.caption)
+                .foregroundStyle(DMTheme.textSecondary)
+
+            ForEach([1.5, 2.5, 4.0], id: \.self) { width in
+                Button {
+                    drawLineWidth = width
+                } label: {
+                    Circle()
+                        .fill(drawLineWidth == width ? DMTheme.accent : DMTheme.textDim)
+                        .frame(width: CGFloat(width * 4 + 8), height: CGFloat(width * 4 + 8))
+                }
+                .frame(minWidth: 44, minHeight: 44)
+            }
+
+            Divider().frame(height: 24)
+
+            Text("Color:")
+                .font(.caption)
+                .foregroundStyle(DMTheme.textSecondary)
+
+            ForEach(["ink", "blue", "green", "red"], id: \.self) { color in
+                let displayColor: Color = switch color {
+                case "blue": InkStyle.borderBlue
+                case "green": InkStyle.drawGreen
+                case "red": InkStyle.borderRed
+                default: InkStyle.inkColor
+                }
+                Button {
+                    drawColor = color
+                } label: {
+                    Circle()
+                        .fill(displayColor)
+                        .frame(width: 20, height: 20)
+                        .overlay(
+                            Circle()
+                                .stroke(drawColor == color ? DMTheme.accent : Color.clear, lineWidth: 2)
+                                .padding(-3)
+                        )
+                }
+                .frame(minWidth: 44, minHeight: 44)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(DMTheme.card.opacity(0.9))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .padding(.horizontal, 16)
+    }
+
+    // MARK: - Border Options Bar
+
+    private var borderOptionsBar: some View {
+        HStack(spacing: 12) {
+            Text("Style:")
+                .font(.caption)
+                .foregroundStyle(DMTheme.textSecondary)
+
+            ForEach(["dashed", "solid", "dotted"], id: \.self) { style in
+                Button {
+                    borderStyle = style
+                } label: {
+                    Text(style.capitalized)
+                        .font(.caption.bold())
+                        .foregroundStyle(borderStyle == style ? DMTheme.accent : DMTheme.textDim)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(borderStyle == style ? DMTheme.accent.opacity(0.15) : Color.clear)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                }
+                .frame(minHeight: 44)
+            }
+
+            Divider().frame(height: 24)
+
+            Text("Type:")
+                .font(.caption)
+                .foregroundStyle(DMTheme.textSecondary)
+
+            ForEach(["border", "river", "road"], id: \.self) { color in
+                Button {
+                    borderColor = color
+                } label: {
+                    Text(color.capitalized)
+                        .font(.caption.bold())
+                        .foregroundStyle(borderColor == color ? DMTheme.accent : DMTheme.textDim)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(borderColor == color ? DMTheme.accent.opacity(0.15) : Color.clear)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                }
+                .frame(minHeight: 44)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(DMTheme.card.opacity(0.9))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .padding(.horizontal, 16)
+    }
+
+    // MARK: - Stamp Picker Sheet
+
+    private var stampPickerSheet: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    ForEach(StampCategory.allCases) { category in
+                        VStack(alignment: .leading, spacing: 10) {
+                            Label(category.rawValue, systemImage: category.icon)
+                                .font(.headline)
+                                .foregroundStyle(DMTheme.textPrimary)
+                                .padding(.horizontal, 16)
+
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 80, maximum: 100))], spacing: 12) {
+                                ForEach(InkStampType.stampsFor(category: category), id: \.uniqueID) { stampType in
+                                    Button {
+                                        selectedStampType = stampType
+                                        toolMode = .stamp
+                                        showStampPicker = false
+                                    } label: {
+                                        VStack(spacing: 4) {
+                                            // Preview canvas
+                                            Canvas { context, size in
+                                                let center = CGPoint(x: size.width / 2, y: size.height / 2)
+                                                MapRenderer.drawPreview(
+                                                    stampType.id,
+                                                    variant: stampType.variant,
+                                                    context: &context,
+                                                    at: center,
+                                                    size: min(size.width, size.height) * 0.7
+                                                )
+                                            }
+                                            .frame(width: 60, height: 60)
+                                            .background(InkStyle.parchment)
+                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(
+                                                        selectedStampType?.uniqueID == stampType.uniqueID ? DMTheme.accent : DMTheme.border,
+                                                        lineWidth: selectedStampType?.uniqueID == stampType.uniqueID ? 2 : 1
+                                                    )
+                                            )
+
+                                            Text(stampType.variantLabel)
+                                                .font(.caption2)
+                                                .foregroundStyle(DMTheme.textSecondary)
+                                                .lineLimit(1)
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                        }
+                    }
+                }
+                .padding(.vertical, 16)
+            }
+            .background(DMTheme.background)
+            .navigationTitle("Map Stamps")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Done") {
+                        showStampPicker = false
+                    }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    // MARK: - Undo
+
+    private func performUndo() {
+        guard let action = undoStack.popLast() else { return }
+        switch action {
+        case .addStamp(let id):
+            campaign.mapStamps.removeAll { $0.id == id }
+        case .addBorder(let id):
+            campaign.mapBorders.removeAll { $0.id == id }
+        case .addDrawing(let id):
+            campaign.mapDrawings.removeAll { $0.id == id }
+        case .addTextLabel(let id):
+            campaign.mapTextLabels.removeAll { $0.id == id }
+        case .removeStamp(let stamp):
+            campaign.mapStamps.append(stamp)
+        case .removeBorder(let border):
+            campaign.mapBorders.append(border)
+        case .removeDrawing(let drawing):
+            campaign.mapDrawings.append(drawing)
+        case .removeTextLabel(let label):
+            campaign.mapTextLabels.append(label)
+        }
     }
 
     // MARK: - Empty State
@@ -600,7 +885,6 @@ struct WorldMapView: View {
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 360)
 
-            // Two prominent options
             HStack(spacing: 20) {
                 // Import a Map
                 VStack(spacing: 12) {
@@ -655,7 +939,7 @@ struct WorldMapView: View {
                         .font(.headline)
                         .foregroundStyle(DMTheme.textPrimary)
 
-                    Text("Parchment canvas with stamps, pins, and labels")
+                    Text("Parchment canvas with ink stamps, borders, and labels")
                         .font(.caption)
                         .foregroundStyle(DMTheme.textSecondary)
                         .multilineTextAlignment(.center)
@@ -663,7 +947,6 @@ struct WorldMapView: View {
 
                     Button {
                         createParchmentCanvas()
-                        showStampToolbar = true
                     } label: {
                         Label("Start Building", systemImage: "hammer.fill")
                             .frame(maxWidth: .infinity)
@@ -684,7 +967,7 @@ struct WorldMapView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    // MARK: - Toolbar
+    // MARK: - Navigation Toolbar
 
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
@@ -713,12 +996,14 @@ struct WorldMapView: View {
                     campaign.mapImageData = nil
                     campaign.mapStamps = []
                     campaign.mapTextLabels = []
-                    zoom = 1.0
-                    lastZoom = 1.0
-                    offset = .zero
-                    lastOffset = .zero
-                    showStampToolbar = false
-                    toolMode = .none
+                    campaign.mapBorders = []
+                    campaign.mapDrawings = []
+                    zoomScale = 1.0
+                    lastZoomScale = 1.0
+                    panOffset = .zero
+                    lastPanOffset = .zero
+                    toolMode = .select
+                    undoStack = []
                 } label: {
                     Label("Remove Map", systemImage: "trash")
                 }
@@ -741,7 +1026,7 @@ struct WorldMapView: View {
                             place.mapY = pos.y
                         }
                         showPlacePicker = false
-                        toolMode = .none
+                        toolMode = .select
                         pendingPinPosition = nil
                     } label: {
                         HStack {
@@ -799,17 +1084,20 @@ struct WorldMapView: View {
     }
 
     private func createParchmentCanvas() {
+        // No image data needed — Canvas draws parchment directly
+        // But we need at least one stamp/label to trigger hasContent
+        // Use a nil mapImageData and just set the flag by adding nothing — hasContent checks mapImageData
+        // Actually, let's keep the image approach for backward compat but with the proper parchment color
         let size = CGSize(width: 2048, height: 2048)
         let renderer = UIGraphicsImageRenderer(size: size)
         let image = renderer.image { ctx in
-            // Parchment-colored background
-            UIColor(red: 0.85, green: 0.78, blue: 0.65, alpha: 1.0).setFill()
+            UIColor(red: 0.957, green: 0.894, blue: 0.757, alpha: 1.0).setFill()  // #f4e4c1
             ctx.fill(CGRect(origin: .zero, size: size))
 
-            // Subtle aged texture with slightly darker edges
-            let edgeColor = UIColor(red: 0.75, green: 0.68, blue: 0.55, alpha: 0.3)
+            // Vignette edges
+            let edgeColor = UIColor(red: 0.6, green: 0.5, blue: 0.35, alpha: 0.15)
             edgeColor.setFill()
-            let borderWidth: CGFloat = 40
+            let borderWidth: CGFloat = 60
             ctx.fill(CGRect(x: 0, y: 0, width: size.width, height: borderWidth))
             ctx.fill(CGRect(x: 0, y: size.height - borderWidth, width: size.width, height: borderWidth))
             ctx.fill(CGRect(x: 0, y: 0, width: borderWidth, height: size.height))
@@ -820,10 +1108,10 @@ struct WorldMapView: View {
     }
 
     private func resetViewState() {
-        zoom = 1.0
-        lastZoom = 1.0
-        offset = .zero
-        lastOffset = .zero
+        zoomScale = 1.0
+        lastZoomScale = 1.0
+        panOffset = .zero
+        lastPanOffset = .zero
         selectedPhoto = nil
     }
 }
