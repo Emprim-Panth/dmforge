@@ -11,11 +11,14 @@ enum MapToolMode: Equatable {
     case border
     case text
     case eraser
+    case river
+    case waterBody
 
     static func == (lhs: MapToolMode, rhs: MapToolMode) -> Bool {
         switch (lhs, rhs) {
         case (.select, .select), (.stamp, .stamp), (.draw, .draw),
-             (.border, .border), (.text, .text), (.eraser, .eraser):
+             (.border, .border), (.text, .text), (.eraser, .eraser),
+             (.river, .river), (.waterBody, .waterBody):
             return true
         default:
             return false
@@ -34,6 +37,10 @@ enum MapUndoAction {
     case removeBorder(MapBorder)
     case removeDrawing(MapDrawing)
     case removeTextLabel(MapTextLabel)
+    case addRiver(UUID)
+    case addWaterBody(UUID)
+    case removeRiver(MapRiver)
+    case removeWaterBody(MapWaterBody)
 }
 
 // MARK: - WorldMapView
@@ -77,6 +84,13 @@ struct WorldMapView: View {
     // Selected stamp for editing
     @State private var selectedStampID: UUID?
 
+    // River drawing state
+    @State private var currentRiverPoints: [CGPoint] = []
+    @State private var riverPreset: String = "river"  // creek, stream, river, major
+
+    // Water body drawing state
+    @State private var currentWaterBodyPoints: [CGPoint] = []
+
     // Undo stack
     @State private var undoStack: [MapUndoAction] = []
 
@@ -87,7 +101,8 @@ struct WorldMapView: View {
     private var hasContent: Bool {
         campaign.mapImageData != nil || !campaign.mapStamps.isEmpty ||
         !campaign.mapTextLabels.isEmpty || !campaign.mapBorders.isEmpty ||
-        !campaign.mapDrawings.isEmpty
+        !campaign.mapDrawings.isEmpty || !campaign.mapRivers.isEmpty ||
+        !campaign.mapWaterBodies.isEmpty
     }
 
     var body: some View {
@@ -208,38 +223,33 @@ struct WorldMapView: View {
                     context.draw(image, in: CGRect(origin: .zero, size: size))
                 }
 
-                // Draw freehand drawings
-                for drawing in campaign.mapDrawings {
-                    MapRenderer.drawFreehand(
+                // Layer 2: Water bodies (drawn first so everything else is on top)
+                for water in campaign.mapWaterBodies {
+                    MapRenderer.drawWaterBody(
                         context: &context,
-                        points: drawing.points,
+                        water: water,
                         mapSize: size,
-                        lineWidth: drawing.lineWidth * zoomScale,
-                        color: drawing.color
+                        wobbleSeed: water.id.hashValue
                     )
                 }
 
-                // Draw borders
-                for border in campaign.mapBorders {
-                    MapRenderer.drawBorder(
+                // Current water body in progress
+                if !currentWaterBodyPoints.isEmpty {
+                    let preview = MapWaterBody(coastline: currentWaterBodyPoints)
+                    MapRenderer.drawWaterBody(
                         context: &context,
-                        points: border.points,
+                        water: preview,
                         mapSize: size,
-                        style: border.style,
-                        color: border.color,
-                        lineWidth: max(1, 2 * zoomScale)
+                        wobbleSeed: 999
                     )
                 }
-
-                // Draw travel path
-                drawTravelPath(context: &context, size: size)
 
                 // Draw encounter zones (DM view only)
                 if isDMView {
                     drawEncounterZones(context: &context, size: size)
                 }
 
-                // Draw stamps (map-space, scale with zoom)
+                // Layer 3: Terrain stamps (mountains, hills, forests)
                 for stamp in campaign.mapStamps {
                     let mapPoint = CGPoint(x: stamp.x * size.width, y: stamp.y * size.height)
                     let stampSize = stamp.size
@@ -277,7 +287,52 @@ struct WorldMapView: View {
                     }
                 }
 
-                // Draw text labels
+                // Layer 4: Rivers (over terrain)
+                for river in campaign.mapRivers {
+                    MapRenderer.drawRiver(
+                        context: &context,
+                        river: river,
+                        mapSize: size,
+                        wobbleSeed: river.id.hashValue
+                    )
+                }
+
+                // Current river in progress
+                if !currentRiverPoints.isEmpty {
+                    let (sw, ew) = riverWidths(for: riverPreset)
+                    let preview = MapRiver(points: currentRiverPoints, startWidth: sw, endWidth: ew)
+                    MapRenderer.drawRiver(
+                        context: &context,
+                        river: preview,
+                        mapSize: size,
+                        wobbleSeed: 998
+                    )
+                }
+
+                // Layer 5: Freehand drawings
+                for drawing in campaign.mapDrawings {
+                    MapRenderer.drawFreehand(
+                        context: &context,
+                        points: drawing.points,
+                        mapSize: size,
+                        lineWidth: drawing.lineWidth * zoomScale,
+                        color: drawing.color
+                    )
+                }
+
+                // Layer 6: Borders
+                for border in campaign.mapBorders {
+                    MapRenderer.drawBorder(
+                        context: &context,
+                        points: border.points,
+                        mapSize: size,
+                        style: border.style,
+                        color: border.color,
+                        lineWidth: max(1, 2 * zoomScale)
+                    )
+                }
+
+                // Layer 7: Text labels
                 for label in campaign.mapTextLabels {
                     MapRenderer.drawTextLabel(
                         context: &context,
@@ -288,8 +343,11 @@ struct WorldMapView: View {
                     )
                 }
 
-                // Draw location pins
+                // Layer 8: Location pins
                 drawPins(context: &context, size: size)
+
+                // Layer 9: Travel path
+                drawTravelPath(context: &context, size: size)
 
                 // Draw current drawing in progress
                 if !currentDrawPoints.isEmpty {
@@ -340,6 +398,10 @@ struct WorldMapView: View {
                     currentDrawPoints.append(normalized)
                 case .border:
                     currentBorderPoints.append(normalized)
+                case .river:
+                    currentRiverPoints.append(normalized)
+                case .waterBody:
+                    currentWaterBodyPoints.append(normalized)
                 case .text:
                     break
                 case .eraser:
@@ -394,6 +456,36 @@ struct WorldMapView: View {
                         undoStack.append(.addBorder(border.id))
                     }
                     currentBorderPoints = []
+                case .river:
+                    if currentRiverPoints.count >= 2 {
+                        let simplified = PathSimplifier.simplify(currentRiverPoints, epsilon: 0.003)
+                        let (sw, ew) = riverWidths(for: riverPreset)
+                        let river = MapRiver(
+                            points: simplified,
+                            startWidth: sw,
+                            endWidth: ew
+                        )
+                        campaign.mapRivers.append(river)
+                        undoStack.append(.addRiver(river.id))
+                    }
+                    currentRiverPoints = []
+                case .waterBody:
+                    if currentWaterBodyPoints.count >= 3 {
+                        var simplified = PathSimplifier.simplify(currentWaterBodyPoints, epsilon: 0.003)
+                        // Auto-close if start and end are close enough
+                        if let first = simplified.first, let last = simplified.last {
+                            let dist = hypot(first.x - last.x, first.y - last.y)
+                            if dist < 0.05 {
+                                simplified[simplified.count - 1] = first
+                            } else {
+                                simplified.append(first)
+                            }
+                        }
+                        let water = MapWaterBody(coastline: simplified)
+                        campaign.mapWaterBodies.append(water)
+                        undoStack.append(.addWaterBody(water.id))
+                    }
+                    currentWaterBodyPoints = []
                 case .text:
                     if dragDistance < 10 {
                         pendingTextLabelPosition = normalized
@@ -486,6 +578,28 @@ struct WorldMapView: View {
                 }
             }
         }
+
+        // Check rivers
+        for (ri, river) in campaign.mapRivers.enumerated() {
+            for point in river.points {
+                if hypot(point.x - normalized.x, point.y - normalized.y) < hitRadius * 1.5 {
+                    let removed = campaign.mapRivers.remove(at: ri)
+                    undoStack.append(.removeRiver(removed))
+                    return
+                }
+            }
+        }
+
+        // Check water bodies
+        for (wi, water) in campaign.mapWaterBodies.enumerated() {
+            for point in water.coastline {
+                if hypot(point.x - normalized.x, point.y - normalized.y) < hitRadius * 1.5 {
+                    let removed = campaign.mapWaterBodies.remove(at: wi)
+                    undoStack.append(.removeWaterBody(removed))
+                    return
+                }
+            }
+        }
     }
 
     // MARK: - Canvas Drawing Helpers
@@ -573,6 +687,10 @@ struct WorldMapView: View {
                 drawOptionsBar
             } else if toolMode == .border {
                 borderOptionsBar
+            } else if toolMode == .river {
+                riverOptionsBar
+            } else if toolMode == .waterBody {
+                waterBodyHintBar
             }
 
             // Main tool buttons
@@ -581,6 +699,8 @@ struct WorldMapView: View {
                 toolButton(icon: "mountain.2", label: "Stamp", tool: .stamp)
                 toolButton(icon: "pencil.tip", label: "Draw", tool: .draw)
                 toolButton(icon: "line.diagonal", label: "Border", tool: .border)
+                toolButton(icon: "water.waves", label: "River", tool: .river)
+                toolButton(icon: "drop.fill", label: "Water", tool: .waterBody)
                 toolButton(icon: "textformat", label: "Text", tool: .text)
                 toolButton(icon: "eraser", label: "Eraser", tool: .eraser)
 
@@ -772,6 +892,64 @@ struct WorldMapView: View {
         .padding(.horizontal, 16)
     }
 
+    // MARK: - River Options Bar
+
+    private var riverOptionsBar: some View {
+        HStack(spacing: 12) {
+            Text("Width:")
+                .font(.caption)
+                .foregroundStyle(DMTheme.textSecondary)
+
+            ForEach(["creek", "stream", "river", "major"], id: \.self) { preset in
+                Button {
+                    riverPreset = preset
+                } label: {
+                    Text(preset.capitalized)
+                        .font(.caption.bold())
+                        .foregroundStyle(riverPreset == preset ? DMTheme.accent : DMTheme.textDim)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(riverPreset == preset ? DMTheme.accent.opacity(0.15) : Color.clear)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                }
+                .frame(minHeight: 44)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(DMTheme.card.opacity(0.9))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .padding(.horizontal, 16)
+    }
+
+    // MARK: - Water Body Hint Bar
+
+    private var waterBodyHintBar: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "info.circle")
+                .foregroundStyle(DMTheme.accent)
+            Text("Draw a closed coastline shape")
+                .font(.caption)
+                .foregroundStyle(DMTheme.textSecondary)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(DMTheme.card.opacity(0.9))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .padding(.horizontal, 16)
+    }
+
+    // MARK: - River Width Presets
+
+    private func riverWidths(for preset: String) -> (Double, Double) {
+        switch preset {
+        case "creek": return (1.0, 3.0)
+        case "stream": return (2.0, 5.0)
+        case "major": return (5.0, 15.0)
+        default: return (3.0, 10.0)  // "river"
+        }
+    }
+
     // MARK: - Stamp Picker Sheet
 
     private var stampPickerSheet: some View {
@@ -864,6 +1042,14 @@ struct WorldMapView: View {
             campaign.mapDrawings.append(drawing)
         case .removeTextLabel(let label):
             campaign.mapTextLabels.append(label)
+        case .addRiver(let id):
+            campaign.mapRivers.removeAll { $0.id == id }
+        case .addWaterBody(let id):
+            campaign.mapWaterBodies.removeAll { $0.id == id }
+        case .removeRiver(let river):
+            campaign.mapRivers.append(river)
+        case .removeWaterBody(let water):
+            campaign.mapWaterBodies.append(water)
         }
     }
 
@@ -998,6 +1184,8 @@ struct WorldMapView: View {
                     campaign.mapTextLabels = []
                     campaign.mapBorders = []
                     campaign.mapDrawings = []
+                    campaign.mapRivers = []
+                    campaign.mapWaterBodies = []
                     zoomScale = 1.0
                     lastZoomScale = 1.0
                     panOffset = .zero

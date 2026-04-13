@@ -35,6 +35,8 @@ final class Campaign {
     var mapTextLabels: [MapTextLabel]
     var mapBorders: [MapBorder]
     var mapDrawings: [MapDrawing]
+    var mapRivers: [MapRiver]
+    var mapWaterBodies: [MapWaterBody]
 
     init(name: String) {
         self.id = UUID()
@@ -58,6 +60,8 @@ final class Campaign {
         self.mapTextLabels = []
         self.mapBorders = []
         self.mapDrawings = []
+        self.mapRivers = []
+        self.mapWaterBodies = []
     }
 }
 
@@ -118,6 +122,23 @@ struct MapTextLabel: Codable, Identifiable {
     var text: String
     var x: Double  // normalized 0...1
     var y: Double  // normalized 0...1
+}
+
+// MARK: - Map Rivers
+
+struct MapRiver: Codable, Identifiable {
+    var id: UUID = UUID()
+    var points: [CGPoint]  // centerline, normalized 0...1
+    var startWidth: Double = 3.0
+    var endWidth: Double = 10.0
+}
+
+// MARK: - Map Water Bodies
+
+struct MapWaterBody: Codable, Identifiable {
+    var id: UUID = UUID()
+    var coastline: [CGPoint]  // closed path, normalized 0...1
+    var name: String?
 }
 
 extension CGPoint: @retroactive Codable {

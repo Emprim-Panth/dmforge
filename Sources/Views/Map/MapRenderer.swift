@@ -10,6 +10,8 @@ enum InkStyle {
     static let borderBlue = Color(hex: "3a5a8a")
     static let borderRed = Color(hex: "8a3a3a")
     static let drawGreen = Color(hex: "3a6a3a")
+    static let riverInk = Color(red: 0.1, green: 0.23, blue: 0.35)  // #1a3a5a
+    static let waterWash = Color(red: 0.78, green: 0.86, blue: 0.91)  // #c8dce8
 
     // Shading aliases (use inkColor/lightInk directly)
 }
@@ -1115,6 +1117,240 @@ enum MapRenderer {
         let canvasPoint = CGPoint(x: point.x * mapSize.width, y: point.y * mapSize.height)
         let resolved = context.resolve(Text(text).font(.system(size: fontSize, weight: .bold, design: .serif)).foregroundColor(InkStyle.inkColor))
         context.draw(resolved, at: canvasPoint, anchor: .center)
+    }
+
+    // MARK: - River Drawing
+
+    /// Draw a river with double bank lines that widen from source to mouth
+    static func drawRiver(
+        context: inout GraphicsContext,
+        river: MapRiver,
+        mapSize: CGSize,
+        wobbleSeed: Int
+    ) {
+        guard river.points.count >= 2 else { return }
+
+        let riverInk = Color(red: 0.1, green: 0.23, blue: 0.35)
+        let canvasPoints = river.points.map { CGPoint(x: $0.x * mapSize.width, y: $0.y * mapSize.height) }
+
+        // Compute cumulative arc lengths
+        var arcLengths: [CGFloat] = [0]
+        for i in 1..<canvasPoints.count {
+            let seg = hypot(canvasPoints[i].x - canvasPoints[i - 1].x, canvasPoints[i].y - canvasPoints[i - 1].y)
+            arcLengths.append(arcLengths.last! + seg)
+        }
+        let totalLength = arcLengths.last ?? 1.0
+
+        // Build left and right bank paths with independent wobble
+        var seedA = UInt64(abs(wobbleSeed) &+ 1)
+        var seedB = UInt64(abs(wobbleSeed) &+ 7919)
+        if seedA == 0 { seedA = 1 }
+        if seedB == 0 { seedB = 1 }
+
+        var rngLeft = SeededRandom(seed: UUID(uuid: withUnsafeBytes(of: seedA) { ptr in
+            var uuid: uuid_t = (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+            withUnsafeMutableBytes(of: &uuid) { dst in
+                let count = min(ptr.count, dst.count)
+                dst.copyBytes(from: UnsafeRawBufferPointer(rebasing: ptr.prefix(count)))
+            }
+            return uuid
+        }))
+        var rngRight = SeededRandom(seed: UUID(uuid: withUnsafeBytes(of: seedB) { ptr in
+            var uuid: uuid_t = (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+            withUnsafeMutableBytes(of: &uuid) { dst in
+                let count = min(ptr.count, dst.count)
+                dst.copyBytes(from: UnsafeRawBufferPointer(rebasing: ptr.prefix(count)))
+            }
+            return uuid
+        }))
+
+        var leftBank = Path()
+        var rightBank = Path()
+
+        for i in 0..<canvasPoints.count {
+            let t = totalLength > 0 ? arcLengths[i] / totalLength : 0
+            let width = CGFloat(river.startWidth + (river.endWidth - river.startWidth) * t)
+
+            // Compute normal at this point
+            let normal: CGPoint
+            if i == 0 {
+                let dx = canvasPoints[1].x - canvasPoints[0].x
+                let dy = canvasPoints[1].y - canvasPoints[0].y
+                let len = max(1, hypot(dx, dy))
+                normal = CGPoint(x: -dy / len, y: dx / len)
+            } else if i == canvasPoints.count - 1 {
+                let dx = canvasPoints[i].x - canvasPoints[i - 1].x
+                let dy = canvasPoints[i].y - canvasPoints[i - 1].y
+                let len = max(1, hypot(dx, dy))
+                normal = CGPoint(x: -dy / len, y: dx / len)
+            } else {
+                let dx = canvasPoints[i + 1].x - canvasPoints[i - 1].x
+                let dy = canvasPoints[i + 1].y - canvasPoints[i - 1].y
+                let len = max(1, hypot(dx, dy))
+                normal = CGPoint(x: -dy / len, y: dx / len)
+            }
+
+            let leftPt = CGPoint(
+                x: canvasPoints[i].x + normal.x * width / 2 + rngLeft.wobble(1.2),
+                y: canvasPoints[i].y + normal.y * width / 2 + rngLeft.wobble(1.2)
+            )
+            let rightPt = CGPoint(
+                x: canvasPoints[i].x - normal.x * width / 2 + rngRight.wobble(1.2),
+                y: canvasPoints[i].y - normal.y * width / 2 + rngRight.wobble(1.2)
+            )
+
+            if i == 0 {
+                leftBank.move(to: leftPt)
+                rightBank.move(to: rightPt)
+            } else {
+                leftBank.addLine(to: leftPt)
+                rightBank.addLine(to: rightPt)
+            }
+        }
+
+        let lw = max(1.0, CGFloat(river.startWidth) * 0.15)
+        context.stroke(leftBank, with: .color(riverInk), style: StrokeStyle(lineWidth: lw, lineCap: .round, lineJoin: .round))
+        context.stroke(rightBank, with: .color(riverInk), style: StrokeStyle(lineWidth: lw, lineCap: .round, lineJoin: .round))
+
+        // Ripple marks at bends (short perpendicular lines across the river)
+        var rngRipple = rngLeft
+        for i in 1..<(canvasPoints.count - 1) {
+            // Check bend angle
+            let v1x = canvasPoints[i].x - canvasPoints[i - 1].x
+            let v1y = canvasPoints[i].y - canvasPoints[i - 1].y
+            let v2x = canvasPoints[i + 1].x - canvasPoints[i].x
+            let v2y = canvasPoints[i + 1].y - canvasPoints[i].y
+            let cross = v1x * v2y - v1y * v2x
+            let dot = v1x * v2x + v1y * v2y
+            let angle = abs(atan2(cross, dot))
+
+            if angle > 0.3 {  // Significant bend
+                let t = totalLength > 0 ? arcLengths[i] / totalLength : 0
+                let width = CGFloat(river.startWidth + (river.endWidth - river.startWidth) * t)
+                let dx = canvasPoints[i + 1].x - canvasPoints[i - 1].x
+                let dy = canvasPoints[i + 1].y - canvasPoints[i - 1].y
+                let len = max(1, hypot(dx, dy))
+                let nx = -dy / len
+                let ny = dx / len
+
+                var ripple = Path()
+                let rippleLen = width * 0.35
+                ripple.move(to: CGPoint(
+                    x: canvasPoints[i].x + nx * rippleLen + rngRipple.wobble(0.5),
+                    y: canvasPoints[i].y + ny * rippleLen + rngRipple.wobble(0.5)
+                ))
+                ripple.addLine(to: CGPoint(
+                    x: canvasPoints[i].x - nx * rippleLen + rngRipple.wobble(0.5),
+                    y: canvasPoints[i].y - ny * rippleLen + rngRipple.wobble(0.5)
+                ))
+                context.stroke(ripple, with: .color(riverInk.opacity(0.5)), lineWidth: lw * 0.6)
+            }
+        }
+    }
+
+    // MARK: - Water Body Drawing
+
+    /// Draw a filled water body with coastline, wave pattern, and stipple
+    static func drawWaterBody(
+        context: inout GraphicsContext,
+        water: MapWaterBody,
+        mapSize: CGSize,
+        wobbleSeed: Int
+    ) {
+        guard water.coastline.count >= 3 else { return }
+
+        let waterWash = Color(red: 0.78, green: 0.86, blue: 0.91).opacity(0.6)
+        let coastInk = Color(red: 0.1, green: 0.23, blue: 0.35)
+        let canvasPoints = water.coastline.map { CGPoint(x: $0.x * mapSize.width, y: $0.y * mapSize.height) }
+
+        var seedVal = UInt64(abs(wobbleSeed) &+ 42)
+        if seedVal == 0 { seedVal = 1 }
+        var rng = SeededRandom(seed: UUID(uuid: withUnsafeBytes(of: seedVal) { ptr in
+            var uuid: uuid_t = (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+            withUnsafeMutableBytes(of: &uuid) { dst in
+                let count = min(ptr.count, dst.count)
+                dst.copyBytes(from: UnsafeRawBufferPointer(rebasing: ptr.prefix(count)))
+            }
+            return uuid
+        }))
+
+        // 1. Build wobbled coastline path
+        var coastPath = Path()
+        if let first = canvasPoints.first {
+            coastPath.move(to: CGPoint(x: first.x + rng.wobble(2), y: first.y + rng.wobble(2)))
+        }
+        for i in 1..<canvasPoints.count {
+            let prev = canvasPoints[i - 1]
+            let curr = canvasPoints[i]
+            let dist = hypot(curr.x - prev.x, curr.y - prev.y)
+            let steps = max(2, Int(dist / 6))
+            for s in 1...steps {
+                let t = CGFloat(s) / CGFloat(steps)
+                let x = prev.x + (curr.x - prev.x) * t + rng.wobble(2.0)
+                let y = prev.y + (curr.y - prev.y) * t + rng.wobble(2.0)
+                coastPath.addLine(to: CGPoint(x: x, y: y))
+            }
+        }
+        coastPath.closeSubpath()
+
+        // 2. Fill interior with water wash
+        context.fill(coastPath, with: .color(waterWash))
+
+        // 3. Draw horizontal wave lines inside (clipped to path)
+        context.drawLayer { layerCtx in
+            layerCtx.clip(to: coastPath)
+
+            let bounds = coastPath.boundingRect
+            let waveSpacing: CGFloat = 30
+            var rngWave = rng
+            var y = bounds.minY + waveSpacing
+            while y < bounds.maxY {
+                var wavePath = Path()
+                var x = bounds.minX
+                wavePath.move(to: CGPoint(x: x, y: y + rngWave.wobble(3)))
+                while x < bounds.maxX {
+                    x += 8
+                    wavePath.addLine(to: CGPoint(x: x, y: y + rngWave.wobble(3)))
+                }
+                layerCtx.stroke(wavePath, with: .color(coastInk.opacity(0.12)), lineWidth: 0.8)
+                y += waveSpacing
+            }
+        }
+
+        // 4. Draw coastline as thick wobbly ink line
+        context.stroke(coastPath, with: .color(coastInk), style: StrokeStyle(lineWidth: 2.0, lineCap: .round, lineJoin: .round))
+
+        // 5. Stipple dots on outside (land side) of coastline
+        var rngStipple = rng
+        for i in 0..<canvasPoints.count {
+            let curr = canvasPoints[i]
+            let next = canvasPoints[(i + 1) % canvasPoints.count]
+            let prev = canvasPoints[(i + canvasPoints.count - 1) % canvasPoints.count]
+
+            // Outward normal (land side)
+            let dx = next.x - prev.x
+            let dy = next.y - prev.y
+            let len = max(1, hypot(dx, dy))
+            // Normal pointing outward (away from interior)
+            let nx = dy / len
+            let ny = -dx / len
+
+            let segLen = hypot(next.x - curr.x, next.y - curr.y)
+            let numDots = max(1, Int(segLen / 12))
+            for _ in 0..<numDots {
+                let t = rngStipple.next()
+                let baseX = curr.x + (next.x - curr.x) * t
+                let baseY = curr.y + (next.y - curr.y) * t
+                let offset = 3.0 + rngStipple.next() * 6.0
+                let dotX = baseX + nx * offset + rngStipple.wobble(1)
+                let dotY = baseY + ny * offset + rngStipple.wobble(1)
+                let dotSize = 0.5 + rngStipple.next() * 1.2
+
+                var dot = Path()
+                dot.addEllipse(in: CGRect(x: dotX - dotSize / 2, y: dotY - dotSize / 2, width: dotSize, height: dotSize))
+                context.fill(dot, with: .color(coastInk.opacity(0.4)))
+            }
+        }
     }
 
     // MARK: - Parchment Background
