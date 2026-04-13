@@ -4,17 +4,65 @@
 <dict>
 	<key>files</key>
 	<dict>
+		<key>AppIcon60x60@2x.png</key>
+		<data>
+		vBREsCWQOKjGUVe3af09HREbM2s=
+		</data>
+		<key>AppIcon76x76@2x~ipad.png</key>
+		<data>
+		R6VlKIHEqsnyXdtaDSM762MJqm8=
+		</data>
+		<key>Assets.car</key>
+		<data>
+		Jpiqw3i9D7utGDSOEqQyALkxcgA=
+		</data>
 		<key>DMForge.debug.dylib</key>
 		<data>
-		3IrmaF4Y3YrAUbMbnPlLGNbSoAw=
+		lmiLisEBfPESShjDCSSWbh+wt4o=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		UFZFmkcwLwDqCuHtEpA+IYAdZFU=
+		JE5UQSG+WZtvDNkyrMPe52KipUY=
 		</data>
 		<key>PkgInfo</key>
 		<data>
 		n57qDP4tZfLD1rCS43W0B4LQjzE=
+		</data>
+		<key>SRD/classes.json</key>
+		<data>
+		MeR5kIxpOh/3GUQJpDH7Stnznys=
+		</data>
+		<key>SRD/conditions.json</key>
+		<data>
+		Xv03f5PZRWPWY2/VWb0wJixrCRA=
+		</data>
+		<key>SRD/items.json</key>
+		<data>
+		O8IRupDUO3mpUG0cIV4/TpvCAe0=
+		</data>
+		<key>SRD/magic_items.json</key>
+		<data>
+		MFkJy0vpcXy3tiGDrKe/2btY5rc=
+		</data>
+		<key>SRD/monsters.json</key>
+		<data>
+		EiHGshO4l5NPoKz5IEbnKV2Dct0=
+		</data>
+		<key>SRD/races.json</key>
+		<data>
+		9HdULEFaAsa3Gqg9Ibx8J2lh2VA=
+		</data>
+		<key>SRD/spells.json</key>
+		<data>
+		7PFelimhVB23S0nawItmTBgIV6U=
+		</data>
+		<key>SRD/starting_equipment.json</key>
+		<data>
+		M242HpddY6+UbUe9fS8bJ9Nk8dg=
+		</data>
+		<key>SRD/throwable_items.json</key>
+		<data>
+		b045e+kiGz8K7MK4JTXoNIEniL4=
 		</data>
 		<key>__preview.dylib</key>
 		<data>
@@ -23,11 +71,95 @@
 	</dict>
 	<key>files2</key>
 	<dict>
+		<key>AppIcon60x60@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			exxcpAF919LfFl6MBE6jwtUaH76OWUC2d0jFliIIXOs=
+			</data>
+		</dict>
+		<key>AppIcon76x76@2x~ipad.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			4fcu8OE6mMK8Hf+G8C2thEpDCulkkuGS8n5qynkHlP0=
+			</data>
+		</dict>
+		<key>Assets.car</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			gkOQs29ex50r9hsBthRy6GRRoRmHdemP7TEkQalqD7M=
+			</data>
+		</dict>
 		<key>DMForge.debug.dylib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			XmWXcrC4qr0S50o2iQOAxcEtj/SvZFjuf1n5+vFGXmk=
+			8PUWHlMaQ8+c8GIX8WFNn6nu4vDCU3BSPVg+Fh3F0AM=
+			</data>
+		</dict>
+		<key>SRD/classes.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			TpIzo9lUbfX8zF9JmU8q2v1Pssv8r4u1o8IRwGTz91k=
+			</data>
+		</dict>
+		<key>SRD/conditions.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			VvmmivtO2s0hLewyB/nAi97Qk5SXG3XXfIJWJ1YAXZI=
+			</data>
+		</dict>
+		<key>SRD/items.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			lUopuf+nbidDYpYojiMNLNvob69JAb1gMt4NvKrUZLc=
+			</data>
+		</dict>
+		<key>SRD/magic_items.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			JscFZ8ULbbLmssUpM8V0mZRCofXSowo9mzLBt7Vid+g=
+			</data>
+		</dict>
+		<key>SRD/monsters.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			P1zRs4AE/8F+y3M/KCGWWCvEPpBz5BLcH6MKT5AshHI=
+			</data>
+		</dict>
+		<key>SRD/races.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			NmnVN6vrpcN9xjXTTitNc1nVFWIQthCseoS59oatbzw=
+			</data>
+		</dict>
+		<key>SRD/spells.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			tsJ1+kGKaIHx+EIlmMBEJwJ5tta6xFST/2RaYa9mPEE=
+			</data>
+		</dict>
+		<key>SRD/starting_equipment.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			uW45szOk4nUGqP7TNgLv5PeaS+tBqoCVl69Sn+5e0kE=
+			</data>
+		</dict>
+		<key>SRD/throwable_items.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			H34B5VPGURtyKbFdZgtADFRER3y/YpvcBaoayQeLlQs=
 			</data>
 		</dict>
 		<key>__preview.dylib</key>

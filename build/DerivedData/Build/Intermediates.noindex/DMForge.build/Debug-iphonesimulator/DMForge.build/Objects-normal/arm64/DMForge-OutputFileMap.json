@@ -195,5 +195,15 @@
     "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/StoryView.o",
     "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/StoryView.swiftdeps",
     "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/StoryView~partial.swiftmodule"
+  },
+  "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/evanprimeau/Development/DMForge/build/DerivedData/Build/Intermediates.noindex/DMForge.build/Debug-iphonesimulator/DMForge.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
   }
 }
