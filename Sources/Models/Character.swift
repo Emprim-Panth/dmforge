@@ -32,6 +32,15 @@ final class PlayerCharacter {
     var spellSaveDC: Int
     var spellAttackBonus: Int
 
+    // Proficiencies & Traits
+    var skillProficiencies: [String]
+    var savingThrowProficiencies: [String]
+    var armorProficiencies: [String]
+    var weaponProficiencies: [String]
+    var traits: [String]
+    var languages: [String]
+    var darkvision: Int
+
     // State
     var conditions: [String]
     var deathSaveSuccesses: Int
@@ -86,6 +95,13 @@ final class PlayerCharacter {
         self.spellcastingAbility = ""
         self.spellSaveDC = 0
         self.spellAttackBonus = 0
+        self.skillProficiencies = []
+        self.savingThrowProficiencies = []
+        self.armorProficiencies = []
+        self.weaponProficiencies = []
+        self.traits = []
+        self.languages = []
+        self.darkvision = 0
         self.conditions = []
         self.deathSaveSuccesses = 0
         self.deathSaveFailures = 0

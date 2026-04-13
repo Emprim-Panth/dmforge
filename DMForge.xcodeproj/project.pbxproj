@@ -11,6 +11,7 @@
 		18B48FED0D542397FAF7A958 /* WorldMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA4480D909B99DFCBB4E8C6 /* WorldMapView.swift */; };
 		21AE5CED4772A06212165F32 /* StoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 994C0FEC204CFD99A05C7FA4 /* StoryView.swift */; };
 		2595655CA94EC68E442036A9 /* ReferenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AEFACD40C50D294B5F4BA2 /* ReferenceView.swift */; };
+		362840BB23F367452515DABB /* LevelUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8CF0A5D385BC55B1FECEA62 /* LevelUpView.swift */; };
 		3BA080393314696606886367 /* DeathSaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E518C6DD254B269AD7000 /* DeathSaveView.swift */; };
 		44AB2B9F1B35B8A64640F94D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73100BE023CDD225C5E0EC97 /* ContentView.swift */; };
 		46B0CFE522D0C92FA48278AE /* NavigationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7F25F1174BB407D93BDEC15 /* NavigationCoordinator.swift */; };
@@ -64,6 +65,7 @@
 		BB3D42180E267F4F34323C35 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BF2531217920829646B52CCC /* CharacterCreatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterCreatorView.swift; sourceTree = "<group>"; };
 		CA98322C7FB219190D6DA268 /* DiceRoller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiceRoller.swift; sourceTree = "<group>"; };
+		D8CF0A5D385BC55B1FECEA62 /* LevelUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelUpView.swift; sourceTree = "<group>"; };
 		E7DFDE9A4C5F51FC4F77862D /* DMTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMTheme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -88,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				BF2531217920829646B52CCC /* CharacterCreatorView.swift */,
+				D8CF0A5D385BC55B1FECEA62 /* LevelUpView.swift */,
 				AA0EE6CA8A66A0E657B44670 /* PeopleView.swift */,
 			);
 			path = People;
@@ -322,6 +325,7 @@
 				3BA080393314696606886367 /* DeathSaveView.swift in Sources */,
 				54B57D1CBDCAC943B3D7548A /* DiceRoller.swift in Sources */,
 				8D06191C231D4E29F0AFB84E /* EncounterView.swift in Sources */,
+				362840BB23F367452515DABB /* LevelUpView.swift in Sources */,
 				D9F827A6C7AA592C6751C7EA /* MapRenderer.swift in Sources */,
 				46B0CFE522D0C92FA48278AE /* NavigationCoordinator.swift in Sources */,
 				C427212C5F317CE9745758F6 /* OnDeviceLLMService.swift in Sources */,
