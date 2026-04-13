@@ -604,17 +604,28 @@ struct CharacterCreatorView: View {
     private func loadRaces() {
         guard let url = Bundle.main.url(forResource: "races", withExtension: "json", subdirectory: "SRD"),
               let data = try? Data(contentsOf: url),
-              let wrapper = try? JSONDecoder().decode(SRDRaceWrapper.self, from: data)
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let raceArray = json["races"] as? [[String: Any]]
         else { return }
-        races = wrapper.races
+        let decoder = JSONDecoder()
+        races = raceArray.compactMap { dict in
+            guard let raceData = try? JSONSerialization.data(withJSONObject: dict) else { return nil }
+            return try? decoder.decode(SRDRace.self, from: raceData)
+        }
     }
 
     private func loadClasses() {
         guard let url = Bundle.main.url(forResource: "classes", withExtension: "json", subdirectory: "SRD"),
               let data = try? Data(contentsOf: url),
-              let wrapper = try? JSONDecoder().decode(SRDClassWrapper.self, from: data)
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let classArray = json["classes"] as? [[String: Any]]
         else { return }
-        self.classes = wrapper.classes
+        // Decode each class individually so one bad entry doesn't kill all
+        let decoder = JSONDecoder()
+        self.classes = classArray.compactMap { dict in
+            guard let classData = try? JSONSerialization.data(withJSONObject: dict) else { return nil }
+            return try? decoder.decode(SRDClass.self, from: classData)
+        }
     }
 }
 
@@ -803,6 +814,6 @@ struct SRDClass: Codable, Identifiable, Sendable {
         spellcastingAbility = try c.decodeIfPresent(String.self, forKey: .spellcastingAbility) ?? ""
         asiLevels = try c.decodeIfPresent([Int].self, forKey: .asiLevels) ?? []
         featuresByLevel = try c.decodeIfPresent([String: [String]].self, forKey: .featuresByLevel) ?? [:]
-        spellSlotsByLevel = try c.decodeIfPresent([String: [String: Int]].self, forKey: .spellSlotsByLevel) ?? [:]
+        spellSlotsByLevel = (try? c.decodeIfPresent([String: [String: Int]].self, forKey: .spellSlotsByLevel)) ?? [:]
     }
 }
