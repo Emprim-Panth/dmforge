@@ -15,13 +15,59 @@ struct CharacterCreatorView: View {
     @State private var abilityScores: [String: Int] = [
         "STR": 15, "DEX": 14, "CON": 13, "INT": 12, "WIS": 10, "CHA": 8
     ]
+    @State private var selectedSkills: Set<String> = []
 
     @State private var races: [SRDRace] = []
     @State private var classes: [SRDClass] = []
 
     private let standardArray = [15, 14, 13, 12, 10, 8]
     private let abilityOrder = ["STR", "DEX", "CON", "INT", "WIS", "CHA"]
-    private let stepTitles = ["Name & Race", "Class", "Ability Scores", "Summary", "Create"]
+    private let stepTitles = ["Name & Race", "Class", "Ability Scores", "Skills", "Summary"]
+
+    private var selectedRaceData: SRDRace? {
+        races.first(where: { $0.name == selectedRace })
+    }
+
+    private var selectedClassData: SRDClass? {
+        classes.first(where: { $0.name == selectedClass })
+    }
+
+    /// Ability scores after applying racial bonuses
+    private var finalAbilityScores: [String: Int] {
+        var scores = abilityScores
+        if let race = selectedRaceData {
+            for (key, bonus) in race.abilityBonuses {
+                let upperKey = key.uppercased()
+                // Skip half-elf choice keys
+                if upperKey == "CHOICE_1" || upperKey == "CHOICE_2" { continue }
+                // Map "INT" key (JSON uses lowercase "int")
+                let mappedKey = upperKey == "INT" ? "INT" : upperKey
+                if scores[mappedKey] != nil {
+                    scores[mappedKey]! += bonus
+                }
+            }
+        }
+        return scores
+    }
+
+    private func abilityModifier(for ability: String) -> Int {
+        ((finalAbilityScores[ability] ?? 10) - 10) / 2
+    }
+
+    private var computedAC: Int {
+        let dexMod = abilityModifier(for: "DEX")
+        // Barbarian unarmored defense: 10 + DEX + CON
+        if selectedClass == "Barbarian" {
+            let conMod = abilityModifier(for: "CON")
+            return 10 + dexMod + conMod
+        }
+        // Monk unarmored defense: 10 + DEX + WIS
+        if selectedClass == "Monk" {
+            let wisMod = abilityModifier(for: "WIS")
+            return 10 + dexMod + wisMod
+        }
+        return 10 + dexMod
+    }
 
     var body: some View {
         NavigationStack {
@@ -32,15 +78,19 @@ struct CharacterCreatorView: View {
 
                 Divider().overlay(DMTheme.border)
 
-                // Step content
-                TabView(selection: $currentStep) {
-                    nameRaceStep.tag(0)
-                    classStep.tag(1)
-                    abilityScoreStep.tag(2)
-                    summaryStep.tag(3)
+                // Step content - plain switch instead of TabView to avoid gesture conflicts
+                Group {
+                    switch currentStep {
+                    case 0: nameRaceStep
+                    case 1: classStep
+                    case 2: abilityScoreStep
+                    case 3: skillStep
+                    case 4: summaryStep
+                    default: EmptyView()
+                    }
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .animation(.easeInOut, value: currentStep)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .animation(.easeInOut(duration: 0.2), value: currentStep)
 
                 Divider().overlay(DMTheme.border)
 
@@ -56,7 +106,7 @@ struct CharacterCreatorView: View {
 
                     Spacer()
 
-                    if currentStep < 3 {
+                    if currentStep < 4 {
                         Button("Next") {
                             currentStep += 1
                         }
@@ -93,6 +143,10 @@ struct CharacterCreatorView: View {
         switch currentStep {
         case 0: return !name.isEmpty && !selectedRace.isEmpty
         case 1: return !selectedClass.isEmpty
+        case 2: return true
+        case 3:
+            guard let cls = selectedClassData else { return true }
+            return selectedSkills.count == cls.skillChoices.count
         default: return true
         }
     }
@@ -140,6 +194,11 @@ struct CharacterCreatorView: View {
                                     Text("Speed \(race.speed)")
                                         .font(.caption2)
                                         .foregroundStyle(DMTheme.textDim)
+                                    if race.darkvision > 0 {
+                                        Text("Darkvision \(race.darkvision)ft")
+                                            .font(.caption2)
+                                            .foregroundStyle(DMTheme.textDim)
+                                    }
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(12)
@@ -174,7 +233,10 @@ struct CharacterCreatorView: View {
                 ], spacing: 8) {
                     ForEach(classes) { cls in
                         Button {
-                            selectedClass = cls.name
+                            if selectedClass != cls.name {
+                                selectedClass = cls.name
+                                selectedSkills = [] // Reset skills when class changes
+                            }
                         } label: {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(cls.name)
@@ -221,15 +283,32 @@ struct CharacterCreatorView: View {
                     .font(.caption)
                     .foregroundStyle(DMTheme.textDim)
 
+                if let race = selectedRaceData {
+                    let bonusText = race.abilityBonuses
+                        .filter { $0.key != "choice_1" && $0.key != "choice_2" }
+                        .map { "+\($0.value) \($0.key.uppercased())" }
+                        .joined(separator: ", ")
+                    if !bonusText.isEmpty {
+                        Text("Racial bonuses (\(selectedRace)): \(bonusText)")
+                            .font(.caption)
+                            .foregroundStyle(DMTheme.accentGreen)
+                    }
+                }
+
                 LazyVGrid(columns: [
                     GridItem(.flexible()),
                     GridItem(.flexible()),
                     GridItem(.flexible()),
                 ], spacing: 12) {
                     ForEach(abilityOrder, id: \.self) { ability in
+                        let baseScore = abilityScores[ability] ?? 10
+                        let finalScore = finalAbilityScores[ability] ?? 10
+                        let bonus = finalScore - baseScore
                         AbilityScoreCard(
                             ability: ability,
-                            score: abilityScores[ability] ?? 10,
+                            score: baseScore,
+                            bonus: bonus,
+                            isSelected: swapSource == ability,
                             onTap: { swapAbility(ability) }
                         )
                     }
@@ -252,7 +331,68 @@ struct CharacterCreatorView: View {
         }
     }
 
-    // MARK: - Step 4: Summary
+    // MARK: - Step 4: Skills
+
+    private var skillStep: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Skill Proficiencies")
+                    .font(.title3.bold())
+                    .foregroundStyle(DMTheme.accent)
+
+                if let cls = selectedClassData {
+                    let needed = cls.skillChoices.count
+                    let chosen = selectedSkills.count
+                    Text("Choose \(needed) skill\(needed == 1 ? "" : "s") (\(chosen)/\(needed) selected)")
+                        .font(.subheadline)
+                        .foregroundStyle(DMTheme.textSecondary)
+
+                    let options = cls.skillChoices.options
+                    // "any" means all standard skills
+                    let skillList: [String] = options.contains("any")
+                        ? ["Acrobatics", "Animal Handling", "Arcana", "Athletics", "Deception",
+                           "History", "Insight", "Intimidation", "Investigation", "Medicine",
+                           "Nature", "Perception", "Performance", "Persuasion", "Religion",
+                           "Sleight of Hand", "Stealth", "Survival"]
+                        : options
+
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                        ForEach(skillList, id: \.self) { skill in
+                            let isSelected = selectedSkills.contains(skill)
+                            Button {
+                                if isSelected {
+                                    selectedSkills.remove(skill)
+                                } else if selectedSkills.count < needed {
+                                    selectedSkills.insert(skill)
+                                }
+                            } label: {
+                                Text(skill)
+                                    .font(.subheadline)
+                                    .foregroundStyle(isSelected ? DMTheme.accent : DMTheme.textPrimary)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(10)
+                                    .background(isSelected ? DMTheme.accent.opacity(0.15) : DMTheme.card)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(isSelected ? DMTheme.accent : DMTheme.border, lineWidth: 1)
+                                    )
+                            }
+                            .buttonStyle(.plain)
+                            .opacity(!isSelected && selectedSkills.count >= needed ? 0.4 : 1.0)
+                        }
+                    }
+                } else {
+                    Text("Select a class first.")
+                        .font(.subheadline)
+                        .foregroundStyle(DMTheme.textDim)
+                }
+            }
+            .padding()
+        }
+    }
+
+    // MARK: - Step 5: Summary
 
     private var summaryStep: some View {
         ScrollView {
@@ -269,7 +409,40 @@ struct CharacterCreatorView: View {
 
                     Divider().overlay(DMTheme.border)
 
-                    Text("Ability Scores")
+                    // Combat stats
+                    if let cls = selectedClassData {
+                        let conMod = abilityModifier(for: "CON")
+                        let hp = cls.startingHP + conMod
+                        SummaryRow(label: "Hit Points", value: "\(hp) (\(cls.hitDie) + \(conMod >= 0 ? "+" : "")\(conMod) CON)")
+                        SummaryRow(label: "Hit Die", value: cls.hitDie)
+                    }
+
+                    SummaryRow(label: "Armor Class", value: "\(computedAC)")
+
+                    if let race = selectedRaceData {
+                        SummaryRow(label: "Speed", value: "\(race.speed) ft")
+                    }
+
+                    // Saving throws
+                    if let cls = selectedClassData {
+                        let saves = cls.savingThrows.map { $0.uppercased() }.joined(separator: ", ")
+                        SummaryRow(label: "Saving Throws", value: saves)
+                    }
+
+                    // Skills
+                    if !selectedSkills.isEmpty {
+                        Divider().overlay(DMTheme.border)
+                        Text("Skill Proficiencies")
+                            .font(.subheadline.bold())
+                            .foregroundStyle(DMTheme.textSecondary)
+                        Text(selectedSkills.sorted().joined(separator: ", "))
+                            .font(.subheadline)
+                            .foregroundStyle(DMTheme.textPrimary)
+                    }
+
+                    Divider().overlay(DMTheme.border)
+
+                    Text("Ability Scores (with racial bonuses)")
                         .font(.subheadline.bold())
                         .foregroundStyle(DMTheme.textSecondary)
 
@@ -279,10 +452,10 @@ struct CharacterCreatorView: View {
                                 Text(ability)
                                     .font(.caption2.bold())
                                     .foregroundStyle(DMTheme.textDim)
-                                Text("\(abilityScores[ability] ?? 10)")
+                                Text("\(finalAbilityScores[ability] ?? 10)")
                                     .font(.headline.monospacedDigit())
                                     .foregroundStyle(DMTheme.textPrimary)
-                                let mod = ((abilityScores[ability] ?? 10) - 10) / 2
+                                let mod = abilityModifier(for: ability)
                                 Text(mod >= 0 ? "+\(mod)" : "\(mod)")
                                     .font(.caption2.monospacedDigit())
                                     .foregroundStyle(DMTheme.accent)
@@ -290,10 +463,25 @@ struct CharacterCreatorView: View {
                         }
                     }
 
-                    if let cls = classes.first(where: { $0.name == selectedClass }) {
+                    // Racial traits
+                    if let race = selectedRaceData, !race.traits.isEmpty {
                         Divider().overlay(DMTheme.border)
-                        SummaryRow(label: "Hit Points", value: "\(cls.startingHP)")
-                        SummaryRow(label: "Hit Die", value: cls.hitDie)
+                        Text("Racial Traits")
+                            .font(.subheadline.bold())
+                            .foregroundStyle(DMTheme.textSecondary)
+                        Text(race.traits.joined(separator: ", "))
+                            .font(.subheadline)
+                            .foregroundStyle(DMTheme.textPrimary)
+                    }
+
+                    // Languages
+                    if let race = selectedRaceData, !race.languages.isEmpty {
+                        Text("Languages")
+                            .font(.subheadline.bold())
+                            .foregroundStyle(DMTheme.textSecondary)
+                        Text(race.languages.joined(separator: ", "))
+                            .font(.subheadline)
+                            .foregroundStyle(DMTheme.textPrimary)
                     }
                 }
                 .padding(16)
@@ -312,18 +500,59 @@ struct CharacterCreatorView: View {
 
     private func createCharacter() {
         let pc = PlayerCharacter(name: name, race: selectedRace, characterClass: selectedClass)
-        pc.str = abilityScores["STR"] ?? 10
-        pc.dex = abilityScores["DEX"] ?? 10
-        pc.con = abilityScores["CON"] ?? 10
-        pc.int_ = abilityScores["INT"] ?? 10
-        pc.wis = abilityScores["WIS"] ?? 10
-        pc.cha = abilityScores["CHA"] ?? 10
 
-        if let cls = classes.first(where: { $0.name == selectedClass }) {
+        // Apply final ability scores (with racial bonuses)
+        let final = finalAbilityScores
+        pc.str = final["STR"] ?? 10
+        pc.dex = final["DEX"] ?? 10
+        pc.con = final["CON"] ?? 10
+        pc.int_ = final["INT"] ?? 10
+        pc.wis = final["WIS"] ?? 10
+        pc.cha = final["CHA"] ?? 10
+
+        // HP
+        if let cls = selectedClassData {
             let conMod = (pc.con - 10) / 2
             pc.hpMax = cls.startingHP + conMod
             pc.hpCurrent = pc.hpMax
+
+            // Saving throws & proficiencies
+            pc.savingThrowProficiencies = cls.savingThrows
+            pc.armorProficiencies = cls.armorProficiencies
+            pc.weaponProficiencies = cls.weaponProficiencies
+
+            // Spellcasting
+            if cls.spellcaster, let slots = cls.spellSlotsByLevel["1"] {
+                pc.spellcastingAbility = cls.spellcastingAbility
+                // Filter out cantrips for spell slot tracking
+                var slotDict: [String: Int] = [:]
+                for (key, val) in slots where key != "cantrips" {
+                    slotDict[key] = val
+                }
+                pc.spellSlotsMax = slotDict
+                pc.spellSlots = slotDict
+                let abilityMod = pc.abilityModifier(cls.spellcastingAbility)
+                pc.spellSaveDC = 8 + 2 + abilityMod // 8 + prof + mod
+                pc.spellAttackBonus = 2 + abilityMod
+            }
         }
+
+        // AC
+        pc.armorClass = computedAC
+
+        // Speed from race
+        if let race = selectedRaceData {
+            pc.speed = race.speed
+            pc.traits = race.traits
+            pc.languages = race.languages
+            pc.darkvision = race.darkvision
+        }
+
+        // Proficiency bonus (level 1 = 2)
+        pc.proficiencyBonus = 2
+
+        // Skills
+        pc.skillProficiencies = Array(selectedSkills).sorted()
 
         pc.campaign = campaign
         campaign.party.append(pc)
@@ -391,9 +620,12 @@ struct StepIndicatorView: View {
 struct AbilityScoreCard: View {
     let ability: String
     let score: Int
+    var bonus: Int = 0
+    var isSelected: Bool = false
     let onTap: () -> Void
 
-    private var modifier: Int { (score - 10) / 2 }
+    private var modifier: Int { (score + bonus - 10) / 2 }
+    private var finalScore: Int { score + bonus }
 
     var body: some View {
         Button {
@@ -403,20 +635,27 @@ struct AbilityScoreCard: View {
                 Text(ability)
                     .font(.caption.bold())
                     .foregroundStyle(DMTheme.textSecondary)
-                Text("\(score)")
-                    .font(.title2.bold().monospacedDigit())
-                    .foregroundStyle(DMTheme.textPrimary)
+                HStack(spacing: 2) {
+                    Text("\(finalScore)")
+                        .font(.title2.bold().monospacedDigit())
+                        .foregroundStyle(DMTheme.textPrimary)
+                    if bonus > 0 {
+                        Text("(+\(bonus))")
+                            .font(.caption2)
+                            .foregroundStyle(DMTheme.accentGreen)
+                    }
+                }
                 Text(modifier >= 0 ? "+\(modifier)" : "\(modifier)")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(DMTheme.accent)
             }
             .frame(maxWidth: .infinity)
             .padding(12)
-            .background(DMTheme.card)
+            .background(isSelected ? DMTheme.accent.opacity(0.15) : DMTheme.card)
             .clipShape(RoundedRectangle(cornerRadius: 8))
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(DMTheme.border, lineWidth: 1)
+                    .stroke(isSelected ? DMTheme.accent : DMTheme.border, lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
@@ -452,16 +691,27 @@ struct SRDRace: Codable, Identifiable, Sendable {
     var id: String { srdID }
     let srdID: String
     let name: String
+    let size: String
     let speed: Int
+    let abilityBonuses: [String: Int]
+    let traits: [String]
+    let languages: [String]
+    let darkvision: Int
 
     enum CodingKeys: String, CodingKey {
         case srdID = "srd_id"
-        case name, speed
+        case name, size, speed, traits, languages, darkvision
+        case abilityBonuses = "ability_bonuses"
     }
 }
 
 struct SRDClassWrapper: Codable, Sendable {
     let classes: [SRDClass]
+}
+
+struct SRDSkillChoices: Codable, Sendable {
+    let count: Int
+    let options: [String]
 }
 
 struct SRDClass: Codable, Identifiable, Sendable {
@@ -471,6 +721,15 @@ struct SRDClass: Codable, Identifiable, Sendable {
     let hitDie: String
     let primaryAbility: String
     let startingHP: Int
+    let savingThrows: [String]
+    let armorProficiencies: [String]
+    let weaponProficiencies: [String]
+    let skillChoices: SRDSkillChoices
+    let spellcaster: Bool
+    let spellcastingAbility: String
+    let asiLevels: [Int]
+    let featuresByLevel: [String: [String]]
+    let spellSlotsByLevel: [String: [String: Int]]
 
     enum CodingKeys: String, CodingKey {
         case srdID = "srd_id"
@@ -478,5 +737,32 @@ struct SRDClass: Codable, Identifiable, Sendable {
         case hitDie = "hit_die"
         case primaryAbility = "primary_ability"
         case startingHP = "starting_hp"
+        case savingThrows = "saving_throws"
+        case armorProficiencies = "armor_proficiencies"
+        case weaponProficiencies = "weapon_proficiencies"
+        case skillChoices = "skill_choices"
+        case spellcaster
+        case spellcastingAbility = "spellcasting_ability"
+        case asiLevels = "asi_levels"
+        case featuresByLevel = "features_by_level"
+        case spellSlotsByLevel = "spell_slots_by_level"
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        srdID = try c.decode(String.self, forKey: .srdID)
+        name = try c.decode(String.self, forKey: .name)
+        hitDie = try c.decode(String.self, forKey: .hitDie)
+        primaryAbility = try c.decode(String.self, forKey: .primaryAbility)
+        startingHP = try c.decode(Int.self, forKey: .startingHP)
+        savingThrows = try c.decodeIfPresent([String].self, forKey: .savingThrows) ?? []
+        armorProficiencies = try c.decodeIfPresent([String].self, forKey: .armorProficiencies) ?? []
+        weaponProficiencies = try c.decodeIfPresent([String].self, forKey: .weaponProficiencies) ?? []
+        skillChoices = try c.decodeIfPresent(SRDSkillChoices.self, forKey: .skillChoices) ?? SRDSkillChoices(count: 0, options: [])
+        spellcaster = try c.decodeIfPresent(Bool.self, forKey: .spellcaster) ?? false
+        spellcastingAbility = try c.decodeIfPresent(String.self, forKey: .spellcastingAbility) ?? ""
+        asiLevels = try c.decodeIfPresent([Int].self, forKey: .asiLevels) ?? []
+        featuresByLevel = try c.decodeIfPresent([String: [String]].self, forKey: .featuresByLevel) ?? [:]
+        spellSlotsByLevel = try c.decodeIfPresent([String: [String: Int]].self, forKey: .spellSlotsByLevel) ?? [:]
     }
 }

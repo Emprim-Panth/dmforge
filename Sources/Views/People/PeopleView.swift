@@ -15,6 +15,12 @@ struct PeopleView: View {
     @State private var damageHealAmount: String = ""
     @State private var isDamageMode = true
 
+    // Level Up sheet state
+    @State private var levelUpTarget: PlayerCharacter?
+
+    // Character Creator
+    @State private var showCharacterCreator = false
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
@@ -33,9 +39,7 @@ struct PeopleView: View {
                                     message: "Tap + New PC to create your first character and begin your adventure.",
                                     buttonTitle: "New PC",
                                     buttonAction: {
-                                        let pc = PlayerCharacter(name: "New Hero", race: "Human", characterClass: "Fighter")
-                                        pc.campaign = campaign
-                                        modelContext.insert(pc)
+                                        showCharacterCreator = true
                                     }
                                 )
                                 .frame(height: 240)
@@ -112,6 +116,13 @@ struct PeopleView: View {
             DamageHealSheet(pc: pc, isDamage: isDamageMode)
                 .presentationDetents([.medium])
         }
+        .sheet(item: $levelUpTarget) { pc in
+            LevelUpView(pc: pc)
+                .presentationDetents([.large])
+        }
+        .sheet(isPresented: $showCharacterCreator) {
+            CharacterCreatorView(campaign: campaign)
+        }
     }
 
     // MARK: - Header
@@ -125,9 +136,7 @@ struct PeopleView: View {
             Spacer()
 
             Button {
-                let pc = PlayerCharacter(name: "New Hero", race: "Human", characterClass: "Fighter")
-                pc.campaign = campaign
-                modelContext.insert(pc)
+                showCharacterCreator = true
             } label: {
                 Label("New PC", systemImage: "plus")
                     .font(.subheadline.bold())
@@ -240,6 +249,14 @@ struct PeopleView: View {
                 }
                 .buttonStyle(DMSmallButtonStyle(color: DMTheme.accentGreen.opacity(0.3)))
                 .frame(minHeight: 44)
+
+                if pc.level < 20 {
+                    Button("Level Up") {
+                        levelUpTarget = pc
+                    }
+                    .buttonStyle(DMSmallButtonStyle(color: DMTheme.accent.opacity(0.3)))
+                    .frame(minHeight: 44)
+                }
 
                 Spacer()
             }
