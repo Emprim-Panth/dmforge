@@ -5,43 +5,106 @@ import SwiftData
 
 struct AIAssistantView: View {
     let campaign: Campaign
+
+    var body: some View {
+        if #available(iOS 26.0, *) {
+            OnDeviceAIView(campaign: campaign)
+        } else {
+            AIUnavailableView(
+                title: "On-Device AI",
+                message: "The AI Co-DM requires iOS 26 or later with Apple Intelligence enabled. Update your iPad to unlock on-device AI — no internet required."
+            )
+        }
+    }
+}
+
+// MARK: - On-Device AI View (iOS 26+)
+
+@available(iOS 26.0, *)
+struct OnDeviceAIView: View {
+    let campaign: Campaign
     @State private var messages: [ChatMessage] = []
     @State private var inputText = ""
     @State private var isLoading = false
-    @State private var showSettings = false
     @State private var errorMessage: String?
     @State private var streamingText = ""
-
-    @AppStorage("aiEndpoint") private var endpoint = "http://localhost:11434"
-    @AppStorage("aiModel") private var model = "qwen2.5-coder:7b"
+    @State private var llmService = OnDeviceLLMService()
+    @State private var hasInitializedSession = false
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
+            header
+            Divider().overlay(DMTheme.border)
+
+            switch llmService.state {
+            case .checking:
+                ProgressView("Checking device capabilities...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(DMTheme.background)
+
+            case .unavailable(let detail):
+                AIUnavailableView(
+                    title: unavailableTitle(for: detail),
+                    message: unavailableMessage(for: detail)
+                )
+
+            case .available:
+                chatContent
+            }
+        }
+        .background(DMTheme.background)
+        .onAppear {
+            initializeSession()
+        }
+    }
+
+    // MARK: - Header
+
+    private var header: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 6) {
                     Text("AI Co-DM")
                         .font(.title2.bold())
                         .foregroundStyle(DMTheme.accent)
-                    Text(campaign.name)
-                        .font(.caption)
-                        .foregroundStyle(DMTheme.textDim)
+                    onDeviceBadge
                 }
-                Spacer()
-                Button {
-                    showSettings = true
-                } label: {
-                    Image(systemName: "gearshape")
-                        .font(.title3)
-                        .foregroundStyle(DMTheme.textSecondary)
-                }
-                .frame(minWidth: 44, minHeight: 44)
+                Text(campaign.name)
+                    .font(.caption)
+                    .foregroundStyle(DMTheme.textDim)
             }
-            .padding()
+            Spacer()
+            Button {
+                resetConversation()
+            } label: {
+                Image(systemName: "arrow.counterclockwise")
+                    .font(.title3)
+                    .foregroundStyle(DMTheme.textSecondary)
+            }
+            .frame(minWidth: 44, minHeight: 44)
+            .disabled(messages.isEmpty && !isLoading)
+        }
+        .padding()
+    }
 
-            Divider().overlay(DMTheme.border)
+    private var onDeviceBadge: some View {
+        HStack(spacing: 3) {
+            Image(systemName: "apple.intelligence")
+                .font(.caption2)
+            Text("On-Device")
+                .font(.caption2.bold())
+        }
+        .foregroundStyle(DMTheme.accentGreen)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 2)
+        .background(DMTheme.accentGreen.opacity(0.12))
+        .clipShape(RoundedRectangle(cornerRadius: 4))
+    }
 
-            // Messages area
+    // MARK: - Chat Content
+
+    private var chatContent: some View {
+        VStack(spacing: 0) {
             if messages.isEmpty && errorMessage == nil {
                 emptyState
             } else {
@@ -80,17 +143,11 @@ struct AIAssistantView: View {
 
             Divider().overlay(DMTheme.border)
 
-            // Quick prompts
             if messages.isEmpty {
                 quickPrompts
             }
 
-            // Input bar
             inputBar
-        }
-        .background(DMTheme.background)
-        .sheet(isPresented: $showSettings) {
-            AISettingsSheet(endpoint: $endpoint, model: $model)
         }
     }
 
@@ -99,17 +156,20 @@ struct AIAssistantView: View {
     private var emptyState: some View {
         VStack(spacing: 16) {
             Spacer()
-            Image(systemName: "sparkles")
+            Image(systemName: "apple.intelligence")
                 .font(.system(size: 48, weight: .light))
                 .foregroundStyle(DMTheme.accent.opacity(0.3))
             Text("Your AI Co-DM is ready")
                 .font(.headline)
                 .foregroundStyle(DMTheme.textPrimary)
-            Text("Ask for NPC dialogue, location descriptions, encounter ideas, or session recaps. The AI knows your campaign context.")
+            Text("On-device AI — no internet required. Ask for NPC dialogue, location descriptions, encounter ideas, or session recaps.")
                 .font(.subheadline)
                 .foregroundStyle(DMTheme.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
+            Text("Powered by Apple Intelligence")
+                .font(.caption)
+                .foregroundStyle(DMTheme.textDim)
             Spacer()
         }
     }
@@ -165,12 +225,12 @@ struct AIAssistantView: View {
 
     private func messageBubble(_ msg: ChatMessage) -> some View {
         HStack {
-            if msg.role == "user" { Spacer(minLength: 60) }
+            if msg.role == .user { Spacer(minLength: 60) }
 
-            VStack(alignment: msg.role == "user" ? .trailing : .leading, spacing: 4) {
-                Text(msg.role == "user" ? "You" : "Co-DM")
+            VStack(alignment: msg.role == .user ? .trailing : .leading, spacing: 4) {
+                Text(msg.role == .user ? "You" : "Co-DM")
                     .font(.caption2.bold())
-                    .foregroundStyle(msg.role == "user" ? DMTheme.accent : DMTheme.accentBlue)
+                    .foregroundStyle(msg.role == .user ? DMTheme.accent : DMTheme.accentBlue)
 
                 Text(msg.content)
                     .font(.body)
@@ -178,14 +238,14 @@ struct AIAssistantView: View {
                     .textSelection(.enabled)
             }
             .padding(12)
-            .background(msg.role == "user" ? DMTheme.accent.opacity(0.15) : DMTheme.card)
+            .background(msg.role == .user ? DMTheme.accent.opacity(0.15) : DMTheme.card)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(msg.role == "user" ? DMTheme.accent.opacity(0.3) : DMTheme.border, lineWidth: 1)
+                    .stroke(msg.role == .user ? DMTheme.accent.opacity(0.3) : DMTheme.border, lineWidth: 1)
             )
 
-            if msg.role != "user" { Spacer(minLength: 60) }
+            if msg.role != .user { Spacer(minLength: 60) }
         }
     }
 
@@ -284,165 +344,137 @@ struct AIAssistantView: View {
         .background(DMTheme.card)
     }
 
+    // MARK: - Session Management
+
+    private func initializeSession() {
+        guard !hasInitializedSession, llmService.state == .available else { return }
+        hasInitializedSession = true
+        let instructions = buildInstructions()
+        llmService.createSession(instructions: instructions)
+    }
+
+    private func resetConversation() {
+        messages.removeAll()
+        streamingText = ""
+        isLoading = false
+        errorMessage = nil
+        let instructions = buildInstructions()
+        llmService.resetSession(instructions: instructions)
+    }
+
     // MARK: - Send Message
 
     private func sendMessage(_ text: String) {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
+        // Ensure session is initialized on first send
+        if !hasInitializedSession {
+            initializeSession()
+        }
+
         inputText = ""
         errorMessage = nil
 
-        let userMsg = ChatMessage(role: "user", content: trimmed)
+        let userMsg = ChatMessage(role: .user, content: trimmed)
         messages.append(userMsg)
         isLoading = true
         streamingText = ""
 
         Task {
-            await callOllama()
+            await performInference(prompt: trimmed)
         }
     }
 
-    // MARK: - Ollama API
+    // MARK: - On-Device Inference
 
-    private func callOllama() async {
-        let systemPrompt = buildSystemPrompt()
-
-        var apiMessages: [[String: String]] = [
-            ["role": "system", "content": systemPrompt]
-        ]
-        for msg in messages {
-            apiMessages.append(["role": msg.role, "content": msg.content])
-        }
-
-        let body: [String: Any] = [
-            "model": model,
-            "messages": apiMessages,
-            "stream": true
-        ]
-
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: body),
-              let url = URL(string: "\(endpoint)/api/chat") else {
-            await MainActor.run {
-                errorMessage = "Invalid endpoint URL. Check your AI settings."
-                isLoading = false
-            }
-            return
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = jsonData
-        request.timeoutInterval = 120
-
+    private func performInference(prompt: String) async {
         do {
-            let (stream, response) = try await URLSession.shared.bytes(for: request)
-
-            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
-                await MainActor.run {
-                    errorMessage = "Server returned status \(httpResponse.statusCode). Check that Ollama is running and the model '\(model)' is available."
-                    isLoading = false
-                }
-                return
-            }
-
-            var fullResponse = ""
-            for try await line in stream.lines {
-                guard let lineData = line.data(using: .utf8),
-                      let json = try? JSONSerialization.jsonObject(with: lineData) as? [String: Any],
-                      let message = json["message"] as? [String: Any],
-                      let content = message["content"] as? String else {
-                    continue
-                }
-                fullResponse += content
-                await MainActor.run {
-                    streamingText = fullResponse
+            let fullResponse = try await llmService.streamResponse(to: prompt) { partial in
+                Task { @MainActor in
+                    streamingText = partial
                 }
             }
 
             await MainActor.run {
                 if !fullResponse.isEmpty {
-                    messages.append(ChatMessage(role: "assistant", content: fullResponse))
+                    messages.append(ChatMessage(role: .assistant, content: fullResponse))
                 }
                 streamingText = ""
                 isLoading = false
             }
-        } catch let error as URLError {
-            await MainActor.run {
-                if error.code == .cannotConnectToHost || error.code == .timedOut || error.code == .cannotFindHost {
-                    errorMessage = "Cannot connect to AI model at \(endpoint). Set up Ollama on your Mac and enter the endpoint in Settings (gear icon)."
-                } else {
-                    errorMessage = "Connection error: \(error.localizedDescription)"
-                }
-                isLoading = false
-            }
         } catch {
             await MainActor.run {
-                errorMessage = "Error: \(error.localizedDescription)"
+                errorMessage = friendlyError(from: error)
                 isLoading = false
+                streamingText = ""
             }
         }
     }
 
-    // MARK: - Campaign Context Builder
+    // MARK: - Campaign Context
 
-    private func buildSystemPrompt() -> String {
-        var parts: [String] = []
-        parts.append("You are a D&D 5e Dungeon Master's AI assistant for the campaign '\(campaign.name)'.")
-
-        // Party
-        if !campaign.party.isEmpty {
-            let pcList = campaign.party.map { "\($0.name) (Level \($0.level) \($0.race) \($0.characterClass))" }.joined(separator: ", ")
-            parts.append("Party: \(pcList)")
-        }
-
-        // NPCs
-        if !campaign.npcs.isEmpty {
-            let npcList = campaign.npcs.prefix(10).map { npc in
+    private func buildInstructions() -> String {
+        CampaignContextBuilder.buildInstructions(
+            campaignName: campaign.name,
+            partyDescriptions: campaign.party.map {
+                "\($0.name) (Level \($0.level) \($0.race) \($0.characterClass))"
+            },
+            npcDescriptions: campaign.npcs.prefix(10).map { npc in
                 npc.role.isEmpty ? npc.name : "\(npc.name) (\(npc.role))"
-            }.joined(separator: ", ")
-            parts.append("NPCs: \(npcList)")
+            },
+            enemyNames: campaign.enemies.filter(\.alive).prefix(5).map(\.name),
+            placeNames: campaign.places.prefix(8).map(\.name),
+            latestSessionTitle: campaign.sessions
+                .sorted(by: { $0.date > $1.date }).first?.title,
+            latestSessionRecap: campaign.sessions
+                .sorted(by: { $0.date > $1.date }).first?.recap,
+            gmNotesExcerpt: campaign.gmNotes.isEmpty ? nil : campaign.gmNotes
+        )
+    }
+
+    // MARK: - Error Handling
+
+    private func friendlyError(from error: Error) -> String {
+        let description = error.localizedDescription
+        if description.contains("guardrail") {
+            return "The AI declined that request. Try rephrasing your prompt."
+        } else if description.contains("context") || description.contains("exceeded") {
+            return "The conversation is too long. Tap the reset button to start fresh."
+        } else if description.contains("rate") {
+            return "Too many requests. Wait a moment and try again."
+        } else if description.contains("session") {
+            return "AI session error. Tap reset to restart the conversation."
         }
+        return "AI error: \(description)"
+    }
 
-        // Enemies
-        if !campaign.enemies.isEmpty {
-            let enemyList = campaign.enemies.filter(\.alive).prefix(5).map(\.name).joined(separator: ", ")
-            if !enemyList.isEmpty {
-                parts.append("Known enemies: \(enemyList)")
-            }
+    // MARK: - Unavailability Helpers
+
+    private func unavailableTitle(for detail: OnDeviceLLMService.UnavailableDetail) -> String {
+        switch detail {
+        case .deviceNotEligible:
+            return "Device Not Supported"
+        case .appleIntelligenceDisabled:
+            return "Apple Intelligence Disabled"
+        case .modelNotReady:
+            return "Model Downloading"
+        case .unknown:
+            return "AI Unavailable"
         }
+    }
 
-        // Places
-        if !campaign.places.isEmpty {
-            let placeList = campaign.places.prefix(8).map(\.name).joined(separator: ", ")
-            parts.append("Known locations: \(placeList)")
+    private func unavailableMessage(for detail: OnDeviceLLMService.UnavailableDetail) -> String {
+        switch detail {
+        case .deviceNotEligible:
+            return "The AI Co-DM requires an iPad with M1 chip or later (iPad Air 5th gen+, iPad Pro 2021+). Your device does not support on-device AI."
+        case .appleIntelligenceDisabled:
+            return "Enable Apple Intelligence in Settings > Apple Intelligence & Siri to use the AI Co-DM."
+        case .modelNotReady:
+            return "The on-device AI model is still downloading. This happens automatically in the background. Check back in a few minutes."
+        case .unknown:
+            return "On-device AI is currently unavailable. Make sure Apple Intelligence is enabled in Settings."
         }
-
-        // Current session
-        if let latestSession = campaign.sessions.sorted(by: { $0.date > $1.date }).first {
-            parts.append("Current session: \(latestSession.title)")
-            if !latestSession.recap.isEmpty {
-                let recap = String(latestSession.recap.prefix(300))
-                parts.append("Session recap: \(recap)")
-            }
-        }
-
-        // GM notes excerpt
-        if !campaign.gmNotes.isEmpty {
-            let notes = String(campaign.gmNotes.prefix(500))
-            parts.append("Campaign notes excerpt: \(notes)")
-        }
-
-        parts.append("")
-        parts.append("Guidelines:")
-        parts.append("- Respond in character when asked for NPC dialogue.")
-        parts.append("- Keep descriptions atmospheric and under 200 words unless asked for more.")
-        parts.append("- Use D&D 5e rules when discussing mechanics.")
-        parts.append("- Reference campaign-specific details when relevant.")
-        parts.append("- Be concise and actionable for a DM running a live session.")
-
-        return parts.joined(separator: "\n")
     }
 }
 
@@ -450,189 +482,60 @@ struct AIAssistantView: View {
 
 struct ChatMessage: Identifiable {
     let id = UUID()
-    let role: String
+    let role: ChatRole
     let content: String
+
+    enum ChatRole {
+        case user
+        case assistant
+    }
 }
 
-// MARK: - AI Settings Sheet
+// MARK: - AI Unavailable View (shared fallback)
 
-struct AISettingsSheet: View {
-    @Binding var endpoint: String
-    @Binding var model: String
-    @Environment(\.dismiss) private var dismiss
-    @State private var testResult: String?
-    @State private var isTesting = false
-
-    private let commonModels = [
-        "qwen2.5-coder:7b",
-        "llama3.1:8b",
-        "mistral:7b",
-        "gemma2:9b",
-        "phi3:14b"
-    ]
+struct AIUnavailableView: View {
+    let title: String
+    let message: String
 
     var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Ollama Endpoint")
-                            .font(.subheadline.bold())
-                            .foregroundStyle(DMTheme.textPrimary)
-                        TextField("http://localhost:11434", text: $endpoint)
-                            .font(.body.monospaced())
-                            .foregroundStyle(DMTheme.textPrimary)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
-                        Text("The address of your Ollama server. Use your Mac's local IP for iPad access (e.g. http://192.168.1.100:11434).")
-                            .font(.caption)
-                            .foregroundStyle(DMTheme.textDim)
-                    }
-                } header: {
-                    Text("Connection")
-                }
-                .listRowBackground(DMTheme.card)
+        VStack(spacing: 20) {
+            Spacer()
 
-                Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Model Name")
-                            .font(.subheadline.bold())
-                            .foregroundStyle(DMTheme.textPrimary)
-                        TextField("qwen2.5-coder:7b", text: $model)
-                            .font(.body.monospaced())
-                            .foregroundStyle(DMTheme.textPrimary)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
+            Image(systemName: "sparkles")
+                .font(.system(size: 56, weight: .light))
+                .foregroundStyle(DMTheme.accent.opacity(0.25))
 
-                        Text("Suggested models:")
-                            .font(.caption)
-                            .foregroundStyle(DMTheme.textDim)
+            Text(title)
+                .font(.title2.bold())
+                .foregroundStyle(DMTheme.textPrimary)
 
-                        ForEach(commonModels, id: \.self) { m in
-                            Button {
-                                model = m
-                            } label: {
-                                HStack {
-                                    Text(m)
-                                        .font(.caption.monospaced())
-                                        .foregroundStyle(model == m ? DMTheme.accent : DMTheme.textSecondary)
-                                    Spacer()
-                                    if model == m {
-                                        Image(systemName: "checkmark")
-                                            .font(.caption)
-                                            .foregroundStyle(DMTheme.accent)
-                                    }
-                                }
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                } header: {
-                    Text("Model")
-                }
-                .listRowBackground(DMTheme.card)
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(DMTheme.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
 
-                Section {
-                    Button {
-                        testConnection()
-                    } label: {
-                        HStack {
-                            if isTesting {
-                                ProgressView()
-                                    .tint(DMTheme.accent)
-                            } else {
-                                Image(systemName: "antenna.radiowaves.left.and.right")
-                            }
-                            Text(isTesting ? "Testing..." : "Test Connection")
-                        }
-                        .frame(maxWidth: .infinity)
-                        .foregroundStyle(DMTheme.accent)
-                    }
-                    .disabled(isTesting)
-
-                    if let result = testResult {
-                        Text(result)
-                            .font(.caption)
-                            .foregroundStyle(result.contains("Connected") ? DMTheme.accentGreen : DMTheme.accentRed)
-                    }
-                } header: {
-                    Text("Diagnostics")
-                }
-                .listRowBackground(DMTheme.card)
-
-                Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("Install Ollama", systemImage: "arrow.down.circle")
-                            .font(.subheadline.bold())
-                            .foregroundStyle(DMTheme.textPrimary)
-                        Text("1. Install Ollama on your Mac: ollama.com\n2. Run: ollama pull \(model)\n3. Ollama starts automatically on port 11434\n4. For iPad access, set OLLAMA_HOST=0.0.0.0 and use your Mac's IP address")
-                            .font(.caption)
-                            .foregroundStyle(DMTheme.textSecondary)
-                    }
-                } header: {
-                    Text("Setup Guide")
-                }
-                .listRowBackground(DMTheme.card)
+            VStack(spacing: 8) {
+                featureRow(icon: "checkmark.circle.fill", text: "Runs entirely on-device", active: true)
+                featureRow(icon: "checkmark.circle.fill", text: "No internet required", active: true)
+                featureRow(icon: "checkmark.circle.fill", text: "Campaign-aware responses", active: true)
+                featureRow(icon: "checkmark.circle.fill", text: "NPC dialogue generation", active: true)
             }
-            .scrollContentBackground(.hidden)
-            .background(DMTheme.background)
-            .navigationTitle("AI Settings")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
-                }
-            }
+            .padding(.top, 8)
+
+            Spacer()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(DMTheme.background)
     }
 
-    private func testConnection() {
-        isTesting = true
-        testResult = nil
-
-        Task {
-            guard let url = URL(string: "\(endpoint)/api/tags") else {
-                await MainActor.run {
-                    testResult = "Invalid URL"
-                    isTesting = false
-                }
-                return
-            }
-
-            do {
-                let (data, response) = try await URLSession.shared.data(from: url)
-                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                    await MainActor.run {
-                        testResult = "Server responded but returned an error"
-                        isTesting = false
-                    }
-                    return
-                }
-
-                if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                   let models = json["models"] as? [[String: Any]] {
-                    let names = models.compactMap { $0["name"] as? String }
-                    let hasModel = names.contains { $0.hasPrefix(model.split(separator: ":").first.map(String.init) ?? model) }
-                    await MainActor.run {
-                        if hasModel {
-                            testResult = "Connected. Model '\(model)' available."
-                        } else {
-                            testResult = "Connected, but '\(model)' not found. Available: \(names.joined(separator: ", "))"
-                        }
-                        isTesting = false
-                    }
-                } else {
-                    await MainActor.run {
-                        testResult = "Connected to Ollama."
-                        isTesting = false
-                    }
-                }
-            } catch {
-                await MainActor.run {
-                    testResult = "Cannot connect: \(error.localizedDescription)"
-                    isTesting = false
-                }
-            }
+    private func featureRow(icon: String, text: String, active: Bool) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .foregroundStyle(active ? DMTheme.accentGreen.opacity(0.5) : DMTheme.textDim)
+            Text(text)
+                .font(.caption)
+                .foregroundStyle(DMTheme.textDim)
         }
     }
 }

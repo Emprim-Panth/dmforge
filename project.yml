@@ -34,8 +34,7 @@ targets:
         UIStatusBarHidden: true
         CFBundleDisplayName: "DM Forge"
         CFBundleIconName: AppIcon
-        NSAppTransportSecurity:
-          NSAllowsLocalNetworking: true
+
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.forgecode.forgemaster
