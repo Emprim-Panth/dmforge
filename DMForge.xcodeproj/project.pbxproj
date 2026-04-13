@@ -22,8 +22,10 @@
 		8D06191C231D4E29F0AFB84E /* EncounterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2673B78921DA5D5B20C00001 /* EncounterView.swift */; };
 		97BB2587294F3419CC8844EA /* DMTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DFDE9A4C5F51FC4F77862D /* DMTheme.swift */; };
 		9E4CFAA9F327F2A9AC4CD3EB /* SRDMonster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E88F041093FE98C43C3D70D /* SRDMonster.swift */; };
+		A3EC424DD9B39A7719CE5277 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BB3D42180E267F4F34323C35 /* Assets.xcassets */; };
 		A550BE796CD224D534EBB4B4 /* SRDLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D793E50FE8A7440D4AE0555 /* SRDLoader.swift */; };
 		C9455D319677766C663A4A64 /* DMForgeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A5CAD1DD684C8710A53412 /* DMForgeApp.swift */; };
+		D8C69C58C7B4FD158C9075BC /* SRD in Resources */ = {isa = PBXBuildFile; fileRef = A9363F9868819CBDEE2C8566 /* SRD */; };
 		DF516195F1B976E55C4BCC9F /* PeopleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0EE6CA8A66A0E657B44670 /* PeopleView.swift */; };
 		FBF5596884005A7327E6B6E2 /* Character.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59B12F762D9FD710567C2A54 /* Character.swift */; };
 /* End PBXBuildFile section */
@@ -45,7 +47,9 @@
 		95A5CAD1DD684C8710A53412 /* DMForgeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMForgeApp.swift; sourceTree = "<group>"; };
 		994C0FEC204CFD99A05C7FA4 /* StoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryView.swift; sourceTree = "<group>"; };
 		9D793E50FE8A7440D4AE0555 /* SRDLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRDLoader.swift; sourceTree = "<group>"; };
+		A9363F9868819CBDEE2C8566 /* SRD */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SRD; path = Resources/SRD; sourceTree = SOURCE_ROOT; };
 		AA0EE6CA8A66A0E657B44670 /* PeopleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleView.swift; sourceTree = "<group>"; };
+		BB3D42180E267F4F34323C35 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BF2531217920829646B52CCC /* CharacterCreatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterCreatorView.swift; sourceTree = "<group>"; };
 		CA98322C7FB219190D6DA268 /* DiceRoller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiceRoller.swift; sourceTree = "<group>"; };
 		E7DFDE9A4C5F51FC4F77862D /* DMTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMTheme.swift; sourceTree = "<group>"; };
@@ -124,6 +128,7 @@
 		38A76819B08009CD0385F716 = {
 			isa = PBXGroup;
 			children = (
+				624ED88596B600D1476F1049 /* Resources */,
 				31D482C215B0168E5DEBDD7A /* Sources */,
 				361D14FFE895587FEDDC0C73 /* Products */,
 			);
@@ -143,6 +148,15 @@
 				E7DFDE9A4C5F51FC4F77862D /* DMTheme.swift */,
 			);
 			path = Theme;
+			sourceTree = "<group>";
+		};
+		624ED88596B600D1476F1049 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				BB3D42180E267F4F34323C35 /* Assets.xcassets */,
+				A9363F9868819CBDEE2C8566 /* SRD */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		644914C7917487797C41EE3D /* Places */ = {
@@ -198,6 +212,7 @@
 			buildConfigurationList = B40008068474CE675E2BEEC4 /* Build configuration list for PBXNativeTarget "DMForge" */;
 			buildPhases = (
 				9009CEA3FE66417DFDAB021B /* Sources */,
+				E80D0E9C665162C3A5AE755D /* Resources */,
 			);
 			buildRules = (
 			);
@@ -243,6 +258,18 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E80D0E9C665162C3A5AE755D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A3EC424DD9B39A7719CE5277 /* Assets.xcassets in Resources */,
+				D8C69C58C7B4FD158C9075BC /* SRD in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		9009CEA3FE66417DFDAB021B /* Sources */ = {
@@ -329,7 +356,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -350,6 +377,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "DM Forge";
+				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -410,7 +438,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -430,6 +458,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "DM Forge";
+				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
