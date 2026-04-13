@@ -30,6 +30,10 @@ final class Campaign {
     var travelStops: [TravelStop]
     var travelSegments: [TravelSegment]
 
+    // Map stamps and text labels
+    var mapStamps: [MapStamp]
+    var mapTextLabels: [MapTextLabel]
+
     init(name: String) {
         self.id = UUID()
         self.name = name
@@ -48,6 +52,8 @@ final class Campaign {
         self.itemVault = []
         self.travelStops = []
         self.travelSegments = []
+        self.mapStamps = []
+        self.mapTextLabels = []
     }
 }
 
@@ -68,6 +74,39 @@ struct TravelSegment: Codable, Identifiable {
     var toStopIndex: Int
     var waypoints: [CGPoint]
     var session: String
+}
+
+// MARK: - Map Stamps
+
+struct MapStamp: Codable, Identifiable {
+    var id: UUID = UUID()
+    var type: String   // "mountain", "forest", "water", "town", "castle", "cave", "camp", "road"
+    var x: Double      // normalized 0...1
+    var y: Double      // normalized 0...1
+    var label: String?
+
+    var emoji: String {
+        switch type {
+        case "mountain": return "\u{26F0}"  // ⛰
+        case "forest": return "\u{1F332}"   // 🌲
+        case "water": return "\u{1F4A7}"    // 💧
+        case "town": return "\u{1F3D8}"     // 🏘
+        case "castle": return "\u{1F3F0}"   // 🏰
+        case "cave": return "\u{2694}\u{FE0F}" // ⚔️
+        case "camp": return "\u{26FA}"      // ⛺
+        case "road": return "\u{2014}"      // —
+        default: return "\u{1F4CD}"         // 📍
+        }
+    }
+}
+
+// MARK: - Map Text Labels
+
+struct MapTextLabel: Codable, Identifiable {
+    var id: UUID = UUID()
+    var text: String
+    var x: Double  // normalized 0...1
+    var y: Double  // normalized 0...1
 }
 
 extension CGPoint: @retroactive Codable {

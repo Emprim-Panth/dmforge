@@ -13,6 +13,7 @@
 		2595655CA94EC68E442036A9 /* ReferenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AEFACD40C50D294B5F4BA2 /* ReferenceView.swift */; };
 		3BA080393314696606886367 /* DeathSaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E518C6DD254B269AD7000 /* DeathSaveView.swift */; };
 		44AB2B9F1B35B8A64640F94D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73100BE023CDD225C5E0EC97 /* ContentView.swift */; };
+		46B0CFE522D0C92FA48278AE /* NavigationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7F25F1174BB407D93BDEC15 /* NavigationCoordinator.swift */; };
 		46C8316646672716DD9CAB44 /* Place.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E18D67813433F59B476A5E /* Place.swift */; };
 		4DCCD175A26B45FA1A378791 /* PlacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D1F90AC53316923BBF41F1 /* PlacesView.swift */; };
 		5436ED182D089656DB0D7200 /* BestiaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FD11295122CA60D21BA098 /* BestiaryView.swift */; };
@@ -51,6 +52,7 @@
 		9D793E50FE8A7440D4AE0555 /* SRDLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRDLoader.swift; sourceTree = "<group>"; };
 		A9363F9868819CBDEE2C8566 /* SRD */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SRD; path = Resources/SRD; sourceTree = SOURCE_ROOT; };
 		AA0EE6CA8A66A0E657B44670 /* PeopleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleView.swift; sourceTree = "<group>"; };
+		B7F25F1174BB407D93BDEC15 /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
 		BB3D42180E267F4F34323C35 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BF2531217920829646B52CCC /* CharacterCreatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterCreatorView.swift; sourceTree = "<group>"; };
 		CA98322C7FB219190D6DA268 /* DiceRoller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiceRoller.swift; sourceTree = "<group>"; };
@@ -182,6 +184,7 @@
 			isa = PBXGroup;
 			children = (
 				CA98322C7FB219190D6DA268 /* DiceRoller.swift */,
+				B7F25F1174BB407D93BDEC15 /* NavigationCoordinator.swift */,
 				23A56B8DB60B440726170A3A /* RulesEngine.swift */,
 				9D793E50FE8A7440D4AE0555 /* SRDLoader.swift */,
 			);
@@ -298,6 +301,7 @@
 				3BA080393314696606886367 /* DeathSaveView.swift in Sources */,
 				54B57D1CBDCAC943B3D7548A /* DiceRoller.swift in Sources */,
 				8D06191C231D4E29F0AFB84E /* EncounterView.swift in Sources */,
+				46B0CFE522D0C92FA48278AE /* NavigationCoordinator.swift in Sources */,
 				DF516195F1B976E55C4BCC9F /* PeopleView.swift in Sources */,
 				46C8316646672716DD9CAB44 /* Place.swift in Sources */,
 				4DCCD175A26B45FA1A378791 /* PlacesView.swift in Sources */,

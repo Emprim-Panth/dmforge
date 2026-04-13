@@ -2,12 +2,53 @@ import SwiftUI
 import SwiftData
 import PhotosUI
 
+// MARK: - Stamp Definition
+
+struct StampType: Identifiable {
+    let id: String
+    let emoji: String
+    let label: String
+
+    static let all: [StampType] = [
+        StampType(id: "mountain", emoji: "\u{26F0}", label: "Mountain"),
+        StampType(id: "forest", emoji: "\u{1F332}", label: "Forest"),
+        StampType(id: "water", emoji: "\u{1F4A7}", label: "Water"),
+        StampType(id: "town", emoji: "\u{1F3D8}", label: "Town"),
+        StampType(id: "castle", emoji: "\u{1F3F0}", label: "Castle"),
+        StampType(id: "cave", emoji: "\u{2694}\u{FE0F}", label: "Cave"),
+        StampType(id: "camp", emoji: "\u{26FA}", label: "Camp"),
+        StampType(id: "road", emoji: "\u{2014}", label: "Road"),
+    ]
+}
+
+// MARK: - Map Tool Mode
+
+enum MapToolMode: Equatable {
+    case none
+    case addPin
+    case stamp(StampType)
+    case textLabel
+
+    static func == (lhs: MapToolMode, rhs: MapToolMode) -> Bool {
+        switch (lhs, rhs) {
+        case (.none, .none): return true
+        case (.addPin, .addPin): return true
+        case (.textLabel, .textLabel): return true
+        case (.stamp(let a), .stamp(let b)): return a.id == b.id
+        default: return false
+        }
+    }
+}
+
+// MARK: - WorldMapView
+
 struct WorldMapView: View {
     @Bindable var campaign: Campaign
+    var coordinator: NavigationCoordinator
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showFileImporter = false
     @State private var isDMView = true
-    @State private var isAddingPin = false
+    @State private var toolMode: MapToolMode = .none
     @State private var pendingPinPosition: CGPoint?
     @State private var showPlacePicker = false
     @State private var selectedPinPlace: Place?
@@ -15,19 +56,35 @@ struct WorldMapView: View {
     @State private var lastZoom: CGFloat = 1.0
     @State private var offset: CGSize = .zero
     @State private var lastOffset: CGSize = .zero
+    @State private var showTextLabelInput = false
+    @State private var pendingTextLabelPosition: CGPoint?
+    @State private var textLabelInput = ""
+    @State private var showStampToolbar = false
+
+    private var hasContent: Bool {
+        campaign.mapImageData != nil || !campaign.mapStamps.isEmpty || !campaign.mapTextLabels.isEmpty
+    }
 
     var body: some View {
         ZStack {
             DMTheme.background.ignoresSafeArea()
 
-            if campaign.mapImageData != nil {
+            if hasContent {
                 mapContentView
             } else {
                 emptyStateView
             }
+
+            // Stamp toolbar overlay at bottom
+            if hasContent {
+                VStack {
+                    Spacer()
+                    stampToolbarView
+                }
+            }
         }
         .toolbar {
-            if campaign.mapImageData != nil {
+            if hasContent {
                 toolbarItems
             }
         }
@@ -44,6 +101,61 @@ struct WorldMapView: View {
         .sheet(isPresented: $showPlacePicker) {
             placePickerSheet
         }
+        .alert("Add Label", isPresented: $showTextLabelInput) {
+            TextField("Label text", text: $textLabelInput)
+            Button("Add") {
+                if let pos = pendingTextLabelPosition, !textLabelInput.trimmingCharacters(in: .whitespaces).isEmpty {
+                    let label = MapTextLabel(
+                        text: textLabelInput.trimmingCharacters(in: .whitespaces),
+                        x: pos.x,
+                        y: pos.y
+                    )
+                    campaign.mapTextLabels.append(label)
+                }
+                textLabelInput = ""
+                pendingTextLabelPosition = nil
+            }
+            Button("Cancel", role: .cancel) {
+                textLabelInput = ""
+                pendingTextLabelPosition = nil
+            }
+        } message: {
+            Text("Enter a name for this location")
+        }
+        .onAppear {
+            handleCoordinatorOnAppear()
+        }
+    }
+
+    // MARK: - Coordinator Handling
+
+    private func handleCoordinatorOnAppear() {
+        if let place = coordinator.showPlaceOnMap {
+            // Zoom/highlight to this place
+            selectedPinPlace = place
+            if let mx = place.mapX, let my = place.mapY {
+                // Center on the place
+                zoom = 2.0
+                lastZoom = 2.0
+                offset = CGSize(
+                    width: -(mx - 0.5) * 400,
+                    height: -(my - 0.5) * 400
+                )
+                lastOffset = offset
+            }
+            coordinator.showPlaceOnMap = nil
+        }
+
+        if let place = coordinator.placeNeedingPin {
+            // Switch to add-pin mode, pre-selecting this place
+            toolMode = .addPin
+            coordinator.placeNeedingPin = nil
+            // If no map exists yet, create a blank canvas
+            if campaign.mapImageData == nil {
+                createParchmentCanvas()
+                showStampToolbar = true
+            }
+        }
     }
 
     // MARK: - Map Content
@@ -51,48 +163,62 @@ struct WorldMapView: View {
     @ViewBuilder
     private var mapContentView: some View {
         GeometryReader { geo in
-            let mapImage = UIImage(data: campaign.mapImageData!)!
-            let imageSize = mapImage.size
-
             ZStack {
-                Image(uiImage: mapImage)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .overlay {
-                        GeometryReader { imageGeo in
-                            ZStack {
-                                // Travel path
-                                travelPathOverlay(in: imageGeo.size)
+                if let data = campaign.mapImageData, let mapImage = UIImage(data: data) {
+                    Image(uiImage: mapImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .overlay {
+                            GeometryReader { imageGeo in
+                                ZStack {
+                                    // Travel path
+                                    travelPathOverlay(in: imageGeo.size)
 
-                                // Encounter zones (DM view only)
-                                if isDMView {
-                                    encounterZoneOverlay(in: imageGeo.size)
-                                }
+                                    // Encounter zones (DM view only)
+                                    if isDMView {
+                                        encounterZoneOverlay(in: imageGeo.size)
+                                    }
 
-                                // Location pins
-                                pinOverlay(in: imageGeo.size)
+                                    // Map stamps
+                                    stampOverlay(in: imageGeo.size)
 
-                                // Pending pin placement
-                                if isAddingPin, let pos = pendingPinPosition {
-                                    pinMarker(emoji: "📍", label: "New Pin")
-                                        .position(x: pos.x * imageGeo.size.width,
-                                                  y: pos.y * imageGeo.size.height)
+                                    // Text labels
+                                    textLabelOverlay(in: imageGeo.size)
+
+                                    // Location pins
+                                    pinOverlay(in: imageGeo.size)
+
+                                    // Pending pin placement
+                                    if case .addPin = toolMode, let pos = pendingPinPosition {
+                                        pinMarker(emoji: "\u{1F4CD}", label: "New Pin")
+                                            .position(x: pos.x * imageGeo.size.width,
+                                                      y: pos.y * imageGeo.size.height)
+                                    }
                                 }
                             }
                         }
-                    }
-                    .onTapGesture { location in
-                        // Only used during pin placement — handled via coordinateSpace below
-                    }
+                } else {
+                    // No image but has stamps/labels — show parchment background
+                    parchmentBackground
+                        .overlay {
+                            GeometryReader { imageGeo in
+                                ZStack {
+                                    stampOverlay(in: imageGeo.size)
+                                    textLabelOverlay(in: imageGeo.size)
+                                    pinOverlay(in: imageGeo.size)
+                                }
+                            }
+                        }
+                }
             }
             .scaleEffect(zoom)
             .offset(offset)
             .gesture(dragGesture)
             .gesture(magnificationGesture)
             .overlay {
-                // Invisible tap target for pin placement
-                if isAddingPin {
+                // Invisible tap target for tool interactions
+                if toolMode != .none {
                     GeometryReader { tapGeo in
                         Color.clear
                             .contentShape(Rectangle())
@@ -101,8 +227,7 @@ struct WorldMapView: View {
                                     x: location.x / tapGeo.size.width,
                                     y: location.y / tapGeo.size.height
                                 )
-                                pendingPinPosition = normalized
-                                showPlacePicker = true
+                                handleMapTap(at: normalized)
                             }
                     }
                 }
@@ -110,7 +235,195 @@ struct WorldMapView: View {
         }
     }
 
+    // MARK: - Map Tap Handling
+
+    private func handleMapTap(at normalized: CGPoint) {
+        switch toolMode {
+        case .addPin:
+            pendingPinPosition = normalized
+            showPlacePicker = true
+        case .stamp(let stampType):
+            let stamp = MapStamp(
+                type: stampType.id,
+                x: normalized.x,
+                y: normalized.y
+            )
+            campaign.mapStamps.append(stamp)
+        case .textLabel:
+            pendingTextLabelPosition = normalized
+            showTextLabelInput = true
+        case .none:
+            break
+        }
+    }
+
+    // MARK: - Parchment Background
+
+    private var parchmentBackground: some View {
+        RoundedRectangle(cornerRadius: 8)
+            .fill(
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.85, green: 0.78, blue: 0.65),
+                        Color(red: 0.82, green: 0.74, blue: 0.60),
+                        Color(red: 0.80, green: 0.72, blue: 0.58),
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .overlay(
+                // Subtle texture noise
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.brown.opacity(0.05))
+            )
+            .padding(8)
+    }
+
+    // MARK: - Stamp Toolbar
+
+    private var stampToolbarView: some View {
+        VStack(spacing: 0) {
+            if showStampToolbar {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        // Pin tool
+                        toolButton(
+                            emoji: "\u{1F4CD}",
+                            label: "Pin",
+                            isActive: toolMode == .addPin
+                        ) {
+                            toolMode = toolMode == .addPin ? .none : .addPin
+                        }
+
+                        Divider()
+                            .frame(height: 40)
+
+                        // Stamp tools
+                        ForEach(StampType.all) { stamp in
+                            toolButton(
+                                emoji: stamp.emoji,
+                                label: stamp.label,
+                                isActive: toolMode == .stamp(stamp)
+                            ) {
+                                toolMode = toolMode == .stamp(stamp) ? .none : .stamp(stamp)
+                            }
+                        }
+
+                        Divider()
+                            .frame(height: 40)
+
+                        // Text label tool
+                        toolButton(
+                            emoji: "Aa",
+                            label: "Label",
+                            isActive: toolMode == .textLabel
+                        ) {
+                            toolMode = toolMode == .textLabel ? .none : .textLabel
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                }
+                .background(
+                    DMTheme.card.opacity(0.95)
+                        .shadow(color: .black.opacity(0.3), radius: 8, y: -2)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .padding(.horizontal, 16)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+
+            // Toggle button
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    showStampToolbar.toggle()
+                    if !showStampToolbar {
+                        toolMode = .none
+                    }
+                }
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: showStampToolbar ? "chevron.down" : "paintbrush.pointed.fill")
+                        .font(.caption)
+                    Text(showStampToolbar ? "Hide Tools" : "Build Tools")
+                        .font(.caption.bold())
+                }
+                .foregroundStyle(DMTheme.accent)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(DMTheme.card.opacity(0.95))
+                .clipShape(Capsule())
+                .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
+            }
+            .padding(.bottom, 12)
+        }
+    }
+
+    private func toolButton(emoji: String, label: String, isActive: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Text(emoji)
+                    .font(.title2)
+                Text(label)
+                    .font(.caption2)
+                    .foregroundStyle(isActive ? DMTheme.accent : DMTheme.textDim)
+            }
+            .frame(width: 52, height: 52)
+            .background(isActive ? DMTheme.accent.opacity(0.2) : Color.clear)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(isActive ? DMTheme.accent : Color.clear, lineWidth: 2)
+            )
+        }
+        .frame(minHeight: 44)
+    }
+
     // MARK: - Overlays
+
+    @ViewBuilder
+    private func stampOverlay(in size: CGSize) -> some View {
+        ForEach(campaign.mapStamps) { stamp in
+            VStack(spacing: 1) {
+                Text(stamp.emoji)
+                    .font(.system(size: 28 / zoom))
+                if let label = stamp.label, !label.isEmpty {
+                    Text(label)
+                        .font(.system(size: 10 / zoom, weight: .semibold))
+                        .foregroundStyle(DMTheme.textPrimary)
+                        .padding(.horizontal, 4)
+                        .background(DMTheme.card.opacity(0.7))
+                        .clipShape(RoundedRectangle(cornerRadius: 3))
+                }
+            }
+            .position(
+                x: stamp.x * size.width,
+                y: stamp.y * size.height
+            )
+            .onLongPressGesture {
+                // Remove stamp on long press
+                campaign.mapStamps.removeAll { $0.id == stamp.id }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func textLabelOverlay(in size: CGSize) -> some View {
+        ForEach(campaign.mapTextLabels) { label in
+            Text(label.text)
+                .font(.system(size: 16 / zoom, weight: .bold, design: .serif))
+                .foregroundStyle(Color(red: 0.3, green: 0.2, blue: 0.1))
+                .shadow(color: .white.opacity(0.5), radius: 1, y: 1)
+                .position(
+                    x: label.x * size.width,
+                    y: label.y * size.height
+                )
+                .onLongPressGesture {
+                    campaign.mapTextLabels.removeAll { $0.id == label.id }
+                }
+        }
+    }
 
     @ViewBuilder
     private func pinOverlay(in size: CGSize) -> some View {
@@ -221,6 +534,17 @@ struct WorldMapView: View {
                     .foregroundStyle(DMTheme.textPrimary)
                     .lineLimit(2)
             }
+
+            Button {
+                coordinator.showPlaceInList = place
+                coordinator.requestedTab = .places
+            } label: {
+                Label("View in Places", systemImage: "list.bullet")
+                    .font(.caption2.bold())
+                    .foregroundStyle(DMTheme.accent)
+            }
+            .frame(minHeight: 36)
+            .padding(.top, 2)
         }
         .padding(10)
         .background(DMTheme.card)
@@ -261,7 +585,7 @@ struct WorldMapView: View {
     // MARK: - Empty State
 
     private var emptyStateView: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 28) {
             Image(systemName: "globe.americas.fill")
                 .font(.system(size: 64))
                 .foregroundStyle(DMTheme.accent.opacity(0.4))
@@ -270,36 +594,91 @@ struct WorldMapView: View {
                 .font(.title.bold())
                 .foregroundStyle(DMTheme.textPrimary)
 
-            Text("Import your world map from Wonderdraft, Inkarnate, or any image")
+            Text("Start building your world")
                 .font(.subheadline)
                 .foregroundStyle(DMTheme.textSecondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 360)
 
-            HStack(spacing: 16) {
-                PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                    Label("Choose from Photos", systemImage: "photo.on.rectangle")
-                        .frame(minHeight: 44)
-                }
-                .buttonStyle(DMButtonStyle(color: DMTheme.card))
+            // Two prominent options
+            HStack(spacing: 20) {
+                // Import a Map
+                VStack(spacing: 12) {
+                    Image(systemName: "photo.on.rectangle.angled")
+                        .font(.system(size: 36))
+                        .foregroundStyle(DMTheme.accent)
 
-                Button {
-                    showFileImporter = true
-                } label: {
-                    Label("Import from Files", systemImage: "folder")
-                        .frame(minHeight: 44)
-                }
-                .buttonStyle(DMButtonStyle(color: DMTheme.card))
-            }
+                    Text("Import a Map")
+                        .font(.headline)
+                        .foregroundStyle(DMTheme.textPrimary)
 
-            Button {
-                // Simple canvas placeholder — basic for now
-                createBlankCanvas()
-            } label: {
-                Label("Or draw your own", systemImage: "pencil.and.outline")
-                    .font(.subheadline)
-                    .foregroundStyle(DMTheme.accent)
-                    .frame(minHeight: 44)
+                    Text("From Wonderdraft, Inkarnate, or any image")
+                        .font(.caption)
+                        .foregroundStyle(DMTheme.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: 160)
+
+                    VStack(spacing: 8) {
+                        PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                            Label("Photos", systemImage: "photo")
+                                .frame(maxWidth: .infinity)
+                                .frame(minHeight: 44)
+                        }
+                        .buttonStyle(DMButtonStyle(color: DMTheme.card))
+
+                        Button {
+                            showFileImporter = true
+                        } label: {
+                            Label("Files", systemImage: "folder")
+                                .frame(maxWidth: .infinity)
+                                .frame(minHeight: 44)
+                        }
+                        .buttonStyle(DMButtonStyle(color: DMTheme.card))
+                    }
+                    .frame(width: 160)
+                }
+                .padding(20)
+                .background(DMTheme.card)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(DMTheme.border, lineWidth: 1)
+                )
+
+                // Build Your Own
+                VStack(spacing: 12) {
+                    Image(systemName: "paintbrush.pointed.fill")
+                        .font(.system(size: 36))
+                        .foregroundStyle(DMTheme.accentGreen)
+
+                    Text("Build Your Own")
+                        .font(.headline)
+                        .foregroundStyle(DMTheme.textPrimary)
+
+                    Text("Parchment canvas with stamps, pins, and labels")
+                        .font(.caption)
+                        .foregroundStyle(DMTheme.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: 160)
+
+                    Button {
+                        createParchmentCanvas()
+                        showStampToolbar = true
+                    } label: {
+                        Label("Start Building", systemImage: "hammer.fill")
+                            .frame(maxWidth: .infinity)
+                            .frame(minHeight: 44)
+                    }
+                    .buttonStyle(DMButtonStyle(color: DMTheme.accentGreen.opacity(0.3)))
+                    .frame(width: 160)
+                }
+                .padding(20)
+                .background(DMTheme.card)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(DMTheme.border, lineWidth: 1)
+                )
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -320,20 +699,6 @@ struct WorldMapView: View {
         }
 
         ToolbarItem(placement: .primaryAction) {
-            Button {
-                isAddingPin.toggle()
-                if !isAddingPin {
-                    pendingPinPosition = nil
-                }
-            } label: {
-                Label(isAddingPin ? "Cancel Pin" : "+ Add Pin",
-                      systemImage: isAddingPin ? "xmark" : "mappin.and.ellipse")
-                    .frame(minHeight: 44)
-            }
-            .tint(isAddingPin ? DMTheme.accentRed : DMTheme.accent)
-        }
-
-        ToolbarItem(placement: .primaryAction) {
             Menu {
                 PhotosPicker(selection: $selectedPhoto, matching: .images) {
                     Label("Replace from Photos", systemImage: "photo")
@@ -346,10 +711,14 @@ struct WorldMapView: View {
                 Divider()
                 Button(role: .destructive) {
                     campaign.mapImageData = nil
+                    campaign.mapStamps = []
+                    campaign.mapTextLabels = []
                     zoom = 1.0
                     lastZoom = 1.0
                     offset = .zero
                     lastOffset = .zero
+                    showStampToolbar = false
+                    toolMode = .none
                 } label: {
                     Label("Remove Map", systemImage: "trash")
                 }
@@ -372,7 +741,7 @@ struct WorldMapView: View {
                             place.mapY = pos.y
                         }
                         showPlacePicker = false
-                        isAddingPin = false
+                        toolMode = .none
                         pendingPinPosition = nil
                     } label: {
                         HStack {
@@ -429,24 +798,22 @@ struct WorldMapView: View {
         }
     }
 
-    private func createBlankCanvas() {
+    private func createParchmentCanvas() {
         let size = CGSize(width: 2048, height: 2048)
         let renderer = UIGraphicsImageRenderer(size: size)
         let image = renderer.image { ctx in
-            UIColor(DMTheme.background).setFill()
+            // Parchment-colored background
+            UIColor(red: 0.85, green: 0.78, blue: 0.65, alpha: 1.0).setFill()
             ctx.fill(CGRect(origin: .zero, size: size))
-            // Grid lines
-            UIColor(DMTheme.border).setStroke()
-            let gridSpacing: CGFloat = 64
-            for x in stride(from: 0, through: size.width, by: gridSpacing) {
-                ctx.cgContext.move(to: CGPoint(x: x, y: 0))
-                ctx.cgContext.addLine(to: CGPoint(x: x, y: size.height))
-            }
-            for y in stride(from: 0, through: size.height, by: gridSpacing) {
-                ctx.cgContext.move(to: CGPoint(x: 0, y: y))
-                ctx.cgContext.addLine(to: CGPoint(x: size.width, y: y))
-            }
-            ctx.cgContext.strokePath()
+
+            // Subtle aged texture with slightly darker edges
+            let edgeColor = UIColor(red: 0.75, green: 0.68, blue: 0.55, alpha: 0.3)
+            edgeColor.setFill()
+            let borderWidth: CGFloat = 40
+            ctx.fill(CGRect(x: 0, y: 0, width: size.width, height: borderWidth))
+            ctx.fill(CGRect(x: 0, y: size.height - borderWidth, width: size.width, height: borderWidth))
+            ctx.fill(CGRect(x: 0, y: 0, width: borderWidth, height: size.height))
+            ctx.fill(CGRect(x: size.width - borderWidth, y: 0, width: borderWidth, height: size.height))
         }
         campaign.mapImageData = image.pngData()
         resetViewState()

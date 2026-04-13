@@ -5,10 +5,12 @@ import SwiftData
 
 struct PlacesView: View {
     let campaign: Campaign
+    var coordinator: NavigationCoordinator
     @Environment(\.modelContext) private var modelContext
 
     @State private var showNewPlace = false
     @State private var editingPlace: Place?
+    @State private var highlightedPlaceID: UUID?
 
     private var topLevelPlaces: [Place] {
         campaign.places
@@ -73,12 +75,22 @@ struct PlacesView: View {
             }
         }
         .background(DMTheme.background)
+        .onAppear {
+            if let place = coordinator.showPlaceInList {
+                highlightedPlaceID = place.id
+                coordinator.showPlaceInList = nil
+                // Clear highlight after a moment
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    withAnimation { highlightedPlaceID = nil }
+                }
+            }
+        }
         .sheet(isPresented: $showNewPlace) {
-            PlaceFormSheet(campaign: campaign, editingPlace: nil)
+            PlaceFormSheet(campaign: campaign, editingPlace: nil, coordinator: coordinator)
                 .presentationDetents([.medium, .large])
         }
         .sheet(item: $editingPlace) { place in
-            PlaceFormSheet(campaign: campaign, editingPlace: place)
+            PlaceFormSheet(campaign: campaign, editingPlace: place, coordinator: coordinator)
                 .presentationDetents([.medium, .large])
         }
     }
@@ -169,6 +181,28 @@ struct PlacesView: View {
                     .buttonStyle(DMSmallButtonStyle(color: DMTheme.card))
                     .frame(minHeight: 44)
 
+                    if place.mapX != nil && place.mapY != nil {
+                        Button {
+                            coordinator.showPlaceOnMap = place
+                            coordinator.requestedTab = .map
+                        } label: {
+                            Label("Show on Map", systemImage: "mappin.and.ellipse")
+                                .font(.caption)
+                        }
+                        .buttonStyle(DMSmallButtonStyle(color: DMTheme.accent.opacity(0.2)))
+                        .frame(minHeight: 44)
+                    } else {
+                        Button {
+                            coordinator.placeNeedingPin = place
+                            coordinator.requestedTab = .map
+                        } label: {
+                            Label("Pin on Map", systemImage: "mappin")
+                                .font(.caption)
+                        }
+                        .buttonStyle(DMSmallButtonStyle(color: DMTheme.accentGreen.opacity(0.2)))
+                        .frame(minHeight: 44)
+                    }
+
                     Button("Remove") {
                         modelContext.delete(place)
                     }
@@ -184,6 +218,11 @@ struct PlacesView: View {
                 .stroke(DMTheme.border, lineWidth: 1)
         )
         .shadow(color: DMTheme.cardShadow, radius: 4, y: 2)
+        .overlay(
+            RoundedRectangle(cornerRadius: DMTheme.cardCornerRadius)
+                .stroke(DMTheme.accent, lineWidth: highlightedPlaceID == place.id ? 2 : 0)
+                .animation(.easeInOut(duration: 0.5).repeatCount(3, autoreverses: true), value: highlightedPlaceID)
+        )
         .padding(.leading, CGFloat(depth) * 20)
     }
 
@@ -211,6 +250,7 @@ struct PlacesView: View {
 struct PlaceFormSheet: View {
     let campaign: Campaign
     let editingPlace: Place?
+    var coordinator: NavigationCoordinator?
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
@@ -219,6 +259,7 @@ struct PlaceFormSheet: View {
     @State private var parentID: UUID?
     @State private var desc = ""
     @State private var notes = ""
+    @State private var pinOnMap = false
 
     private let placeTypes = ["Town", "City", "Village", "Dungeon", "Building", "Wilderness", "Tavern", "Temple"]
 
@@ -250,6 +291,12 @@ struct PlaceFormSheet: View {
                 Section("Notes") {
                     TextField("Notes", text: $notes, axis: .vertical)
                         .lineLimit(3...8)
+                }
+
+                if !isEditing && coordinator != nil {
+                    Section("Map") {
+                        Toggle("Pin on Map after creating", isOn: $pinOnMap)
+                    }
                 }
             }
             .scrollContentBackground(.hidden)
@@ -297,6 +344,11 @@ struct PlaceFormSheet: View {
             place.notes = notes
             place.campaign = campaign
             modelContext.insert(place)
+
+            if pinOnMap, let coordinator {
+                coordinator.placeNeedingPin = place
+                coordinator.requestedTab = .map
+            }
         }
     }
 }

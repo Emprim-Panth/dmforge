@@ -3,34 +3,9 @@ import SwiftData
 
 struct DashboardView: View {
     @Bindable var campaign: Campaign
-    @State private var selectedTab: Tab = .encounter
+    @State private var selectedTab: DashboardTab = .encounter
     @State private var showCharacterCreator = false
-
-    enum Tab: String, CaseIterable {
-        case encounter = "Encounter"
-        case people = "People"
-        case places = "Places"
-        case story = "Story"
-        case bestiary = "Bestiary"
-        case map = "Map"
-        case notes = "Notes"
-        case reference = "Reference"
-        case ai = "AI"
-
-        var icon: String {
-            switch self {
-            case .encounter: return "shield.fill"
-            case .people: return "person.3.fill"
-            case .places: return "map.fill"
-            case .story: return "book.fill"
-            case .bestiary: return "pawprint.fill"
-            case .map: return "globe.americas.fill"
-            case .notes: return "note.text"
-            case .reference: return "books.vertical.fill"
-            case .ai: return "sparkles"
-            }
-        }
-    }
+    @State private var coordinator = NavigationCoordinator()
 
     var body: some View {
         NavigationSplitView {
@@ -75,7 +50,7 @@ struct DashboardView: View {
                 // Tab list
                 ScrollView {
                     VStack(spacing: 4) {
-                        ForEach(Tab.allCases, id: \.self) { tab in
+                        ForEach(DashboardTab.allCases, id: \.self) { tab in
                             Button {
                                 withAnimation(.easeInOut(duration: 0.2)) {
                                     selectedTab = tab
@@ -126,13 +101,13 @@ struct DashboardView: View {
                 case .people:
                     PeopleView(campaign: campaign)
                 case .places:
-                    PlacesView(campaign: campaign)
+                    PlacesView(campaign: campaign, coordinator: coordinator)
                 case .story:
                     StoryView(campaign: campaign)
                 case .bestiary:
                     BestiaryView(campaign: campaign)
                 case .map:
-                    WorldMapView(campaign: campaign)
+                    WorldMapView(campaign: campaign, coordinator: coordinator)
                 case .notes:
                     NotesView(campaign: campaign)
                 case .reference:
@@ -145,6 +120,14 @@ struct DashboardView: View {
             .background(DMTheme.background)
         }
         .navigationSplitViewStyle(.balanced)
+        .onChange(of: coordinator.requestedTab) { _, newTab in
+            if let tab = newTab {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    selectedTab = tab
+                }
+                coordinator.requestedTab = nil
+            }
+        }
         .sheet(isPresented: $showCharacterCreator) {
             CharacterCreatorView(campaign: campaign)
                 .presentationDetents([.large])
