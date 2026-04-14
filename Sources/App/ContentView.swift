@@ -6,13 +6,10 @@ struct ContentView: View {
     @Query private var campaigns: [Campaign]
     @State private var activeCampaign: Campaign?
     @State private var showCampaignPicker = true
-    @State private var showQA = false
-
+    
     var body: some View {
         Group {
-            if showQA {
-                QARunnerView()
-            } else if let campaign = activeCampaign {
+if let campaign = activeCampaign {
                 DashboardView(campaign: campaign)
                     .environment(\.campaign, campaign)
                     .transition(.opacity)
