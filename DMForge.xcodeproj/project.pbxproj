@@ -19,6 +19,7 @@
 		4DCCD175A26B45FA1A378791 /* PlacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D1F90AC53316923BBF41F1 /* PlacesView.swift */; };
 		5436ED182D089656DB0D7200 /* BestiaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FD11295122CA60D21BA098 /* BestiaryView.swift */; };
 		54B57D1CBDCAC943B3D7548A /* DiceRoller.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA98322C7FB219190D6DA268 /* DiceRoller.swift */; };
+		5B304759AE658EEEA11E4C58 /* QATest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FE8BC12B03005AB8A785D5B /* QATest.swift */; };
 		62613CDFF71B557EF0043D91 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5056011700C412EC4C3A954B /* DashboardView.swift */; };
 		62F561531CDED8CD5740E3EE /* RulesEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23A56B8DB60B440726170A3A /* RulesEngine.swift */; };
 		63CFE793DAD583BC44312F62 /* CharacterCreatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF2531217920829646B52CCC /* CharacterCreatorView.swift */; };
@@ -52,6 +53,7 @@
 		65358B0E485D991FD434ECFD /* MapRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapRenderer.swift; sourceTree = "<group>"; };
 		69B4E931705E33C0DB7B275E /* Campaign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Campaign.swift; sourceTree = "<group>"; };
 		6BA4480D909B99DFCBB4E8C6 /* WorldMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldMapView.swift; sourceTree = "<group>"; };
+		6FE8BC12B03005AB8A785D5B /* QATest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QATest.swift; sourceTree = "<group>"; };
 		73100BE023CDD225C5E0EC97 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7B6CFCBABE71138D49E4072A /* OnDeviceLLMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceLLMService.swift; sourceTree = "<group>"; };
 		7F1E518C6DD254B269AD7000 /* DeathSaveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeathSaveView.swift; sourceTree = "<group>"; };
@@ -101,6 +103,7 @@
 			children = (
 				73100BE023CDD225C5E0EC97 /* ContentView.swift */,
 				95A5CAD1DD684C8710A53412 /* DMForgeApp.swift */,
+				6FE8BC12B03005AB8A785D5B /* QATest.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -333,6 +336,7 @@
 				DF516195F1B976E55C4BCC9F /* PeopleView.swift in Sources */,
 				46C8316646672716DD9CAB44 /* Place.swift in Sources */,
 				4DCCD175A26B45FA1A378791 /* PlacesView.swift in Sources */,
+				5B304759AE658EEEA11E4C58 /* QATest.swift in Sources */,
 				2595655CA94EC68E442036A9 /* ReferenceView.swift in Sources */,
 				62F561531CDED8CD5740E3EE /* RulesEngine.swift in Sources */,
 				A550BE796CD224D534EBB4B4 /* SRDLoader.swift in Sources */,
@@ -415,7 +419,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				INFOPLIST_FILE = "DMForge-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -491,7 +495,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				INFOPLIST_FILE = "DMForge-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

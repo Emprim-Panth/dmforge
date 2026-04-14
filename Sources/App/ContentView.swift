@@ -6,10 +6,13 @@ struct ContentView: View {
     @Query private var campaigns: [Campaign]
     @State private var activeCampaign: Campaign?
     @State private var showCampaignPicker = true
+    @State private var showQA = false
 
     var body: some View {
         Group {
-            if let campaign = activeCampaign {
+            if showQA {
+                QARunnerView()
+            } else if let campaign = activeCampaign {
                 DashboardView(campaign: campaign)
                     .environment(\.campaign, campaign)
                     .transition(.opacity)
@@ -199,3 +202,25 @@ struct CampaignPickerView: View {
         }
     }
 }
+
+// MARK: - Debug QA Runner
+#if DEBUG
+struct QARunnerView: View {
+    @Environment(\.modelContext) private var modelContext
+    @State private var results = "Running tests..."
+    
+    var body: some View {
+        ScrollView {
+            Text(results)
+                .font(.system(.caption, design: .monospaced))
+                .foregroundStyle(DMTheme.textPrimary)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .background(DMTheme.background)
+        .onAppear {
+            results = QATest.run(modelContext: modelContext)
+        }
+    }
+}
+#endif
