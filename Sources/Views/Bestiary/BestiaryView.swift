@@ -229,7 +229,7 @@ struct BestiaryView: View {
 
     private func loadMonsters() {
         guard allMonsters.isEmpty else { return }
-        guard let url = Bundle.main.url(forResource: "monsters", withExtension: "json", subdirectory: "SRD") else { return }
+        let url = Bundle.main.bundleURL.appendingPathComponent("SRD/monsters.json")
         do {
             let data = try Data(contentsOf: url)
             let file = try JSONDecoder().decode(SRDMonsterFile.self, from: data)

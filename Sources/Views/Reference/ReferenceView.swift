@@ -139,7 +139,8 @@ struct RefBestiaryListView: View {
 
     private func loadMonsters() {
         guard monsters.isEmpty else { return }
-        guard let url = Bundle.main.url(forResource: "monsters", withExtension: "json", subdirectory: "SRD"),
+        let url = Bundle.main.bundleURL.appendingPathComponent("SRD/monsters.json")
+        guard
               let data = try? Data(contentsOf: url),
               let wrapper = try? JSONDecoder().decode(SRDMonsterFile.self, from: data)
         else { return }
@@ -435,7 +436,8 @@ struct SpellListView: View {
     }
 
     private func loadSpells() {
-        guard let url = Bundle.main.url(forResource: "spells", withExtension: "json", subdirectory: "SRD"),
+        let url = Bundle.main.bundleURL.appendingPathComponent("SRD/spells.json")
+        guard
               let data = try? Data(contentsOf: url),
               let wrapper = try? JSONDecoder().decode(SRDSpellWrapper.self, from: data)
         else { return }
@@ -617,7 +619,8 @@ struct RefItemListView: View {
         var items: [RefDisplayItem] = []
 
         // Weapons
-        if let url = Bundle.main.url(forResource: "items", withExtension: "json", subdirectory: "SRD"),
+        let url = Bundle.main.bundleURL.appendingPathComponent("SRD/items.json")
+        if
            let data = try? Data(contentsOf: url) {
             if let wrapper = try? JSONDecoder().decode(SRDFullItemFile.self, from: data) {
                 // Weapons
@@ -684,8 +687,9 @@ struct RefItemListView: View {
         }
 
         // Magic Items
-        if let url = Bundle.main.url(forResource: "magic_items", withExtension: "json", subdirectory: "SRD"),
-           let data = try? Data(contentsOf: url),
+        let magicURL = Bundle.main.bundleURL.appendingPathComponent("SRD/magic_items.json")
+        if
+           let data = try? Data(contentsOf: magicURL),
            let wrapper = try? JSONDecoder().decode(SRDMagicItemFile.self, from: data) {
             for m in wrapper.magicItems {
                 var subtitle = m.type.capitalized
@@ -806,7 +810,8 @@ struct ConditionListView: View {
     }
 
     private func loadConditions() {
-        guard let url = Bundle.main.url(forResource: "conditions", withExtension: "json", subdirectory: "SRD"),
+        let url = Bundle.main.bundleURL.appendingPathComponent("SRD/conditions.json")
+        guard
               let data = try? Data(contentsOf: url),
               let wrapper = try? JSONDecoder().decode(SRDConditionWrapper.self, from: data)
         else { return }

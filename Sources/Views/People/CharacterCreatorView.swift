@@ -602,7 +602,8 @@ struct CharacterCreatorView: View {
     // MARK: - Data Loading
 
     private func loadRaces() {
-        guard let url = Bundle.main.url(forResource: "races", withExtension: "json", subdirectory: "SRD"),
+        let url = Bundle.main.bundleURL.appendingPathComponent("SRD/races.json")
+        guard
               let data = try? Data(contentsOf: url),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let raceArray = json["races"] as? [[String: Any]]
@@ -615,7 +616,8 @@ struct CharacterCreatorView: View {
     }
 
     private func loadClasses() {
-        guard let url = Bundle.main.url(forResource: "classes", withExtension: "json", subdirectory: "SRD"),
+        let url = Bundle.main.bundleURL.appendingPathComponent("SRD/classes.json")
+        guard
               let data = try? Data(contentsOf: url),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let classArray = json["classes"] as? [[String: Any]]

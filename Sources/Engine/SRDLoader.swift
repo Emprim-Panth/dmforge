@@ -96,9 +96,9 @@ final class SRDLoader {
     // MARK: - Private Loaders
 
     private func loadJSON(_ filename: String) -> [String: Any]? {
-        guard let url = Bundle.main.url(forResource: filename, withExtension: "json",
-                                        subdirectory: "SRD") else {
-            Self.logger.warning("File not found: SRD/\(filename).json")
+        let url = Bundle.main.bundleURL.appendingPathComponent("SRD/\(filename)")
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            Self.logger.warning("File not found: SRD/\(filename)")
             return nil
         }
         do {

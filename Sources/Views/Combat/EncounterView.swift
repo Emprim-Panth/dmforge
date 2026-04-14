@@ -650,7 +650,7 @@ struct MonsterPickerSheet: View {
     }
 
     private func loadMonsters() {
-        guard let url = Bundle.main.url(forResource: "monsters", withExtension: "json", subdirectory: "SRD") else { return }
+        let url = Bundle.main.bundleURL.appendingPathComponent("SRD/monsters.json")
         guard let data = try? Data(contentsOf: url) else { return }
         guard let wrapper = try? JSONDecoder().decode(SRDMonsterFile.self, from: data) else { return }
         allMonsters = wrapper.monsters

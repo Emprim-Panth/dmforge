@@ -373,7 +373,8 @@ struct LevelUpView: View {
     }
 
     private func loadClasses() {
-        guard let url = Bundle.main.url(forResource: "classes", withExtension: "json", subdirectory: "SRD"),
+        let url = Bundle.main.bundleURL.appendingPathComponent("SRD/classes.json")
+        guard
               let data = try? Data(contentsOf: url),
               let wrapper = try? JSONDecoder().decode(SRDClassWrapper.self, from: data)
         else { return }
